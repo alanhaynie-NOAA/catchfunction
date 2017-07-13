@@ -1,0 +1,14 @@
+Package: catchfunction
+Title: BSAI catch function
+Version: 1.0.0
+Authors@R: person("Amanda", "Faig", email = "amanda.faig@noaa.gov", role = c("aut", "cre"))
+Description: contains function which calculates catch in BSAI
+Depends:
+    R (>= 3.3.1)
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1.9000
+Imports: dplyr,
+    systemfit,
+    devtools
