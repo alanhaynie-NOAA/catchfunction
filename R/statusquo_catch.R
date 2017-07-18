@@ -57,17 +57,17 @@ statusquo_catch <- function(ABC.DATA) {
     Pred.SUR <-  predict(tac.fit[[13]], ABC.DATA)
     
     # Sablefish
-    TAC.PRED$TAC.203 <- min(Pred.SUR$sablefish.pred, ABC.DATA$ABC.203)
+    TAC.PRED$TAC.203 <- pmin(Pred.SUR$sablefish.pred, ABC.DATA$ABC.203)
     # Pollock
-    TAC.PRED$TAC.201 <- min(Pred.SUR$pollock.pred, ABC.DATA$ABC.201)
+    TAC.PRED$TAC.201 <- pmin(Pred.SUR$pollock.pred, ABC.DATA$ABC.201)
     # PCod
-    TAC.PRED$TAC.202 <- min(Pred.SUR$Pcod.pred, ABC.DATA$ABC.202)
+    TAC.PRED$TAC.202 <- pmin(Pred.SUR$Pcod.pred, ABC.DATA$ABC.202)
     # Yellowfin
-    TAC.PRED$TAC.140 <- min(Pred.SUR$yellowfin.pred, ABC.DATA$ABC.140)
+    TAC.PRED$TAC.140 <- pmin(Pred.SUR$yellowfin.pred, ABC.DATA$ABC.140)
     # Rock Sole
-    TAC.PRED$TAC.104 <- min(Pred.SUR$rocksole.pred, ABC.DATA$ABC.104)
+    TAC.PRED$TAC.104 <- pmin(Pred.SUR$rocksole.pred, ABC.DATA$ABC.104)
     # Atka
-    TAC.PRED$TAC.204 <- min(Pred.SUR$atka.pred, ABC.DATA$ABC.204)
+    TAC.PRED$TAC.204 <- pmin(Pred.SUR$atka.pred, ABC.DATA$ABC.204)
     # Squid
     TAC.PRED$TAC.50 <- Pred.SUR$squid.pred 
     # Arrowtooth
