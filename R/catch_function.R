@@ -31,6 +31,9 @@
 #' @param Squid Optional.  ABC of Squid.
 #' @param Yellowfin Optional.  ABC of Yellowfin Sole.
 #' 
+#' 
+#' @import dplyr
+#'
 #' @export
 #' 
 #' @examples 
