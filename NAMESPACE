@@ -2,3 +2,4 @@
 
 export(catch_function)
 import(dplyr)
+import(systemfit)

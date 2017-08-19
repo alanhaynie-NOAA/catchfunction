@@ -33,6 +33,7 @@
 #' 
 #' 
 #' @import dplyr
+#' @import systemfit
 #'
 #' @export
 #' 
