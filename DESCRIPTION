@@ -1,6 +1,6 @@
 Package: catchfunction
 Title: BSAI catch function
-Version: 1.0.0
+Version: 1.1.0
 Authors@R: person("Amanda", "Faig", email = "amanda.faig@noaa.gov", role = c("aut", "cre"))
 Description: contains function which calculates catch in BSAI
 Depends:
