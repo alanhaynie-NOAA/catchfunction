@@ -139,9 +139,10 @@ catch_function <- function(scenario,
     singledraw <- function(code) { 
         mu <- mean.sd %>% select(ends_with(paste(code,"mean",sep="_")))
         mu <- as.numeric(mu[1])
-        sig <- mean.sd %>% select(ends_with(paste(code,"sd",sep="_")))
-        sig <- as.numeric(sig[1])
-        draw <- round(rnorm(1,mu,sig))
+        # sig <- mean.sd %>% select(ends_with(paste(code,"sd",sep="_")))
+        # sig <- as.numeric(sig[1])
+        # draw <- round(rnorm(1,mu,sig))
+        draw <- mu
         return(draw)
     }
     

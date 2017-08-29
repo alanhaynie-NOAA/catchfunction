@@ -167,7 +167,7 @@ predict.tac.function <- function(model,fit_sur,fit_nosur,FISH.DATA){
         # Plaice
         PREDICTIONS_NOSUR$TAC.106 <- pmin(1,predict(fit_sur[[10]], FISH.DATA))*FISH.DATA$ABC.106
         
-     PREDICTIONS_NOSUR[PREDICTIONS_NOSUR<0] <- 0 #nothing negative allowed..
+        PREDICTIONS_NOSUR[PREDICTIONS_NOSUR<0] <- 0 #nothing negative allowed..
         
         PREDICTIONS_NOSUR$NETTAC <- rowSums(PREDICTIONS_NOSUR[,1:22], na.rm = TRUE)
         PREDICTIONS_NOSUR$EXCEEDS.CAP <- PREDICTIONS_NOSUR$NETTAC > 2e6
@@ -496,6 +496,7 @@ predict.catch.function <- function(model,fit_sur,fit_nosur,FISH.DATA) {
         PREDICTIONS_wSUR$CATCH.104 <- Pred.SUR.A80$rocksole.pred        
         # Plaice
         PREDICTIONS_wSUR$CATCH.106 <- predict(fit_sur[[10]], FISH.DATA)
+        
         PREDICTIONS_wSUR[PREDICTIONS_wSUR<0] <- 0 #nothing negative allowed..
 
         PREDICTIONS_wSUR$NETCATCH <- rowSums(PREDICTIONS_wSUR[,1:22], na.rm = TRUE)
@@ -562,6 +563,7 @@ predict.catch.function <- function(model,fit_sur,fit_nosur,FISH.DATA) {
         PREDICTIONS_wSUR$CATCH.104 <- predict(fit_sur[[18]], FISH.DATA)       
         # Plaice
         PREDICTIONS_wSUR$CATCH.106 <- predict(fit_sur[[10]], FISH.DATA)
+        
         PREDICTIONS_wSUR[PREDICTIONS_wSUR<0] <- 0 #nothing negative allowed..
 
         PREDICTIONS_wSUR$NETCATCH <- rowSums(PREDICTIONS_wSUR[,1:22], na.rm = TRUE)
