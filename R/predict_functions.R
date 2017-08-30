@@ -315,13 +315,20 @@ predict.tac.function <- function(model,fit_sur,fit_nosur,FISH.DATA){
     }
     
     
+## Return predictions ####
     
     if (SUR | NOROCKSOLE | FLATSUR) {
-        return(PREDICTIONS)
+        PREDICTIONS <- PREDICTIONS %>% mutate(YEAR = 1)
+        FISH.DATA <- FISH.DATA %>% mutate(YEAR = 1)
+        output <- full_join(PREDICTIONS,FISH.DATA, by = "YEAR")  %>% select(-YEAR)
+        return(output)
     }
     
     if (NOSUR) {
-        return(PREDICTIONS_NOSUR)
+        PREDICTIONS_NOSUR <- PREDICTIONS_NOSUR %>% mutate(YEAR = 1)
+        FISH.DATA <- FISH.DATA %>% mutate(YEAR = 1)
+        output <- full_join(PREDICTIONS_NOSUR,FISH.DATA, by = "YEAR")  %>% select(-YEAR)
+        return(output)
     }
 }
 
@@ -379,57 +386,57 @@ predict.catch.function <- function(model,fit_sur,fit_nosur,FISH.DATA) {
 # Make Predictions ####    
     if (NOSUR ) {
         PREDICTIONS_NOSUR <- data.frame(CATCH.60=0)   #PTAC stands for predicted TAC
-        # Octopus
-        PREDICTIONS_NOSUR$CATCH.60 <- predict(fit_nosur[[1]], FISH.DATA)
+        
+                 # Octopus
+        PREDICTIONS_wSUR$CATCH.60 <- pmin(predict(fit_sur[[1]], FISH.DATA), FISH.DATA$ABC.60)
         # Sharks
-        PREDICTIONS_NOSUR$CATCH.65 <- predict(fit_nosur[[2]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.65 <- pmin(predict(fit_sur[[2]], FISH.DATA), FISH.DATA$ABC.65)
         # Skates
-        PREDICTIONS_NOSUR$CATCH.90 <- predict(fit_nosur[[3]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.90 <- pmin(predict(fit_sur[[3]], FISH.DATA), FISH.DATA$ABC.90)
         # Sculpin
-        PREDICTIONS_NOSUR$CATCH.400 <- predict(fit_nosur[[4]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.400 <- pmin(predict(fit_sur[[4]], FISH.DATA), FISH.DATA$ABC.400)
         # Squid
-        PREDICTIONS_NOSUR$CATCH.50 <- predict(fit_nosur[[17]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.50 <- pmin(predict(fit_nosur[[17]], FISH.DATA), FISH.DATA$ABC.50)
+        
         
         # Shortraker
-        PREDICTIONS_NOSUR$CATCH.326 <- predict(fit_nosur[[21]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.326 <- pmin(predict(fit_sur[[21]], FISH.DATA), FISH.DATA$ABC.326)
         # Rougheye
-        PREDICTIONS_NOSUR$CATCH.307 <- predict(fit_nosur[[22]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.307 <- pmin(predict(fit_sur[[22]], FISH.DATA), FISH.DATA$ABC.307)
         # Other Rockfish
-        PREDICTIONS_NOSUR$CATCH.310 <- predict(fit_nosur[[8]], FISH.DATA)        
-        # Northern 
-        PREDICTIONS_NOSUR$CATCH.303 <- predict(fit_nosur[[7]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.310 <- pmin(predict(fit_sur[[8]], FISH.DATA), FISH.DATA$ABC.310)
+        # Northern
+        PREDICTIONS_wSUR$CATCH.303 <- pmin(predict(fit_sur[[7]], FISH.DATA), FISH.DATA$ABC.303)
         # POP
-        PREDICTIONS_NOSUR$CATCH.301 <- predict(fit_nosur[[6]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.301 <- pmin(predict(fit_sur[[6]], FISH.DATA), FISH.DATA$ABC.301)
         
-
         # Pollock
-        PREDICTIONS_NOSUR$CATCH.201 <- predict(fit_nosur[[12]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.201 <- pmin(predict(fit_nosur[[12]], FISH.DATA), FISH.DATA$TAC.201)
         # PCod
-        PREDICTIONS_NOSUR$CATCH.202 <- predict(fit_nosur[[13]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.202 <- pmin(predict(fit_nosur[[13]], FISH.DATA), FISH.DATA$TAC.202)
         # Sablefish
-        PREDICTIONS_NOSUR$CATCH.203 <- predict(fit_nosur[[11]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.203 <- pmin(predict(fit_nosur[[11]], FISH.DATA), FISH.DATA$TAC.203)
         # Atka
-        PREDICTIONS_NOSUR$CATCH.204 <- predict(fit_nosur[[16]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.204 <- pmin(predict(fit_nosur[[16]], FISH.DATA), FISH.DATA$TAC.204)
         
         # Yellowfin
-        PREDICTIONS_NOSUR$CATCH.140 <- predict(fit_nosur[[14]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.140 <- pmin(predict(fit_nosur[[14]], FISH.DATA), FISH.DATA$TAC.140)
         # Arrowtooth
-        PREDICTIONS_NOSUR$CATCH.141 <- predict(fit_nosur[[18]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.141 <- pmin(predict(fit_nosur[[18]], FISH.DATA), FISH.DATA$ABC.141)
         # Kamchatka
-        PREDICTIONS_NOSUR$CATCH.147 <- predict(fit_nosur[[5]], FISH.DATA)
-        
-        
+        PREDICTIONS_wSUR$CATCH.147 <- pmin(predict(fit_nosur[[5]], FISH.DATA), FISH.DATA$ABC.147)
+
         # Other Flatfish
-        PREDICTIONS_NOSUR$CATCH.100 <- predict(fit_nosur[[19]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.100 <- pmin(predict(fit_sur[[19]], FISH.DATA), FISH.DATA$ABC.100)
         # Greenland turbot
-        PREDICTIONS_NOSUR$CATCH.102 <- predict(fit_nosur[[9]], FISH.DATA)
-        # Flathead sole, 
-        PREDICTIONS_NOSUR$CATCH.103 <- predict(fit_nosur[[20]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.102 <- pmin(predict(fit_sur[[9]], FISH.DATA), FISH.DATA$ABC.102)
+        # Flathead sole,
+        PREDICTIONS_wSUR$CATCH.103 <- pmin(predict(fit_sur[[20]], FISH.DATA), FISH.DATA$ABC.103)        
         # Rock Sole
-        PREDICTIONS_NOSUR$CATCH.104 <- predict(fit_nosur[[15]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.104 <- pmin(predict(fit_nosur[[15]], FISH.DATA), FISH.DATA$ABC.104)      
         # Plaice
-        PREDICTIONS_NOSUR$CATCH.106 <- predict(fit_nosur[[10]], FISH.DATA)
-        
+        PREDICTIONS_wSUR$CATCH.106 <- pmin(predict(fit_sur[[10]], FISH.DATA), FISH.DATA$ABC.106)
+
         PREDICTIONS_NOSUR[PREDICTIONS_NOSUR<0] <- 0 #nothing negative allowed..
         
         PREDICTIONS_NOSUR$NETCATCH <- rowSums(PREDICTIONS_NOSUR[,1:22], na.rm = TRUE)
@@ -447,55 +454,56 @@ predict.catch.function <- function(model,fit_sur,fit_nosur,FISH.DATA) {
         Pred.SUR.A80 <- predict(fit_sur[[16]], FISH.DATA)
         Pred.SUR.AFA <- predict(fit_sur[[17]], FISH.DATA)
         
-        # Octopus
-        PREDICTIONS_wSUR$CATCH.60 <- predict(fit_sur[[1]], FISH.DATA)
+         # Octopus
+        PREDICTIONS_wSUR$CATCH.60 <- pmin(predict(fit_sur[[1]], FISH.DATA), FISH.DATA$ABC.60)
         # Sharks
-        PREDICTIONS_wSUR$CATCH.65 <- predict(fit_sur[[2]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.65 <- pmin(predict(fit_sur[[2]], FISH.DATA), FISH.DATA$ABC.65)
         # Skates
-        PREDICTIONS_wSUR$CATCH.90 <- predict(fit_sur[[3]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.90 <- pmin(predict(fit_sur[[3]], FISH.DATA), FISH.DATA$ABC.90)
         # Sculpin
-        PREDICTIONS_wSUR$CATCH.400 <- predict(fit_sur[[4]], FISH.DATA) 
+        PREDICTIONS_wSUR$CATCH.400 <- pmin(predict(fit_sur[[4]], FISH.DATA), FISH.DATA$ABC.400)
         # Squid
-        PREDICTIONS_wSUR$CATCH.50 <- Pred.SUR.AFA$squid.pred
+        PREDICTIONS_wSUR$CATCH.50 <- pmin(Pred.SUR.AFA$squid.pred, FISH.DATA$ABC.50)
         
         
         # Shortraker
-        PREDICTIONS_wSUR$CATCH.326 <- predict(fit_sur[[13]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.326 <- pmin(predict(fit_sur[[13]], FISH.DATA), FISH.DATA$ABC.326)
         # Rougheye
-        PREDICTIONS_wSUR$CATCH.307 <- predict(fit_sur[[14]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.307 <- pmin(predict(fit_sur[[14]], FISH.DATA), FISH.DATA$ABC.307)
         # Other Rockfish
-        PREDICTIONS_wSUR$CATCH.310 <- predict(fit_sur[[8]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.310 <- pmin(predict(fit_sur[[8]], FISH.DATA), FISH.DATA$ABC.310)
         # Northern
-        PREDICTIONS_wSUR$CATCH.303 <- predict(fit_sur[[7]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.303 <- pmin(predict(fit_sur[[7]], FISH.DATA), FISH.DATA$ABC.303)
         # POP
-        PREDICTIONS_wSUR$CATCH.301 <- predict(fit_sur[[6]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.301 <- pmin(predict(fit_sur[[6]], FISH.DATA), FISH.DATA$ABC.301)
         
         # Pollock
-        PREDICTIONS_wSUR$CATCH.201 <- Pred.SUR.AFA$pollock.pred
+        PREDICTIONS_wSUR$CATCH.201 <- pmin(Pred.SUR.AFA$pollock.pred, FISH.DATA$TAC.201)
         # PCod
-        PREDICTIONS_wSUR$CATCH.202 <- Pred.SUR.AFA$Pcod.pred
+        PREDICTIONS_wSUR$CATCH.202 <- pmin(Pred.SUR.AFA$Pcod.pred, FISH.DATA$TAC.202)
         # Sablefish
-        PREDICTIONS_wSUR$CATCH.203 <- Pred.SUR.A80$sablefish.pred
+        PREDICTIONS_wSUR$CATCH.203 <- pmin(Pred.SUR.A80$sablefish.pred, FISH.DATA$TAC.203)
         # Atka
-        PREDICTIONS_wSUR$CATCH.204 <- Pred.SUR.A80$atka.pred
+        PREDICTIONS_wSUR$CATCH.204 <- pmin(Pred.SUR.A80$atka.pred, FISH.DATA$TAC.204)
         
         # Yellowfin
-        PREDICTIONS_wSUR$CATCH.140 <- Pred.SUR.A80$yellowfin.pred
+        PREDICTIONS_wSUR$CATCH.140 <- pmin(Pred.SUR.A80$yellowfin.pred, FISH.DATA$TAC.140)
         # Arrowtooth
-        PREDICTIONS_wSUR$CATCH.141 <- predict(fit_sur[[15]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.141 <- pmin(predict(fit_sur[[15]], FISH.DATA), FISH.DATA$ABC.141)
         # Kamchatka
-        PREDICTIONS_wSUR$CATCH.147 <- predict(fit_sur[[5]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.147 <- pmin(predict(fit_sur[[5]], FISH.DATA), FISH.DATA$ABC.147)
 
         # Other Flatfish
-        PREDICTIONS_wSUR$CATCH.100 <- predict(fit_sur[[11]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.100 <- pmin(predict(fit_sur[[11]], FISH.DATA), FISH.DATA$ABC.100)
         # Greenland turbot
-        PREDICTIONS_wSUR$CATCH.102 <- predict(fit_sur[[9]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.102 <- pmin(predict(fit_sur[[9]], FISH.DATA), FISH.DATA$ABC.102)
         # Flathead sole,
-        PREDICTIONS_wSUR$CATCH.103 <- predict(fit_sur[[12]], FISH.DATA)        
+        PREDICTIONS_wSUR$CATCH.103 <- pmin(predict(fit_sur[[12]], FISH.DATA), FISH.DATA$ABC.103)        
         # Rock Sole
-        PREDICTIONS_wSUR$CATCH.104 <- Pred.SUR.A80$rocksole.pred        
+        PREDICTIONS_wSUR$CATCH.104 <- pmin(predict(Pred.SUR.A80$rocksole.pred ), FISH.DATA$ABC.104)      
         # Plaice
-        PREDICTIONS_wSUR$CATCH.106 <- predict(fit_sur[[10]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.106 <- pmin(predict(fit_sur[[10]], FISH.DATA), FISH.DATA$ABC.106)
+
         
         PREDICTIONS_wSUR[PREDICTIONS_wSUR<0] <- 0 #nothing negative allowed..
 
@@ -515,54 +523,54 @@ predict.catch.function <- function(model,fit_sur,fit_nosur,FISH.DATA) {
         Pred.SUR.AFA <- predict(fit_sur[[17]], FISH.DATA)
         
         # Octopus
-        PREDICTIONS_wSUR$CATCH.60 <- predict(fit_sur[[1]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.60 <- pmin(predict(fit_sur[[1]], FISH.DATA), FISH.DATA$ABC.60)
         # Sharks
-        PREDICTIONS_wSUR$CATCH.65 <- predict(fit_sur[[2]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.65 <- pmin(predict(fit_sur[[2]], FISH.DATA), FISH.DATA$ABC.65)
         # Skates
-        PREDICTIONS_wSUR$CATCH.90 <- predict(fit_sur[[3]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.90 <- pmin(predict(fit_sur[[3]], FISH.DATA), FISH.DATA$ABC.90)
         # Sculpin
-        PREDICTIONS_wSUR$CATCH.400 <- predict(fit_sur[[4]], FISH.DATA) 
+        PREDICTIONS_wSUR$CATCH.400 <- pmin(predict(fit_sur[[4]], FISH.DATA), FISH.DATA$ABC.400)
         # Squid
-        PREDICTIONS_wSUR$CATCH.50 <- Pred.SUR.AFA$squid.pred
+        PREDICTIONS_wSUR$CATCH.50 <- pmin(Pred.SUR.AFA$squid.pred, FISH.DATA$ABC.50)
         
         
         # Shortraker
-        PREDICTIONS_wSUR$CATCH.326 <- predict(fit_sur[[13]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.326 <- pmin(predict(fit_sur[[13]], FISH.DATA), FISH.DATA$ABC.326)
         # Rougheye
-        PREDICTIONS_wSUR$CATCH.307 <- predict(fit_sur[[14]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.307 <- pmin(predict(fit_sur[[14]], FISH.DATA), FISH.DATA$ABC.307)
         # Other Rockfish
-        PREDICTIONS_wSUR$CATCH.310 <- predict(fit_sur[[8]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.310 <- pmin(predict(fit_sur[[8]], FISH.DATA), FISH.DATA$ABC.310)
         # Northern
-        PREDICTIONS_wSUR$CATCH.303 <- predict(fit_sur[[7]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.303 <- pmin(predict(fit_sur[[7]], FISH.DATA), FISH.DATA$ABC.303)
         # POP
-        PREDICTIONS_wSUR$CATCH.301 <- predict(fit_sur[[6]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.301 <- pmin(predict(fit_sur[[6]], FISH.DATA), FISH.DATA$ABC.301)
         
         # Pollock
-        PREDICTIONS_wSUR$CATCH.201 <- Pred.SUR.AFA$pollock.pred
+        PREDICTIONS_wSUR$CATCH.201 <- pmin(Pred.SUR.AFA$pollock.pred, FISH.DATA$TAC.201)
         # PCod
-        PREDICTIONS_wSUR$CATCH.202 <- Pred.SUR.AFA$Pcod.pred
+        PREDICTIONS_wSUR$CATCH.202 <- pmin(Pred.SUR.AFA$Pcod.pred, FISH.DATA$TAC.202)
         # Sablefish
-        PREDICTIONS_wSUR$CATCH.203 <- Pred.SUR.A80$sablefish.pred
+        PREDICTIONS_wSUR$CATCH.203 <- pmin(Pred.SUR.A80$sablefish.pred, FISH.DATA$TAC.203)
         # Atka
-        PREDICTIONS_wSUR$CATCH.204 <- Pred.SUR.A80$atka.pred
+        PREDICTIONS_wSUR$CATCH.204 <- pmin(Pred.SUR.A80$atka.pred, FISH.DATA$TAC.204)
         
         # Yellowfin
-        PREDICTIONS_wSUR$CATCH.140 <- Pred.SUR.A80$yellowfin.pred
+        PREDICTIONS_wSUR$CATCH.140 <- pmin(Pred.SUR.A80$yellowfin.pred, FISH.DATA$TAC.140)
         # Arrowtooth
-        PREDICTIONS_wSUR$CATCH.141 <- predict(fit_sur[[15]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.141 <- pmin(predict(fit_sur[[15]], FISH.DATA), FISH.DATA$ABC.141)
         # Kamchatka
-        PREDICTIONS_wSUR$CATCH.147 <- predict(fit_sur[[5]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.147 <- pmin(predict(fit_sur[[5]], FISH.DATA), FISH.DATA$ABC.147)
 
         # Other Flatfish
-        PREDICTIONS_wSUR$CATCH.100 <- predict(fit_sur[[11]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.100 <- pmin(predict(fit_sur[[11]], FISH.DATA), FISH.DATA$ABC.100)
         # Greenland turbot
-        PREDICTIONS_wSUR$CATCH.102 <- predict(fit_sur[[9]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.102 <- pmin(predict(fit_sur[[9]], FISH.DATA), FISH.DATA$ABC.102)
         # Flathead sole,
-        PREDICTIONS_wSUR$CATCH.103 <- predict(fit_sur[[12]], FISH.DATA)        
+        PREDICTIONS_wSUR$CATCH.103 <- pmin(predict(fit_sur[[12]], FISH.DATA), FISH.DATA$ABC.103)        
         # Rock Sole
-        PREDICTIONS_wSUR$CATCH.104 <- predict(fit_sur[[18]], FISH.DATA)       
+        PREDICTIONS_wSUR$CATCH.104 <- pmin(predict(fit_sur[[18]], FISH.DATA), FISH.DATA$ABC.104)      
         # Plaice
-        PREDICTIONS_wSUR$CATCH.106 <- predict(fit_sur[[10]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.106 <- pmin(predict(fit_sur[[10]], FISH.DATA), FISH.DATA$ABC.106)
         
         PREDICTIONS_wSUR[PREDICTIONS_wSUR<0] <- 0 #nothing negative allowed..
 
@@ -583,55 +591,55 @@ predict.catch.function <- function(model,fit_sur,fit_nosur,FISH.DATA) {
         Pred.SUR.flat <- predict(fit_sur[[15]], FISH.DATA)
         
         # Octopus
-        PREDICTIONS_wSUR$CATCH.60 <- predict(fit_sur[[1]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.60 <- pmin(predict(fit_sur[[1]], FISH.DATA), FISH.DATA$ABC.60)
         # Sharks
-        PREDICTIONS_wSUR$CATCH.65 <- predict(fit_sur[[2]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.65 <- pmin(predict(fit_sur[[2]], FISH.DATA), FISH.DATA$ABC.65)
         # Skates
-        PREDICTIONS_wSUR$CATCH.90 <- predict(fit_sur[[3]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.90 <- pmin(predict(fit_sur[[3]], FISH.DATA), FISH.DATA$ABC.90)
         # Sculpin
-        PREDICTIONS_wSUR$CATCH.400 <- predict(fit_sur[[4]], FISH.DATA) 
+        PREDICTIONS_wSUR$CATCH.400 <- pmin(predict(fit_sur[[4]], FISH.DATA), FISH.DATA$ABC.400)
         # Squid
-        PREDICTIONS_wSUR$CATCH.50 <- Pred.SUR.AFA$squid.pred
+        PREDICTIONS_wSUR$CATCH.50 <- pmin(Pred.SUR.AFA$squid.pred, FISH.DATA$ABC.50)
         
         
-        # Shortraker
-        PREDICTIONS_wSUR$CATCH.326 <- predict(fit_sur[[12]], FISH.DATA)
+         # Shortraker
+        PREDICTIONS_wSUR$CATCH.326 <- pmin(predict(fit_sur[[12]], FISH.DATA), FISH.DATA$ABC.326)
         # Rougheye
-        PREDICTIONS_wSUR$CATCH.307 <- predict(fit_sur[[8]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.307 <- pmin(predict(fit_sur[[8]], FISH.DATA), FISH.DATA$ABC.307)
         # Other Rockfish
-        PREDICTIONS_wSUR$CATCH.310 <- predict(fit_sur[[11]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.310 <- pmin(predict(fit_sur[[11]], FISH.DATA), FISH.DATA$ABC.310)
         # Northern
-        PREDICTIONS_wSUR$CATCH.303 <- predict(fit_sur[[9]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.303 <- pmin(predict(fit_sur[[9]], FISH.DATA), FISH.DATA$ABC.303)
         # POP
-        PREDICTIONS_wSUR$CATCH.301 <- predict(fit_sur[[10]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.301 <- pmin(predict(fit_sur[[10]], FISH.DATA), FISH.DATA$ABC.301)
         
         # Pollock
-        PREDICTIONS_wSUR$CATCH.201 <- Pred.SUR.AFA$pollock.pred
+        PREDICTIONS_wSUR$CATCH.201 <- pmin(Pred.SUR.AFA$pollock.pred, FISH.DATA$TAC.201)
         # PCod
-        PREDICTIONS_wSUR$CATCH.202 <- Pred.SUR.AFA$Pcod.pred
+        PREDICTIONS_wSUR$CATCH.202 <- pmin(Pred.SUR.AFA$Pcod.pred, FISH.DATA$TAC.202)
         # Sablefish
-        PREDICTIONS_wSUR$CATCH.203 <- Pred.SUR.A80$sablefish.pred
+        PREDICTIONS_wSUR$CATCH.203 <- pmin(Pred.SUR.A80$sablefish.pred, FISH.DATA$TAC.203)
         # Atka
-        PREDICTIONS_wSUR$CATCH.204 <- Pred.SUR.A80$atka.pred
+        PREDICTIONS_wSUR$CATCH.204 <- pmin(Pred.SUR.A80$atka.pred, FISH.DATA$TAC.204)
         
         # Yellowfin
-        PREDICTIONS_wSUR$CATCH.140 <- Pred.SUR.A80$yellowfin.pred
+        PREDICTIONS_wSUR$CATCH.140 <- pmin(Pred.SUR.A80$yellowfin.pred, FISH.DATA$TAC.140)
         # Arrowtooth
-        PREDICTIONS_wSUR$CATCH.141 <- Pred.SUR.flat$arrowtooth.pred  
+        PREDICTIONS_wSUR$CATCH.141 <- pmin(Pred.SUR.flat$arrowtooth.pred, FISH.DATA$ABC.141)
         # Kamchatka
-        PREDICTIONS_wSUR$CATCH.147 <- predict(fit_sur[[5]], FISH.DATA)
+        PREDICTIONS_wSUR$CATCH.147 <- pmin(predict(fit_sur[[5]], FISH.DATA), FISH.DATA$ABC.147)
 
         # Other Flatfish
-        PREDICTIONS_wSUR$CATCH.100 <- Pred.SUR.flat$Oflat.pred  
+        PREDICTIONS_wSUR$CATCH.100 <- pmin(Pred.SUR.flat$Oflat.pred , FISH.DATA$ABC.100)
         # Greenland turbot
-        PREDICTIONS_wSUR$CATCH.102 <- Pred.SUR.flat$Greenland.pred      
+        PREDICTIONS_wSUR$CATCH.102 <- pmin(Pred.SUR.flat$Greenland.pred , FISH.DATA$ABC.102)
         # Flathead sole,
-        PREDICTIONS_wSUR$CATCH.103 <- predict(fit_sur[[7]], FISH.DATA)        
+        PREDICTIONS_wSUR$CATCH.103 <- pmin(predict(fit_sur[[7]], FISH.DATA), FISH.DATA$ABC.103)        
         # Rock Sole
-        PREDICTIONS_wSUR$CATCH.104 <- Pred.SUR.flat$rocksole.pred        
+        PREDICTIONS_wSUR$CATCH.104 <- pmin(Pred.SUR.flat$rocksole.pred, FISH.DATA$ABC.104)      
         # Plaice
-        PREDICTIONS_wSUR$CATCH.106 <- predict(fit_sur[[6]], FISH.DATA)
-        
+        PREDICTIONS_wSUR$CATCH.106 <- pmin(predict(fit_sur[[6]], FISH.DATA), FISH.DATA$ABC.106)
+
         PREDICTIONS_wSUR[PREDICTIONS_wSUR<0] <- 0 #nothing negative allowed..
 
         PREDICTIONS_wSUR$NETCATCH <- rowSums(PREDICTIONS_wSUR[,1:22], na.rm = TRUE)
