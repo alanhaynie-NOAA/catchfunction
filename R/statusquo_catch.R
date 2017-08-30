@@ -12,84 +12,22 @@ statusquo_catch <- function(ABC.DATA) {
         mutate(kamsplit = 1) #%>% filter(YEAR == 2016)
     
   ## SURSUR and SUROLS
-   TAC.PRED.SUR <- predict.tac.function(model="SUR",fit_sur=tac_fit_sur,fit_nosur=tac_fit_nosur,ABC.DATA)
-        
-        # Add some indicators to the data for catch portion
-        
-        # TAC.PRED.SUR <- TAC.PRED.SUR %>%
-        #     mutate(flex = 1) %>% # introduction of flatfish flex
-        #     mutate(A80 = 1) %>%  # introduction of A80
-        #     mutate(pollock.UB = as.numeric(TAC.201 >= 1.25e6 & A80 == 1) + as.numeric(TAC.201 >= 1.4e6 & A80==0)) %>% # consider a single UB?
-        #     mutate(SSL = 1)%>% # stellar sea lion closure
-        #     mutate(solegone = 1) %>%
-        #     mutate(plaicegone = 1) %>%
-        #     mutate(kamsplit = 1) #%>% filter(YEAR == 2016)
-        # 
-   
-    ABC.DATA <- ABC.DATA %>% mutate(YEAR = 1)
-    TAC.PRED.SUR <- TAC.PRED.SUR %>% mutate(YEAR = 1)
-    TAC.PRED.SUR <- full_join(ABC.DATA, TAC.PRED.SUR, by = "YEAR") %>% select(-YEAR)
-   
+    TAC.PRED.SUR <- predict.tac.function(model="SUR",fit_sur=tac_fit_sur,fit_nosur=tac_fit_nosur,ABC.DATA)
     CATCH.SURSUR <- predict.catch.function(model="SUR",fit_sur=catch_fit_sur,fit_nosur=catch_fit_nosur,TAC.PRED.SUR)
-    
     CATCH.SURNOSUR <- predict.catch.function(model="NOSUR",fit_sur=catch_fit_sur,fit_nosur=catch_fit_nosur,TAC.PRED.SUR)
     
     # Rock sole not in SUR
      TAC.NOROCKSOLE <- predict.tac.function(model="NOROCKSOLE",fit_sur=tac_NOROCKSOLE_sur,fit_nosur=tac_fit_nosur,ABC.DATA)
-        
-        # Add some indicators to the data for catch portion
-        
-        # TAC.NOROCKSOLE <- TAC.NOROCKSOLE %>%
-        #     mutate(flex = 1) %>% # introduction of flatfish flex
-        #     mutate(A80 = 1) %>%  # introduction of A80
-        #     mutate(pollock.UB = as.numeric(TAC.201 >= 1.25e6 & A80 == 1) + as.numeric(TAC.201 >= 1.4e6 & A80==0)) %>% # consider a single UB?
-        #     mutate(SSL = 1)%>% # stellar sea lion closure
-        #     mutate(solegone = 1) %>%
-        #     mutate(plaicegone = 1) %>%
-        #     mutate(kamsplit = 1) #%>% filter(YEAR == 2016)
-     
-        TAC.NOROCKSOLE <- TAC.NOROCKSOLE %>% mutate(YEAR = 1)
-        TAC.NOROCKSOLE <- full_join(ABC.DATA, TAC.NOROCKSOLE, by = "YEAR") %>% select(-YEAR)
-     
-        CATCH.NOROCKSOLE <- predict.catch.function(model="NOROCKSOLE",fit_sur=catch_NOROCKSOLE_sur,fit_nosur=catch_fit_nosur,TAC.NOROCKSOLE)
+     CATCH.NOROCKSOLE <- predict.catch.function(model="NOROCKSOLE",fit_sur=catch_NOROCKSOLE_sur,fit_nosur=catch_fit_nosur,TAC.NOROCKSOLE)
 
     # Flatfish has own SUR
     TAC.FLATSUR <- predict.tac.function(model="FLATSUR",fit_sur=tac_FLATSUR_sur,fit_nosur=tac_fit_nosur,ABC.DATA)
-        # Add some indicators to the data for catch portion
-        
-        # TAC.FLATSUR <- TAC.FLATSUR %>%
-        #     mutate(flex = 1) %>% # introduction of flatfish flex
-        #     mutate(A80 = 1) %>%  # introduction of A80
-        #     mutate(pollock.UB = as.numeric(TAC.201 >= 1.25e6 & A80 == 1) + as.numeric(TAC.201 >= 1.4e6 & A80==0)) %>% # consider a single UB?
-        #     mutate(SSL = 1)%>% # stellar sea lion closure
-        #     mutate(solegone = 1) %>%
-        #     mutate(plaicegone = 1) %>%
-        #     mutate(kamsplit = 1) #%>% filter(YEAR == 2016)
-    
-        TAC.FLATSUR <- TAC.FLATSUR %>% mutate(YEAR = 1)
-        TAC.FLATSUR <- full_join(ABC.DATA, TAC.FLATSUR, by = "YEAR") %>% select(-YEAR)
-    
-        CATCH.FLATSUR <- predict.catch.function(model="FLATSUR",fit_sur=catch_FLATSUR_sur,fit_nosur=catch_fit_nosur,TAC.FLATSUR)
+    CATCH.FLATSUR <- predict.catch.function(model="FLATSUR",fit_sur=catch_FLATSUR_sur,fit_nosur=catch_fit_nosur,TAC.FLATSUR)
 
     # No First Year Data SURSUR and SUROLS
     TAC.NOFIRSTYEAR  <- predict.tac.function(model="SUR",fit_sur=tac_NOFIRSTYEAR_sur,fit_nosur=tac_fit_nosur,ABC.DATA)
-        
-        # Add some indicators to the data for catch portion
-        
-        # TAC.NOFIRSTYEAR <- TAC.NOFIRSTYEAR %>%
-        #     mutate(flex = 1) %>% # introduction of flatfish flex
-        #     mutate(A80 = 1) %>%  # introduction of A80
-        #     mutate(pollock.UB = as.numeric(TAC.201 >= 1.25e6 & A80 == 1) + as.numeric(TAC.201 >= 1.4e6 & A80==0)) %>% # consider a single UB?
-        #     mutate(SSL = 1)%>% # stellar sea lion closure
-        #     mutate(solegone = 1) %>%
-        #     mutate(plaicegone = 1) %>%
-        #     mutate(kamsplit = 1) #%>% filter(YEAR == 2016))) 
-        
-        TAC.NOFIRSTYEAR <- TAC.NOFIRSTYEAR %>% mutate(YEAR = 1)
-        TAC.NOFIRSTYEAR <- full_join(ABC.DATA, TAC.NOFIRSTYEAR, by = "YEAR") %>% select(-YEAR)
-     
-        CATCH.NOFIRSTYEAR.SURSUR <- predict.catch.function(model="SUR",fit_sur=catch_NOFIRSTYEAR_sur,fit_nosur = catch_NOFIRSTYEAR_nosur,TAC.NOFIRSTYEAR )
-        CATCH.NOFIRSTYEAR.SURNOSUR <- predict.catch.function(model="NOSUR",fit_sur=catch_NOFIRSTYEAR_sur,fit_nosur = catch_NOFIRSTYEAR_nosur,TAC.NOFIRSTYEAR )
+    CATCH.NOFIRSTYEAR.SURSUR <- predict.catch.function(model="SUR",fit_sur=catch_NOFIRSTYEAR_sur,fit_nosur = catch_NOFIRSTYEAR_nosur,TAC.NOFIRSTYEAR )
+    CATCH.NOFIRSTYEAR.SURNOSUR <- predict.catch.function(model="NOSUR",fit_sur=catch_NOFIRSTYEAR_sur,fit_nosur = catch_NOFIRSTYEAR_nosur,TAC.NOFIRSTYEAR )
         
         
     # create ensemble
