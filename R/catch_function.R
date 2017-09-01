@@ -159,6 +159,7 @@ catch_function <- function(scenario,
             ABC.DATA$ABC <- eval(parse(text = sppnames[i]))
         }
         colnames(ABC.DATA)[i] <- paste("ABC",allspp[i],sep=".")
+        if (allspp[i] == 307) {ABC.DATA$ABC.307 <- 390} # 2004 was an outlier that should be removed, but changing the built in data right now is more likely to lead to glitches.  Fix up later.
         }
     
     ABC.DATA$ABC.50 <- 1970
