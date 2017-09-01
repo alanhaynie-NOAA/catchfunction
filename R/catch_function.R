@@ -161,7 +161,7 @@ catch_function <- function(scenario,
         colnames(ABC.DATA)[i] <- paste("ABC",allspp[i],sep=".")
         }
     
-    ABC.DATA$ABC.50 <- 5184
+    ABC.DATA$ABC.50 <- 1970
         
     ## Second, pass ABCs to status quo function to get catch
     
