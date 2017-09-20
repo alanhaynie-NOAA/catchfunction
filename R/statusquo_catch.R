@@ -2,29 +2,23 @@ statusquo_catch <- function(ABC.DATA) {
     ABC.DATA <- ABC.DATA %>%
         mutate(flex = 1) %>% # introduction of flatfish flex
         mutate(A80 = 1) %>%  # introduction of A80
-        mutate(sablefish.over.6k = as.numeric(ABC.203>6e3)) %>%  # sablefish upper bound
-        mutate(pcod.over.280k = as.numeric(ABC.202 >= 28e4)) %>% # pcod upper bound
-        mutate(pollock.UB = as.numeric(ABC.201 >= 1.25e6 & A80 == 1) + as.numeric(ABC.201 >= 1.4e6 & A80==0)) %>% # consider a single UB?
-        mutate(pollock.ABC = (1-pollock.UB)*ABC.201) %>% # Pollock ABC when not at UB
+        mutate(sablefish.ai.over.3k = as.numeric(ABC.AI.203>3e3)) %>%  # sablefish upper bound
+        mutate(pcod.over.280k = as.numeric(ABC.BSAI.202 >= 28e4)) %>% # pcod upper bound
+        mutate(pollock.bs.UB = as.numeric(ABC.BS.201 > 1.2e6 & A80 == 1) + as.numeric(ABC.BS.201 > 1.33e6 & A80==0)) %>% # consider a single UB?
+        mutate(pollock.bs.ABC = (1-pollock.bs.UB)*ABC.BS.201) %>% # Pollock ABC when not at UB
         mutate(SSL = 1)%>% # stellar sea lion closure
         mutate(solegone = 1) %>%
         mutate(plaicegone = 1) %>%
-        mutate(kamsplit = 1) #%>% filter(YEAR == 2016)
+        mutate(AFA = 1) %>%
+        mutate(kamsplit = 1) %>%
+        mutate(pollockAIchange = 1) #%>% filter(YEAR == 2016)
     
   ## SURSUR and SUROLS
     TAC.PRED.SUR <- predict.tac.function(model="SUR",fit_sur=tac_fit_sur,fit_nosur=tac_fit_nosur,ABC.DATA)
     CATCH.SURSUR <- predict.catch.function(model="SUR",fit_sur=catch_fit_sur,fit_nosur=catch_fit_nosur,TAC.PRED.SUR)
     CATCH.SURNOSUR <- predict.catch.function(model="NOSUR",fit_sur=catch_fit_sur,fit_nosur=catch_fit_nosur,TAC.PRED.SUR)
     
-    # Rock sole not in SUR
-     TAC.NOROCKSOLE <- predict.tac.function(model="NOROCKSOLE",fit_sur=tac_NOROCKSOLE_sur,fit_nosur=tac_fit_nosur,ABC.DATA)
-     CATCH.NOROCKSOLE <- predict.catch.function(model="NOROCKSOLE",fit_sur=catch_NOROCKSOLE_sur,fit_nosur=catch_fit_nosur,TAC.NOROCKSOLE)
-
-    # Flatfish has own SUR
-    TAC.FLATSUR <- predict.tac.function(model="FLATSUR",fit_sur=tac_FLATSUR_sur,fit_nosur=tac_fit_nosur,ABC.DATA)
-    CATCH.FLATSUR <- predict.catch.function(model="FLATSUR",fit_sur=catch_FLATSUR_sur,fit_nosur=catch_fit_nosur,TAC.FLATSUR)
-
-    # No First Year Data SURSUR and SUROLS
+ # No First Year Data SURSUR and SUROLS
     TAC.NOFIRSTYEAR  <- predict.tac.function(model="SUR",fit_sur=tac_NOFIRSTYEAR_sur,fit_nosur=tac_fit_nosur,ABC.DATA)
     CATCH.NOFIRSTYEAR.SURSUR <- predict.catch.function(model="SUR",fit_sur=catch_NOFIRSTYEAR_sur,fit_nosur = catch_NOFIRSTYEAR_nosur,TAC.NOFIRSTYEAR )
     CATCH.NOFIRSTYEAR.SURNOSUR <- predict.catch.function(model="NOSUR",fit_sur=catch_NOFIRSTYEAR_sur,fit_nosur = catch_NOFIRSTYEAR_nosur,TAC.NOFIRSTYEAR )
@@ -32,30 +26,29 @@ statusquo_catch <- function(ABC.DATA) {
         
     # create ensemble
     # 
-    CATCH.PRED <-  (CATCH.SURSUR + CATCH.SURNOSUR + CATCH.NOROCKSOLE + CATCH.FLATSUR + CATCH.NOFIRSTYEAR.SURNOSUR + CATCH.NOFIRSTYEAR.SURSUR)/6
+    CATCH.PRED <-  (CATCH.SURSUR + CATCH.SURNOSUR + CATCH.NOFIRSTYEAR.SURNOSUR + CATCH.NOFIRSTYEAR.SURSUR)/4
     
-    
-    output <- CATCH.PRED[c("CATCH.141",
-                           "CATCH.204",
-                           "CATCH.103",
-                           "CATCH.102",
-                           "CATCH.147",
-                           "CATCH.303",
-                           "CATCH.60",
-                           "CATCH.100",
-                           "CATCH.310",
-                           "CATCH.202",
-                           "CATCH.106",
-                           "CATCH.301",
-                           "CATCH.201",
-                           "CATCH.104",
-                           "CATCH.307",
-                           "CATCH.203",
-                           "CATCH.400",
-                           "CATCH.65",
-                           "CATCH.326",
-                           "CATCH.90",
-                           "CATCH.50",
-                           "CATCH.140")]
+    output <- CATCH.PRED[c("CATCH.BS.141",
+                           "CATCH.BS.204",
+                           "CATCH.BS.103",
+                           "CATCH.BS.102",
+                           "CATCH.BS.147",
+                           "CATCH.BS.303",
+                           "CATCH.BS.60",
+                           "CATCH.BS.100",
+                           "CATCH.BS.310",
+                           "CATCH.BS.202",
+                           "CATCH.BS.106",
+                           "CATCH.BS.301",
+                           "CATCH.BS.201",
+                           "CATCH.BS.104",
+                           "CATCH.BS.307",
+                           "CATCH.BS.203",
+                           "CATCH.BS.400",
+                           "CATCH.BS.65",
+                           "CATCH.BS.326",
+                           "CATCH.BS.90",
+                           "CATCH.BS.50",
+                           "CATCH.BS.140")]
     return (output)
 }

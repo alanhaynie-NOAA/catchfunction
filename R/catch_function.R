@@ -134,36 +134,62 @@ catch_function <- function(scenario,
                   missing(Squid), 
                   missing(Yellowfin))
     
-    mean.sd <- ABC_meansd
-    
-    singledraw <- function(code) { 
-        mu <- mean.sd %>% select(ends_with(paste(code,"mean",sep="_")))
-        mu <- as.numeric(mu[1])
-        # sig <- mean.sd %>% select(ends_with(paste(code,"sd",sep="_")))
-        # sig <- as.numeric(sig[1])
-        # draw <- round(rnorm(1,mu,sig))
-        # 
-        draw <- mu
-        return(draw)
-    }
+    # mean.sd <- ABC_means
+    # 
+    # singledraw <- function(code) { 
+    #     mu <- mean.sd %>% select(ends_with(paste(code,"mean",sep="_")))
+    #     mu <- as.numeric(mu[1])
+    #     # sig <- mean.sd %>% select(ends_with(paste(code,"sd",sep="_")))
+    #     # sig <- as.numeric(sig[1])
+    #     # draw <- round(rnorm(1,mu,sig))
+    #     # 
+    #     draw <- mu
+    #     return(draw)
+    # }
     
     ## First, create a data frame of all the ABCs. Draw unspecified species from 
     ## stationary distributions
     
-    ABC.DATA <- data.frame(ABC = NA)
+    # ABC.DATA <- data.frame(ABC.BS.141 = NA)
+    # 
+    # for (i in 1:22) {
+    #     if (missingspp[i]) {
+    #         ABC.DATA$ABC <- singledraw(allspp[i])
+    #     } else {
+    #         ABC.DATA$ABC <- eval(parse(text = sppnames[i]))
+    #     }
+    #     colnames(ABC.DATA)[i] <- paste("ABC",allspp[i],sep=".")
+    #     if (allspp[i] == 307) {ABC.DATA$ABC.307 <- 390} # 2004 was an outlier that should be removed, but changing the built in data right now is more likely to lead to glitches.  Fix up later.
+    #     }
+    #     
+    ABC.DATA <- mean.BS.AI.ABCs
 
     for (i in 1:22) {
-        if (missingspp[i]) {
-            ABC.DATA$ABC <- singledraw(allspp[i])
-        } else {
-            ABC.DATA$ABC <- eval(parse(text = sppnames[i]))
+        if (!missingspp[i]) {
+            eval(parse(text = paste("ABC.DATA$ABC.BS.",allspp[i],"<-",sppnames[i],sep="")))
         }
-        colnames(ABC.DATA)[i] <- paste("ABC",allspp[i],sep=".")
-        if (allspp[i] == 307) {ABC.DATA$ABC.307 <- 390} # 2004 was an outlier that should be removed, but changing the built in data right now is more likely to lead to glitches.  Fix up later.
-        }
+    }
     
-    ABC.DATA$ABC.50 <- 1970
-        
+    ## Create BSAI where necessary
+    ABC.DATA <- ABC.DATA %>%
+        mutate(ABC.BSAI.100 = ABC.BS.100 + ABC.AI.100) %>%
+        mutate(ABC.BSAI.103 = ABC.BS.103 + ABC.AI.103) %>%
+        mutate(ABC.BSAI.104 = ABC.BS.104 + ABC.AI.104) %>%
+        mutate(ABC.BSAI.106 = ABC.BS.106 + ABC.AI.106) %>%
+        mutate(ABC.BSAI.140 = ABC.BS.140 + ABC.AI.140) %>%
+        mutate(ABC.BSAI.141 = ABC.BS.141 + ABC.AI.141) %>%
+        mutate(ABC.BSAI.147 = ABC.BS.147 + ABC.AI.147) %>%
+        mutate(ABC.BSAI.204 = ABC.BS.204 + ABC.AI.204) %>%
+        mutate(ABC.BSAI.303 = ABC.BS.303 + ABC.AI.303) %>%
+        mutate(ABC.BSAI.307 = ABC.BS.307 + ABC.AI.307) %>%
+        mutate(ABC.BSAI.326 = ABC.BS.326 + ABC.AI.326) %>%
+        mutate(ABC.BSAI.400 = ABC.BS.400 + ABC.AI.400) %>%
+        mutate(ABC.BSAI.50 = ABC.BS.50 + ABC.AI.50) %>%
+        mutate(ABC.BSAI.60 = ABC.BS.60 + ABC.AI.60) %>%
+        mutate(ABC.BSAI.65 = ABC.BS.65 + ABC.AI.65) %>%
+        mutate(ABC.BSAI.90 = ABC.BS.90 + ABC.AI.90) %>%
+        mutate(ABC.BSAI.202 = ABC.BS.202 + ABC.AI.202) 
+
     ## Second, pass ABCs to status quo function to get catch
     
     if (scenario == 1) {
