@@ -111,14 +111,18 @@ predict.tac.function <- function(model,fit_sur,fit_nosur,FISH.DATA){
         
         PREDICTIONS[PREDICTIONS<0] <- 0 #nothing negative allowed..
 
-        # Rest [ The rest of the species are very connected, and were estimated using
    
-        PREDICTIONS$NETTAC <- rowSums(PREDICTIONS[,1:22], na.rm = TRUE)
-        PREDICTIONS$EXCEEDS.CAP <- PREDICTIONS$NETTAC > 2e6
-        PREDICTIONS$SURPLUS <- as.numeric(PREDICTIONS$NETTAC > 2e6)*(PREDICTIONS$NETTAC - 2e6)
-        # If prediction exceeds cap, trim down pollock and yellowfin, 50/50
-        PREDICTIONS$TAC.BS.201 <- PREDICTIONS$TAC.BS.201 - PREDICTIONS$SURPLUS*0.5
-        PREDICTIONS$TAC.BSAI.140 <- PREDICTIONS$TAC.BSAI.140 - PREDICTIONS$SURPLUS*0.5
+         NETTAC <- rowSums(PREDICTIONS, na.rm = TRUE)
+         SURPLUS <- as.numeric(NETTAC > 2e6)*(NETTAC - 2e6)
+         PREDICTIONS <- sort(PREDICTIONS, decreasing = T)
+         # If prediction exceeds cap, trim down pollock and yellowfin, 50/50
+         TEMP <- PREDICTIONS/NETTAC
+         TOTALRAT <- sum(TEMP[1:3])
+         TEMP[1:3] <- TEMP[1:3]/TOTALRAT 
+         TEMP[4:27] <- 0
+         PREDICTIONS <- PREDICTIONS - SURPLUS*TEMP
+        # PREDICTIONS$TAC.BS.201 <- PREDICTIONS$TAC.BS.201 - PREDICTIONS$SURPLUS*0.5
+         #PREDICTIONS$TAC.BSAI.140 <- PREDICTIONS$TAC.BSAI.140 - PREDICTIONS$SURPLUS*0.5
     }
     
     if (NOSUR) { 
@@ -181,13 +185,22 @@ predict.tac.function <- function(model,fit_sur,fit_nosur,FISH.DATA){
         
         PREDICTIONS_NOSUR[PREDICTIONS_NOSUR<0] <- 0 #nothing negative allowed..
         
+         NETTAC <- rowSums(PREDICTIONS_NOSUR, na.rm = TRUE)
+         SURPLUS <- as.numeric(NETTAC > 2e6)*(NETTAC - 2e6)
+         PREDICTIONS_NOSUR <- sort(PREDICTIONS_NOSUR, decreasing = T)
+         # If prediction exceeds cap, trim down pollock and yellowfin, 50/50
+         TEMP <- PREDICTIONS_NOSUR/NETTAC
+         TOTALRAT <- sum(TEMP[1:3])
+         TEMP[1:3] <- TEMP[1:3]/TOTALRAT 
+         TEMP[4:27] <- 0
+         PREDICTIONS_NOSUR <- PREDICTIONS_NOSUR - SURPLUS*TEMP
         
-        PREDICTIONS_NOSUR$NETTAC <- rowSums(PREDICTIONS_NOSUR[,1:22], na.rm = TRUE)
-        PREDICTIONS_NOSUR$EXCEEDS.CAP <- PREDICTIONS_NOSUR$NETTAC > 2e6
-        PREDICTIONS_NOSUR$SURPLUS <- as.numeric(PREDICTIONS_NOSUR$NETTAC > 2e6)*(PREDICTIONS_NOSUR$NETTAC - 2e6)
-        # If prediction exceeds cap, trim down pollock and yellowfin, 50/50
-        PREDICTIONS_NOSUR$TAC.BS.201 <- PREDICTIONS_NOSUR$TAC.BS.201 - PREDICTIONS_NOSUR$SURPLUS*0.5
-        PREDICTIONS_NOSUR$TAC.BSAI.140 <- PREDICTIONS_NOSUR$TAC.BSAI.140 - PREDICTIONS_NOSUR$SURPLUS*0.5
+        # PREDICTIONS_NOSUR$NETTAC <- rowSums(PREDICTIONS_NOSUR[,1:22], na.rm = TRUE)
+        # PREDICTIONS_NOSUR$EXCEEDS.CAP <- PREDICTIONS_NOSUR$NETTAC > 2e6
+        # PREDICTIONS_NOSUR$SURPLUS <- as.numeric(PREDICTIONS_NOSUR$NETTAC > 2e6)*(PREDICTIONS_NOSUR$NETTAC - 2e6)
+        # # If prediction exceeds cap, trim down pollock and yellowfin, 50/50
+        # PREDICTIONS_NOSUR$TAC.BS.201 <- PREDICTIONS_NOSUR$TAC.BS.201 - PREDICTIONS_NOSUR$SURPLUS*0.5
+        # PREDICTIONS_NOSUR$TAC.BSAI.140 <- PREDICTIONS_NOSUR$TAC.BSAI.140 - PREDICTIONS_NOSUR$SURPLUS*0.5
     }
     
 
@@ -196,9 +209,10 @@ predict.tac.function <- function(model,fit_sur,fit_nosur,FISH.DATA){
 ## Return predictions ####
     
     if (SUR) {
-        PREDICTIONS <- PREDICTIONS %>% mutate(YEAR = 1)
+       PREDICTIONS <- PREDICTIONS %>% mutate(YEAR = 1)
         FISH.DATA <- FISH.DATA %>% mutate(YEAR = 1)
         output <- full_join(PREDICTIONS,FISH.DATA, by = "YEAR")  %>% select(-YEAR)
+       # output <- PREDICTIONS
         return(output)
     }
     
@@ -338,13 +352,15 @@ predict.catch.function <- function(model,fit_sur,fit_nosur,FISH.DATA) {
         
         PREDICTIONS_NOSUR[PREDICTIONS_NOSUR<0] <- 0 #nothing negative allowed..
         
-        PREDICTIONS_NOSUR$NETCATCH <- rowSums(PREDICTIONS_NOSUR[,2:23], na.rm = TRUE)
-        PREDICTIONS_NOSUR$EXCEEDS.CAP <- PREDICTIONS_NOSUR$NETCATCH > 2e6
-        PREDICTIONS_NOSUR$SURPLUS <- as.numeric(PREDICTIONS_NOSUR$NETCATCH > 2e6)*(PREDICTIONS_NOSUR$NETCATCH - 2e6)
-        # If prediction exceeds cap, trim down pollock and yellowfin, 50/50
-        PREDICTIONS_NOSUR$CATCH.BS.201 <- PREDICTIONS_NOSUR$CATCH.BS.201 - PREDICTIONS_NOSUR$SURPLUS*0.5
-        PREDICTIONS_NOSUR$CATCH.BS.140 <- PREDICTIONS_NOSUR$CATCH.BS.140 - PREDICTIONS_NOSUR$SURPLUS*0.5 
-        
+         NETTAC <- rowSums(PREDICTIONS_NOSUR, na.rm = TRUE)
+         SURPLUS <- as.numeric(NETTAC > 2e6)*(NETTAC - 2e6)
+         PREDICTIONS_NOSUR <- sort(PREDICTIONS_NOSUR, decreasing = T)
+         # If prediction exceeds cap, trim down pollock and yellowfin, 50/50
+         TEMP <- PREDICTIONS_NOSUR/NETTAC
+         TOTALRAT <- sum(TEMP[1:3])
+         TEMP[1:3] <- TEMP[1:3]/TOTALRAT 
+         TEMP[4:27] <- 0
+         PREDICTIONS_NOSUR <- PREDICTIONS_NOSUR - SURPLUS*TEMP
         
     }  
     if (SUR) {
@@ -427,13 +443,16 @@ predict.catch.function <- function(model,fit_sur,fit_nosur,FISH.DATA) {
         PREDICTIONS_wSUR[PREDICTIONS_wSUR<0] <- 0 #nothing negative allowed..
         
         
-        PREDICTIONS_wSUR$NETCATCH <- rowSums(PREDICTIONS_wSUR[,2:23], na.rm = TRUE)
-        PREDICTIONS_wSUR$EXCEEDS.CAP <- PREDICTIONS_wSUR$NETCATCH > 2e6
-        PREDICTIONS_wSUR$SURPLUS <- as.numeric(PREDICTIONS_wSUR$NETCATCH > 2e6)*(PREDICTIONS_wSUR$NETCATCH - 2e6)
-        # If prediction exceeds cap, trim down pollock and yellowfin, 50/50
-        PREDICTIONS_wSUR$CATCH.BS.201 <- PREDICTIONS_wSUR$CATCH.BS.201 - PREDICTIONS_wSUR$SURPLUS*0.5
-        PREDICTIONS_wSUR$CATCH.BS.140 <- PREDICTIONS_wSUR$CATCH.BS.140 - PREDICTIONS_wSUR$SURPLUS*0.5
-        
+         NETTAC <- rowSums(PREDICTIONS_wSUR, na.rm = TRUE)
+         SURPLUS <- as.numeric(NETTAC > 2e6)*(NETTAC - 2e6)
+         PREDICTIONS_wSUR <- sort(PREDICTIONS_wSUR, decreasing = T)
+         # If prediction exceeds cap, trim down pollock and yellowfin, 50/50
+         TEMP <- PREDICTIONS_wSUR/NETTAC
+         TOTALRAT <- sum(TEMP[1:3])
+         TEMP[1:3] <- TEMP[1:3]/TOTALRAT
+         TEMP[4:27] <- 0
+         PREDICTIONS_wSUR <- PREDICTIONS_wSUR - SURPLUS*TEMP
+
     }
 
    

@@ -193,24 +193,22 @@ catch_function <- function(scenario,
     ## Second, pass ABCs to status quo function to get catch
     
     if (scenario == 1) {
-        print("Scenario 1: Status Quo")
-        
-        
         catch <- statusquo_catch(ABC.DATA)
         
     } else if (scenario == 2) {
         print("Scenario 2: No 2MT cap. This scenario not yet programmed.")
     } else if (scenario == 3) {
-        print("Scenario 3: No Fishing")
-        catch <- 0*1:22
+       catch <- statusquo_catch(ABC.DATA)*0
     } else if (scenario == 4) {
         print("Scenario 4: MEY.  Speak with Steve about this one.")
     } else if (scenario == 5) {
         print("Scenario 5: Fleet dynamics.  See notes from socio-econ workshop")
     }
+    
     # Third, pick only species that were passed in to pass back out.
     output <- catch[!missingspp]
     colnames(output) <- sppnames[!missingspp]
+    #return(ABC.DATA)
     return(output)
     
 }
