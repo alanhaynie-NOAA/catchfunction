@@ -301,11 +301,10 @@ if (FLATSUR) {
 
 
 ## Return predictions ####
-
-
-PREDICTIONS <- PREDICTIONS %>% mutate(YEAR = 1)
-FISH.DATA <- FISH.DATA %>% mutate(YEAR = 1)
-output <- full_join(PREDICTIONS,FISH.DATA, by = "YEAR")  %>% select(-YEAR)
+PREDICTIONS$YEAR <- 1
+FISH.DATA$YEAR <- 1
+output <- full_join(PREDICTIONS,FISH.DATA, by = "YEAR")
+    
 return(output)
 
 }

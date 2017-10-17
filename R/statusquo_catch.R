@@ -1,32 +1,52 @@
 statusquo_catch <- function(ABC.DATA) {
     
-    ABC.DATA$flex <-  1  # introduction of flatfish flex
-    ABC.DATA$A80 <-  1  # introduction of A80
-    ABC.DATA$sablefish.ai.over.3k <-  as.numeric(ABC.AI.203>3e3)  # sablefish upper bound
-    ABC.DATA$pcod.over.280k <-  as.numeric(ABC.BSAI.202 >=  28e4) # pcod upper bound
-    ABC.DATA$pollock.bs.UB <-  as.numeric(ABC.BS.201 > 1.2e6 & A80 ==  1) + as.numeric(ABC.BS.201 > 1.33e6 & A80 == 0) # consider a single UB?
-    ABC.DATA$pollock.bs.ABC <-  (1-pollock.bs.UB)*ABC.BS.201 # Pollock ABC when not at UB
-    ABC.DATA$SSL <-  1 # stellar sea lion closure
-    ABC.DATA$solegone <-  1
-    ABC.DATA$plaicegone <-  1
-    ABC.DATA$AFA <-  1
-    ABC.DATA$kamsplit <-  1
-    ABC.DATA$pollockAIchange <-  1 
+    logABC.DATA <- log(ABC.DATA)
+    
+    logABC.DATA$flex <-  1  # introduction of flatfish flex
+    logABC.DATA$A80 <-  1  # introduction of A80
+    logABC.DATA$sablefish.ai.over.3k <-  as.numeric(ABC.DATA$ABC.AI.203>3e3)  # sablefish upper bound
+    logABC.DATA$pcod.over.280k <-  as.numeric(ABC.DATA$ABC.BSAI.202 >=  28e4) # pcod upper bound
+    logABC.DATA$pollock.bs.UB <-  as.numeric(ABC.DATA$ABC.BS.201 > 1.2e6)
+    logABC.DATA$pollock.bs.ABC <-  (1-logABC.DATA$pollock.bs.UB)*ABC.DATA$ABC.BS.201 # Pollock ABC when not at UB
+    logABC.DATA$SSL <-  1 # stellar sea lion closure
+    logABC.DATA$solegone <-  1
+    logABC.DATA$plaicegone <-  1
+    logABC.DATA$AFA <-  1
+    logABC.DATA$kamsplit <-  1
+    logABC.DATA$pollockAIchange <-  1 
+    logABC.DATA$A28 <- 1
+    logABC.DATA$atkadisp <- 0
+    logABC.DATA$newmngmnt <- 1
+    logABC.DATA$WAISSL <- 0
+    logABC.DATA$A80.ask.POP <- 1
+    logABC.DATA$po10 <- 1
+    logABC.DATA$pre97 <- 0
+    logABC.DATA$is93 <- 0
+    
+
     
   ## SURSUR and SUROLS
-    TAC.PRED.SUR <- predict.tac.function(model="SUR",fit_sur=tac_fit_sur,fit_nosur=tac_fit_nosur,ABC.DATA)
+    TAC.PRED.SUR <- predict.tac.function(model="SUR",fit_sur=tac_fit_sur,fit_nosur=tac_fit_nosur,logABC.DATA)
     CATCH.SURSUR <- predict.catch.function(model="SUR",fit_sur=catch_fit_sur,fit_nosur=catch_fit_nosur,TAC.PRED.SUR)
     CATCH.SURNOSUR <- predict.catch.function(model="NOSUR",fit_sur=catch_fit_sur,fit_nosur=catch_fit_nosur,TAC.PRED.SUR)
     
  # No First Year Data SURSUR and SUROLS
-    TAC.NOFIRSTYEAR  <- predict.tac.function(model="SUR",fit_sur=tac_NOFIRSTYEAR_sur,fit_nosur=tac_fit_nosur,ABC.DATA)
+    TAC.NOFIRSTYEAR  <- predict.tac.function(model="SUR",fit_sur=tac_NOFIRSTYEAR_sur,fit_nosur=tac_fit_nosur,logABC.DATA)
     CATCH.NOFIRSTYEAR.SURSUR <- predict.catch.function(model="SUR",fit_sur=catch_NOFIRSTYEAR_sur,fit_nosur = catch_NOFIRSTYEAR_nosur,TAC.NOFIRSTYEAR )
     CATCH.NOFIRSTYEAR.SURNOSUR <- predict.catch.function(model="NOSUR",fit_sur=catch_NOFIRSTYEAR_sur,fit_nosur = catch_NOFIRSTYEAR_nosur,TAC.NOFIRSTYEAR )
-        
+  
+  ## NOROCKSOLE (SURSUR)
+    TAC.NOROCKSOLE <- predict.tac.function(model="NOROCKSOLE",fit_sur=tac_NOROCKSOLE_sur,fit_nosur=tac_fit_nosur,logABC.DATA)
+    CATCH.NOROCKSOLE <- predict.catch.function(model="NOROCKSOLE",fit_sur=catch_NOROCKSOLE_sur,fit_nosur=catch_fit_nosur,TAC.PRED.SUR)
+    
+  ## FLATSUR (SURSUR)
+    TAC.FLATSUR <- predict.tac.function(model="FLATSUR",fit_sur=tac_FLATSUR_sur,fit_nosur=tac_fit_nosur,logABC.DATA)
+    CATCH.FLATSUR <- predict.catch.function(model="FLATSUR",fit_sur=catch_FLATSUR_sur,fit_nosur=catch_fit_nosur,TAC.PRED.SUR)
+      
         
     # create ensemble
     # 
-    CATCH.PRED <-  (CATCH.SURSUR + CATCH.SURNOSUR + CATCH.NOFIRSTYEAR.SURNOSUR + CATCH.NOFIRSTYEAR.SURSUR)/4
+    CATCH.PRED <-  (CATCH.SURSUR + CATCH.SURNOSUR + CATCH.NOFIRSTYEAR.SURNOSUR + CATCH.NOFIRSTYEAR.SURSUR + CATCH.FLATSUR + CATCH.NOROCKSOLE)/6
     
     output <- CATCH.PRED[c("CATCH.BS.141",
                            "CATCH.BS.204",
