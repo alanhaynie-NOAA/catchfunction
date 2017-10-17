@@ -1,17 +1,17 @@
 statusquo_catch <- function(ABC.DATA) {
-    ABC.DATA <- ABC.DATA %>%
-        mutate(flex = 1) %>% # introduction of flatfish flex
-        mutate(A80 = 1) %>%  # introduction of A80
-        mutate(sablefish.ai.over.3k = as.numeric(ABC.AI.203>3e3)) %>%  # sablefish upper bound
-        mutate(pcod.over.280k = as.numeric(ABC.BSAI.202 >= 28e4)) %>% # pcod upper bound
-        mutate(pollock.bs.UB = as.numeric(ABC.BS.201 > 1.2e6 & A80 == 1) + as.numeric(ABC.BS.201 > 1.33e6 & A80==0)) %>% # consider a single UB?
-        mutate(pollock.bs.ABC = (1-pollock.bs.UB)*ABC.BS.201) %>% # Pollock ABC when not at UB
-        mutate(SSL = 1)%>% # stellar sea lion closure
-        mutate(solegone = 1) %>%
-        mutate(plaicegone = 1) %>%
-        mutate(AFA = 1) %>%
-        mutate(kamsplit = 1) %>%
-        mutate(pollockAIchange = 1) #%>% filter(YEAR == 2016)
+    
+    ABC.DATA$flex <-  1  # introduction of flatfish flex
+    ABC.DATA$A80 <-  1  # introduction of A80
+    ABC.DATA$sablefish.ai.over.3k <-  as.numeric(ABC.AI.203>3e3)  # sablefish upper bound
+    ABC.DATA$pcod.over.280k <-  as.numeric(ABC.BSAI.202 >=  28e4) # pcod upper bound
+    ABC.DATA$pollock.bs.UB <-  as.numeric(ABC.BS.201 > 1.2e6 & A80 ==  1) + as.numeric(ABC.BS.201 > 1.33e6 & A80 == 0) # consider a single UB?
+    ABC.DATA$pollock.bs.ABC <-  (1-pollock.bs.UB)*ABC.BS.201 # Pollock ABC when not at UB
+    ABC.DATA$SSL <-  1 # stellar sea lion closure
+    ABC.DATA$solegone <-  1
+    ABC.DATA$plaicegone <-  1
+    ABC.DATA$AFA <-  1
+    ABC.DATA$kamsplit <-  1
+    ABC.DATA$pollockAIchange <-  1 
     
   ## SURSUR and SUROLS
     TAC.PRED.SUR <- predict.tac.function(model="SUR",fit_sur=tac_fit_sur,fit_nosur=tac_fit_nosur,ABC.DATA)
