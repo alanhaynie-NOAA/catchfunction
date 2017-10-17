@@ -303,7 +303,7 @@ if (FLATSUR) {
 ## Return predictions ####
 PREDICTIONS$YEAR <- 1
 FISH.DATA$YEAR <- 1
-output <- full_join(PREDICTIONS,FISH.DATA, by = "YEAR")
+output <- merge(PREDICTIONS,FISH.DATA, by = "YEAR")
     
 return(output)
 
