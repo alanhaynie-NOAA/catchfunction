@@ -22,7 +22,6 @@ statusquo_catch <- function(ABC.DATA) {
     logABC.DATA$po10 <- 1
     logABC.DATA$pre97 <- 0
     logABC.DATA$is93 <- 0
-    
 
     
   ## SURSUR and SUROLS
