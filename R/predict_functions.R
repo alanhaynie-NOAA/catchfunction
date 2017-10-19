@@ -292,7 +292,7 @@ if (FLATSUR) {
     # Rock Sole
     PREDICTIONS$TAC.BSAI.104 <- pmin(Pred.SUR.flat$rocksole.pred , FISH.DATA$ABC.BSAI.104)
     # Plaice
-    PREDICTIONS$TAC.BSAI.106 <- pmin(1,predict(fit_sur[[6]], FISH.DATA))*FISH.DATA$ABC.BSAI.106
+    PREDICTIONS$TAC.BSAI.106 <- pmin(predict(fit_sur[[6]], FISH.DATA,FISH.DATA$ABC.BSAI.106)
     
     
     # Apply 2MT cap explicitly
