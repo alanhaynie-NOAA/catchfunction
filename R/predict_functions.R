@@ -101,7 +101,11 @@ if (SUR) {
     # Flathead sole
     PREDICTIONS$TAC.BSAI.103 <- pmin(predict(fit_sur[[13]], FISH.DATA), FISH.DATA$ABC.BSAI.103)
     # Rock Sole
+<<<<<<< HEAD
     PREDICTIONS$TAC.BSAI.104 <- pmin(predict(fit_sur[[19]], FISH.DATA), FISH.DATA$ABC.BSAI.104)
+=======
+    PREDICTIONS$TAC.BSAI.104 <- pmin(Pred.SUR$rocksole.pred , FISH.DATA$ABC.BSAI.104)
+>>>>>>> c828c36ff1e7bee552bff5da79c3e6a9c83f5ecb
     # Plaice
     PREDICTIONS$TAC.BSAI.106 <- pmin(predict(fit_sur[[11]], FISH.DATA), FISH.DATA$ABC.BSAI.106)
     
@@ -290,9 +294,15 @@ if (FLATSUR) {
     # Flathead sole
     PREDICTIONS$TAC.BSAI.103 <- pmin(predict(fit_sur[[7]],FISH.DATA), FISH.DATA$ABC.BSAI.103)
     # Rock Sole
+<<<<<<< HEAD
     PREDICTIONS$TAC.BSAI.104 <- pmin(predict(fit_sur[[18]], FISH.DATA), FISH.DATA$ABC.BSAI.104)
     # Plaice
     PREDICTIONS$TAC.BSAI.106 <- pmin(predict(fit_sur[[6]], FISH.DATA),FISH.DATA$ABC.BSAI.106)
+=======
+    PREDICTIONS$TAC.BSAI.104 <- pmin(Pred.SUR.flat$rocksole.pred , FISH.DATA$ABC.BSAI.104)
+    # Plaice
+    PREDICTIONS$TAC.BSAI.106 <- pmin(predict(fit_sur[[6]], FISH.DATA,FISH.DATA$ABC.BSAI.106)
+>>>>>>> c828c36ff1e7bee552bff5da79c3e6a9c83f5ecb
     
     
     # Apply 2MT cap explicitly
@@ -504,7 +514,11 @@ predict.catch.function <- function(model,fit_sur,fit_nosur,FISH.DATA) {
         PREDICTIONS_wSUR$CATCH.BS.103 <- pmin(predict(fit_sur[[22]], FISH.DATA), FISH.DATA$ABC.BS.103)   
         PREDICTIONS_wSUR$CATCH.AI.103 <- pmin(predict(fit_sur[[23]], FISH.DATA), FISH.DATA$ABC.AI.103)       
         # Rock Sole
+<<<<<<< HEAD
         PREDICTIONS_wSUR$CATCH.BS.104 <- pmin(predict(fit_sur[[39]], FISH.DATA), FISH.DATA$ABC.BS.104)  
+=======
+        PREDICTIONS_wSUR$CATCH.BS.104 <- pmin(Pred.SUR.A80$rocksole.pred , FISH.DATA$ABC.BS.104)  
+>>>>>>> c828c36ff1e7bee552bff5da79c3e6a9c83f5ecb
         PREDICTIONS_wSUR$CATCH.AI.104 <- pmin(predict(fit_sur[[35]], FISH.DATA), FISH.DATA$ABC.AI.104)     
         # Plaice
         PREDICTIONS_wSUR$CATCH.BS.106 <- pmin(predict(fit_sur[[19]], FISH.DATA), FISH.DATA$ABC.BSAI.106) # No AI
@@ -672,7 +686,11 @@ predict.catch.function <- function(model,fit_sur,fit_nosur,FISH.DATA) {
         PREDICTIONS_wSUR$CATCH.BS.103 <- pmin(predict(fit_sur[[21]], FISH.DATA), FISH.DATA$ABC.BS.103)   
         PREDICTIONS_wSUR$CATCH.AI.103 <- pmin(predict(fit_sur[[22]], FISH.DATA), FISH.DATA$ABC.AI.103)       
         # Rock Sole
+<<<<<<< HEAD
         PREDICTIONS_wSUR$CATCH.BS.104 <- pmin(predict(fit_sur[[38]], FISH.DATA), FISH.DATA$ABC.BS.104) 
+=======
+        PREDICTIONS_wSUR$CATCH.BS.104 <- pmin(Pred.SUR.flat$rocksole.pred, FISH.DATA$ABC.BS.104) 
+>>>>>>> c828c36ff1e7bee552bff5da79c3e6a9c83f5ecb
         PREDICTIONS_wSUR$CATCH.AI.104 <- pmin(predict(fit_sur[[34]], FISH.DATA), FISH.DATA$ABC.AI.104)     
         # Plaice
         PREDICTIONS_wSUR$CATCH.BS.106 <- pmin(predict(fit_sur[[19]], FISH.DATA), FISH.DATA$ABC.BSAI.106) # No AI
@@ -691,4 +709,8 @@ predict.catch.function <- function(model,fit_sur,fit_nosur,FISH.DATA) {
     if (NOSUR) {
         return(PREDICTIONS_NOSUR)
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> c828c36ff1e7bee552bff5da79c3e6a9c83f5ecb
