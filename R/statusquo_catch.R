@@ -4,24 +4,24 @@ statusquo_catch <- function(ABC.DATA) {
     
     logABC.DATA$flex <-  1  # introduction of flatfish flex
     logABC.DATA$A80 <-  1  # introduction of A80
-    logABC.DATA$sablefish.ai.over.3k <-  as.numeric(ABC.DATA$ABC.AI.203>3e3)  # sablefish upper bound
-    logABC.DATA$pcod.over.280k <-  as.numeric(ABC.DATA$ABC.BSAI.202 >=  28e4) # pcod upper bound
     logABC.DATA$pollock.bs.UB <-  as.numeric(ABC.DATA$ABC.BS.201 > 1.2e6)
-    logABC.DATA$pollock.bs.ABC <-  (1-logABC.DATA$pollock.bs.UB)*ABC.DATA$ABC.BS.201 # Pollock ABC when not at UB
-    logABC.DATA$SSL <-  1 # stellar sea lion closure
-    logABC.DATA$solegone <-  1
-    logABC.DATA$plaicegone <-  1
-    logABC.DATA$AFA <-  1
-    logABC.DATA$kamsplit <-  1
-    logABC.DATA$pollockAIchange <-  1 
-    logABC.DATA$A28 <- 1
-    logABC.DATA$atkadisp <- 0
-    logABC.DATA$newmngmnt <- 1
-    logABC.DATA$WAISSL <- 0
-    logABC.DATA$A80.ask.POP <- 1
     logABC.DATA$po10 <- 1
     logABC.DATA$pre97 <- 0
     logABC.DATA$is93 <- 0
+    logABC.DATA$WAISSLadj <- 1
+    logABC.DATA$solegone <-  1
+    logABC.DATA$plaicegone <-  1
+    logABC.DATA$kamsplit <-  1
+    logABC.DATA$AFA <-  1
+    logABC.DATA$pollockAIchange <-  1 
+    logABC.DATA$A28 <- 1
+    logABC.DATA$atkadisp <- 0
+    logABC.DATA$SSL <-  1 # stellar sea lion closure
+    logABC.DATA$WAISSL <- 0
+    logABC.DATA$A80.ask.POP <- 1
+    logABC.DATA$is93 <- 0
+    logABC.DATA$ABCboth.UB.150 <- as.numeric(ABC.DATA$ABC.BS.201 + ABC.DATA$ABC.BSAI.202 >= 1.5e6)
+    
 
     #devtools::use_data(mean.BS.AI.ABCs, catch_BOTHBIND_nosur, catch_BOTHBIND_sur, tac_BOTHBIND_sur, tac_fit_nosur, tac_BOTHBIND_SIMPLER_sur, catch_BOTHBIND_SIMPLER_nosur, catch_BOTHBIND_SIMPLER_sur, internal = T, overwrite = T)
     
