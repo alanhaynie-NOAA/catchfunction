@@ -40,7 +40,7 @@ predict.tac.function <- function(model,fit_sur,fit_nosur,FISH.DATA){
         TEMP$TAC.AI.203 <- 0
         TEMP$TAC.BSAI.326 <- 0
         TEMP$TAC.BSAI.303 <- 0
-        TOTALRAT <- sum(TEMP)
+        TOTALRAT <- sum(TEMP, na.rm = TRUE)
         TEMP <- TEMP/TOTALRAT
         output <- DT - SURPLUS*TEMP
         output <- log(output)         
@@ -73,7 +73,7 @@ predict.tac.function <- function(model,fit_sur,fit_nosur,FISH.DATA){
         PREDICTIONS$TAC.BS.310 <- pmin(predict(fit_sur[[8]], FISH.DATA),FISH.DATA$ABC.BS.310)
         PREDICTIONS$TAC.AI.310 <- FISH.DATA$ABC.AI.310
         # Northern 
-        PREDICTIONS$TAC.BSAI.303 <- pmin(predict(fit_nosur[[7]], FISH.DATA), FISH.DATA$ABC.BSAI.303)
+        PREDICTIONS$TAC.BSAI.303 <- pmin(predict(fit_sur[[7]], FISH.DATA), FISH.DATA$ABC.BSAI.303)
         # POP
         PREDICTIONS$TAC.BS.301 <- pmin(predict(fit_sur[[6]], FISH.DATA),FISH.DATA$ABC.BS.301)
         PREDICTIONS$TAC.AI.301 <- FISH.DATA$ABC.AI.301
@@ -141,7 +141,7 @@ predict.tac.function <- function(model,fit_sur,fit_nosur,FISH.DATA){
         
         # Pollock
         PREDICTIONS$TAC.BS.201 <- pmin(predict(fit_nosur[[16]], FISH.DATA), FISH.DATA$ABC.BS.201)
-        PREDICTIONS$TAC.AI.201 <- pmin(predict(fit_sur[[17]], FISH.DATA),FISH.DATA$ABC.BSAI.201)
+        PREDICTIONS$TAC.AI.201 <- pmin(predict(fit_nosur[[17]], FISH.DATA),FISH.DATA$ABC.BSAI.201)
         # PCod
         PREDICTIONS$TAC.BSAI.202 <- pmin(predict(fit_nosur[[18]], FISH.DATA), FISH.DATA$ABC.BSAI.202)
         # Sablefish
@@ -167,7 +167,7 @@ predict.tac.function <- function(model,fit_sur,fit_nosur,FISH.DATA){
         # Rock Sole
         PREDICTIONS$TAC.BSAI.104 <- pmin(predict(fit_nosur[[20]], FISH.DATA), FISH.DATA$ABC.BSAI.104)
         # Plaice
-        PREDICTIONS$TAC.BSAI.106 <- pmin(predict(fit_sur[[11]], FISH.DATA), FISH.DATA$ABC.BSAI.106)
+        PREDICTIONS$TAC.BSAI.106 <- pmin(predict(fit_nosur[[11]], FISH.DATA), FISH.DATA$ABC.BSAI.106)
         
         # Apply 2MT cap explicitly
         PREDICTIONS <- TAC.CAPFUNCTION(PREDICTIONS)
@@ -346,20 +346,20 @@ predict.catch.function <- function(model,fit_sur,fit_nosur,FISH.DATA) {
     
     CATCH.CAPFUNCTION <- function(DT) {
         DT <- exp(DT)
-        DT$CATCH.AI.106 <- NA*DT$CATCH.AI.201
-        DT$CATCH.AI.140 <- DT$CATCH.AI.106
-        # If prediction exceeds cap, trim down from the LARGEST stocks
-        NETTAC <- rowSums(DT, na.rm = TRUE)
-        SURPLUS <- as.numeric(NETTAC > 2e6)*(NETTAC - 2e6)
-        DT <- DT[order(DT, decreasing = T)]
-        # If prediction exceeds cap, trim down pollock and yellowfin, 50/50
-        TEMP <- DT/NETTAC
-        TOTALRAT <- sum(TEMP[1:3])
-        TEMP[1:3] <- TEMP[1:3]/TOTALRAT 
-        TEMP[4:29] <- 0
-        output <- DT - SURPLUS*TEMP
-        
-        return(output)
+        # DT$CATCH.AI.106 <- NA*DT$CATCH.AI.201
+        # DT$CATCH.AI.140 <- DT$CATCH.AI.106
+        # # If prediction exceeds cap, trim down from the LARGEST stocks
+        # NETTAC <- rowSums(DT, na.rm = TRUE)
+        # SURPLUS <- as.numeric(NETTAC > 2e6)*(NETTAC - 2e6)
+        # DT <- DT[order(DT, decreasing = T)]
+        # # If prediction exceeds cap, trim down pollock and yellowfin, 50/50
+        # TEMP <- DT/NETTAC
+        # TOTALRAT <- sum(TEMP[1:3])
+        # TEMP[1:3] <- TEMP[1:3]/TOTALRAT 
+        # TEMP[4:29] <- 0
+        # output <- DT - SURPLUS*TEMP
+        # 
+        return(DT)
     }
     
     # Make Predictions ####    
