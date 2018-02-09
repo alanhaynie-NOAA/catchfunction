@@ -163,11 +163,17 @@ catch_function <- function(scenario,
     #     
     ABC.DATA <- mean.BS.AI.ABCs
 
+    # For any species given (not missing) replace the ABC.DATA$ABC.BS mean with the given.
+    # Also, replace ABC.DATA$ABC.AI mean with the relative increase/decrease in the BS.
     for (i in 1:22) {
         if (!missingspp[i]) {
             eval(parse(text = paste("ABC.DATA$ABC.BS.",allspp[i],"<-",sppnames[i],sep="")))
+            eval(parse(text = paste("changeinABC <- ABC.DATA$ABC.BS.",allspp[i],"/mean.BS.AI.ABCs$ABC.BS.",allspp[i],sep="")))
+            eval(parse(text = paste("ABC.DATA$ABC.AI.",allspp[i],"<-",changeinABC,"*mean.BS.AI.ABCs$ABC.AI.",allspp[i],sep="")))
         }
     }
+    
+    ABC.DATA[ABC.DATA<=0] <- 1
     
     ## Create BSAI where necessary
     
@@ -210,6 +216,7 @@ ABC.DATA <- BSAIfun(ABC.DATA,"202")
     } else if (scenario == 3) {
        catch <- statusquo_catch(ABC.DATA)*0
     } else if (scenario == 4) {
+        catch <- ABC.DATA
         print("Scenario 4: MEY.  Speak with Steve about this one.")
     } else if (scenario == 5) {
         print("Scenario 5: Fleet dynamics.  See notes from socio-econ workshop")
