@@ -173,6 +173,7 @@ catch_function <- function(scenario,
         }
     }
     
+    # avoid -Inf 
     ABC.DATA[ABC.DATA<=0] <- 1
     
     ## Create BSAI where necessary

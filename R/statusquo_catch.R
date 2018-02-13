@@ -23,7 +23,7 @@ statusquo_catch <- function(ABC.DATA) {
     logABC.DATA$ABCboth.UB.150 <- as.numeric(ABC.DATA$ABC.BS.201 + ABC.DATA$ABC.BSAI.202 >= 1.5e6)
     
 
-    #devtools::use_data(mean.BS.AI.ABCs, catch_BOTHBIND_nosur, catch_BOTHBIND_sur, tac_BOTHBIND_sur, tac_fit_nosur, tac_BOTHBIND_SIMPLER_sur, catch_BOTHBIND_SIMPLER_nosur, catch_BOTHBIND_SIMPLER_sur, internal = T, overwrite = T)
+    #devtools::use_data(mean.BS.AI.ABCs, catch_BOTHBIND_nosur, catch_BOTHBIND_sur, tac_BOTHBIND_sur, tac_BOTHBIND_FLATSUR_sur, catch_BOTHBIND_FLATSUR_sur, internal = T, overwrite = T)
     
 
         TAC.BOTHBIND <- predict.tac.function(model="SUR",fit_sur=tac_BOTHBIND_sur,fit_nosur=tac_fit_nosur,logABC.DATA)
@@ -31,35 +31,15 @@ statusquo_catch <- function(ABC.DATA) {
         CATCH.BOTHBIND.SURSUR <- predict.catch.function(model="SUR",fit_sur=catch_BOTHBIND_sur,fit_nosur = catch_BOTHBIND_nosur,TAC.BOTHBIND )
         CATCH.BOTHBIND.SUROLS <- predict.catch.function(model="NOSUR",fit_sur=catch_BOTHBIND_sur,fit_nosur = catch_BOTHBIND_nosur,TAC.BOTHBIND )
 
-        TAC.BOTHBIND.SIMPLER <- predict.tac.function(model="SUR",fit_sur=tac_BOTHBIND_SIMPLER_sur,fit_nosur=tac_fit_nosur,logABC.DATA)
+        TAC.BOTHBIND.FLATSUR <- predict.tac.function(model="FLATSUR",fit_sur=tac_BOTHBIND_FLATSUR_sur,fit_nosur=tac_fit_nosur,logABC.DATA)
         
-        CATCH.BOTHBIND.SIMPLER.SURSUR <- predict.catch.function(model="SUR",fit_sur=catch_BOTHBIND_SIMPLER_sur,fit_nosur = catch_BOTHBIND_SIMPLER_nosur,TAC.BOTHBIND.SIMPLER )
-        CATCH.BOTHBIND.SIMPLER.SUROLS <- predict.catch.function(model="NOSUR",fit_sur=catch_BOTHBIND_SIMPLER_sur,fit_nosur = catch_BOTHBIND_SIMPLER_nosur,TAC.BOTHBIND.SIMPLER )
+        CATCH.BOTHBIND.FLATSUR.SURSUR <- predict.catch.function(model="FLATSUR",fit_sur=catch_BOTHBIND_FLATSUR_sur,fit_nosur = catch_BOTHBIND_SIMPLER_nosur,TAC.BOTHBIND.FLATSUR )
     
-
-  ## SURSUR and SUROLS
-    #TAC.PRED.SUR <- predict.tac.function(model="SUR",fit_sur=tac_fit_sur,fit_nosur=tac_fit_nosur,logABC.DATA)
-    #CATCH.SURSUR <- predict.catch.function(model="SUR",fit_sur=catch_fit_sur,fit_nosur=catch_fit_nosur,TAC.PRED.SUR)
-    #CATCH.SURNOSUR <- predict.catch.function(model="NOSUR",fit_sur=catch_fit_sur,fit_nosur=catch_fit_nosur,TAC.PRED.SUR)
-    
- # No First Year Data SURSUR and SUROLS
-    #TAC.NOFIRSTYEAR  <- predict.tac.function(model="SUR",fit_sur=tac_NOFIRSTYEAR_sur,fit_nosur=tac_fit_nosur,logABC.DATA)
-    #CATCH.NOFIRSTYEAR.SURSUR <- predict.catch.function(model="SUR",fit_sur=catch_NOFIRSTYEAR_sur,fit_nosur = catch_NOFIRSTYEAR_nosur,TAC.NOFIRSTYEAR )
-    #CATCH.NOFIRSTYEAR.SURNOSUR <- predict.catch.function(model="NOSUR",fit_sur=catch_NOFIRSTYEAR_sur,fit_nosur = catch_NOFIRSTYEAR_nosur,TAC.NOFIRSTYEAR )
-  
-  ## NOROCKSOLE (SURSUR)
-    #TAC.NOROCKSOLE <- predict.tac.function(model="NOROCKSOLE",fit_sur=tac_NOROCKSOLE_sur,fit_nosur=tac_fit_nosur,logABC.DATA)
-    #CATCH.NOROCKSOLE <- predict.catch.function(model="NOROCKSOLE",fit_sur=catch_NOROCKSOLE_sur,fit_nosur=catch_fit_nosur,TAC.PRED.SUR)
-    
-    ## FLATSUR (SURSUR)
-    #TAC.FLATSUR <- predict.tac.function(model="FLATSUR",fit_sur=tac_FLATSUR_sur,fit_nosur=tac_fit_nosur,logABC.DATA)
-    #CATCH.FLATSUR <- predict.catch.function(model="FLATSUR",fit_sur=catch_FLATSUR_sur,fit_nosur=catch_fit_nosur,TAC.PRED.SUR)
-      
         
     # create ensemble
     # 
     #CATCH.PRED <-  (CATCH.SURSUR + CATCH.SURNOSUR + CATCH.NOFIRSTYEAR.SURNOSUR + CATCH.NOFIRSTYEAR.SURSUR + CATCH.FLATSUR + CATCH.NOROCKSOLE)/6
-    CATCH.PRED <- (CATCH.BOTHBIND.SURSUR + CATCH.BOTHBIND.SUROLS + CATCH.BOTHBIND.SIMPLER.SUROLS + CATCH.BOTHBIND.SIMPLER.SURSUR)/4
+    CATCH.PRED <- (CATCH.BOTHBIND.SURSUR + CATCH.BOTHBIND.SUROLS + CATCH.BOTHBIND.FLATSUR.SURSUR)/3
     
     output <- CATCH.PRED[c("CATCH.BS.141",
                            "CATCH.BS.204",
