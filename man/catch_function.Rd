@@ -63,6 +63,6 @@ If you have any questions, please contact me (e-mail: amanda.faig@noaa.gov, call
 Currently programmed scenarios: Scenario 1 & Scenario 3
 }
 \examples{
-catchfunction(1, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-catchfunction(3, Pollock = 2e6, Yellowfin = 2e5, PCod = 1e5)
+catch_function(1, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
+catch_function(3, Pollock = 2e6, Yellowfin = 2e5, PCod = 1e5)
 }
