@@ -37,8 +37,8 @@
 #' @export
 #' 
 #' @examples 
-#' catchfunction(1, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-#' catchfunction(3, Pollock = 2e6, Yellowfin = 2e5, PCod = 1e5)
+#' catch_function(1, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
+#' catch_function(3, Pollock = 2e6, Yellowfin = 2e5, PCod = 1e5)
 
 catch_function <- function(scenario, 
                           Arrowtooth, 
