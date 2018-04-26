@@ -21,7 +21,7 @@ statusquo_catch <- function(ABC.DATA) {
     logABC.DATA$A80.ask.POP <- 1
     logABC.DATA$is93 <- 0
     logABC.DATA$ABCboth.UB.150 <- as.numeric(ABC.DATA$ABC.BS.201 + ABC.DATA$ABC.BSAI.202 >= 1.5e6)
-    
+    logABC.DATA$A82 <- 1
 
     #devtools::use_data(mean.BS.AI.ABCs, catch_BOTHBIND_nosur, catch_BOTHBIND_sur, tac_BOTHBIND_sur, tac_BOTHBIND_FLATSUR_sur, catch_BOTHBIND_FLATSUR_sur, internal = T, overwrite = T)
     
