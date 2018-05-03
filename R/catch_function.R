@@ -5,9 +5,9 @@
 #' 
 #' If you have any questions, please contact me (e-mail: amanda.faig@noaa.gov, call: X-4281).
 #' 
-#' Currently programmed scenarios: Scenario 1 & Scenario 3
+#' Currently programmed scenarios: Scenario 1, Scenario 1.1 & Scenario 3
 #' 
-#' @param scenario The economic scenario number (1 through 5). 1: Status Quo, 2: Eliminate 2 million ton cap, 3: No fishing, 4: MEY, 5: "Fleet Dynamics"
+#' @param scenario The economic scenario number. 1: Status Quo (log-linear). 1.1: Status quo (log-log.  This fits just as well as log-linear in retrospect, but assumes if the target dissapears (e.g. Atka) then the catch of the bycatch (e.g. Northern) would go to 0.  This assumption is problematic so this is an "alternative" status quo but not the "go to").  3. No fishing (will only return 0's)
 #' @param Arrowtooth Optional.  ABC of Arrowtooth Flounder.
 #' @param Atka Optional.  ABC of Atka Mackerel.
 #' @param Flathead Optional.  ABC of Flathead Sole.
@@ -40,6 +40,11 @@
 #' catch_function(1, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 #' catch_function(3, Pollock = 2e6, Yellowfin = 2e5, PCod = 1e5)
 
+
+# Above is what creates the help document.  It's easier to read by 
+# running ?catch_function once you've loaded the package.
+# 
+# Below is the function users call.
 catch_function <- function(scenario, 
                           Arrowtooth, 
                           Atka, 
@@ -64,6 +69,7 @@ catch_function <- function(scenario,
                           Squid, 
                           Yellowfin) {
     
+    # I start by giving myself a list of all the species numbers
     allspp <- c("141",
                 "204",
                 "103",
@@ -86,7 +92,9 @@ catch_function <- function(scenario,
                 "90",
                 "50",
                 "140")
-
+# And their corresponding names, alphabetically.  
+# Honestly this could be saved in sysdata and loaded but it's not bad to have 
+# handy in case if you forget what number = what species
     sppnames <- c("Arrowtooth", 
                   "Atka", 
                   "Flathead", 
@@ -109,7 +117,7 @@ catch_function <- function(scenario,
                   "Skate", 
                   "Squid", 
                   "Yellowfin")
-
+# Figure out which species' ABCs WERE NOT passed through by the user.
     missingspp <- c(missing(Arrowtooth), 
                   missing(Atka), 
                   missing(Flathead), 
@@ -133,39 +141,14 @@ catch_function <- function(scenario,
                   missing(Squid), 
                   missing(Yellowfin))
     
-    # mean.sd <- ABC_means
-    # 
-    # singledraw <- function(code) { 
-    #     mu <- mean.sd %>% select(ends_with(paste(code,"mean",sep="_")))
-    #     mu <- as.numeric(mu[1])
-    #     # sig <- mean.sd %>% select(ends_with(paste(code,"sd",sep="_")))
-    #     # sig <- as.numeric(sig[1])
-    #     # draw <- round(rnorm(1,mu,sig))
-    #     # 
-    #     draw <- mu
-    #     return(draw)
-    # }
-    
-    ## First, create a data frame of all the ABCs. Draw unspecified species from 
-    ## stationary distributions
-    
-    # ABC.DATA <- data.frame(ABC.BS.141 = NA)
-    # 
-    # for (i in 1:22) {
-    #     if (missingspp[i]) {
-    #         ABC.DATA$ABC <- singledraw(allspp[i])
-    #     } else {
-    #         ABC.DATA$ABC <- eval(parse(text = sppnames[i]))
-    #     }
-    #     colnames(ABC.DATA)[i] <- paste("ABC",allspp[i],sep=".")
-    #     if (allspp[i] == 307) {ABC.DATA$ABC.307 <- 390} # 2004 was an outlier that should be removed, but changing the built in data right now is more likely to lead to glitches.  Fix up later.
-    #     }
-    #     
+# Load the mean ABCs from system data.  This was calculated by just finding a 
+# simple mean using all the available data.
     ABC.DATA <- mean.BS.AI.ABCs
     
 
     # For any species given (not missing) replace the ABC.DATA$ABC.BS mean with the given.
     # Also, replace ABC.DATA$ABC.AI mean with the relative increase/decrease in the BS.
+    # (i.e. assume AI ABC rises and falls with BS.)
     for (i in 1:22) {
         if (!missingspp[i]) {
             eval(parse(text = paste("ABC.DATA$ABC.BS.",allspp[i],"<-",sppnames[i],sep="")))
@@ -174,26 +157,30 @@ catch_function <- function(scenario,
         }
     }
     
-    # avoid -Inf 
-    ABC.DATA[ABC.DATA<=0] <- 1
     
     ## Create BSAI where necessary
     
 BSAIfun <- function(DT, code) {
     if (eval(parse(text= paste("DT$ABC.BS.",code,"[1] == 0",sep="")))) {
+        # If the ABC passed through was 0, assume entire BSAI ABC is wiped out (0)
         eval(parse(text= paste("DT$ABC.BSAI.",code," <- DT$ABC.BS.",code,sep="")))
     } else {
+        # Otherwise, assume BSAI ABC is the sum of BS and AI.  
         eval(parse(text= paste("DT$ABC.BSAI.",code,"<- DT$ABC.BS.",code,"+ DT$ABC.AI.",code,sep="")))
     }
     return(DT)
 }
+
+# Honestly the first else in the above loop should be redundant, since we already 
+# assume AI rises and falls with BS.  At some point I probably should remove this redundancy.
 
 ABC.DATA <- BSAIfun(ABC.DATA,"100")
 ABC.DATA <- BSAIfun(ABC.DATA,"103")
 ABC.DATA <- BSAIfun(ABC.DATA,"104")
 ABC.DATA <- BSAIfun(ABC.DATA,"106")
 #ABC.DATA <- BSAIfun(ABC.DATA,"140")
-ABC.DATA$ABC.BSAI.140 <- ABC.DATA$ABC.BS.140
+ABC.DATA$ABC.BSAI.140 <- ABC.DATA$ABC.BS.140  
+# For yellowfin (140), assume BS ABC makes up entire BSAI. In practice it appears the AI ABC is ignored when decision making/harvesting.
 ABC.DATA <- BSAIfun(ABC.DATA,"141")
 ABC.DATA <- BSAIfun(ABC.DATA,"147")
 ABC.DATA <- BSAIfun(ABC.DATA,"204")
@@ -207,29 +194,32 @@ ABC.DATA <- BSAIfun(ABC.DATA,"65")
 ABC.DATA <- BSAIfun(ABC.DATA,"90")
 ABC.DATA <- BSAIfun(ABC.DATA,"202")
 
+#return(ABC.DATA)
+# ## Second, pass ABCs to status quo function to get catch
 
-    ## Second, pass ABCs to status quo function to get catch
-    
-    if (scenario == 1) {
-        catch <- statusquo_catch(ABC.DATA)
-        
-    } else if (scenario == 2) {
-        print("Scenario 2: No 2MT cap. This scenario not yet programmed.")
-    } else if (scenario == 3) {
-       catch <- statusquo_catch(ABC.DATA)*0
-    } else if (scenario == 4) {
-        catch <- ABC.DATA
-        print("Scenario 4: MEY.  Speak with Steve about this one.")
-    } else if (scenario == 5) {
-        print("Scenario 5: Fleet dynamics.  See notes from socio-econ workshop")
-    }
-    
-    # Third, pick only species that were passed in to pass back out.
-    output <- catch[!missingspp]
-    colnames(output) <- sppnames[!missingspp]
-    #return(ABC.DATA)
-    return(output)
-    
+ if (scenario == 1) {
+     catch <- statusquo_catch(ABC.DATA,1)
+     # log linear
+ } else if (scenario == 1.1) {
+     catch <- statusquo_catch(ABC.DATA,1.1)
+     # log log
+ } else if (scenario == 2) {
+     print("Scenario 2: No 2MT cap. This scenario not yet programmed.")
+ } else if (scenario == 3) {
+    catch <- statusquo_catch(ABC.DATA)*0
+ } else if (scenario == 4) {
+     catch <- ABC.DATA
+     print("Scenario 4: MEY.  Speak with Steve about this one.")
+ } else if (scenario == 5) {
+     print("Scenario 5: Fleet dynamics.  See notes from socio-econ workshop")
+ }
+
+ # Third, pick only species that were passed in to pass back out.
+output <- catch[!missingspp]
+colnames(output) <- sppnames[!missingspp]
+
+return(output)
+
 }
 
     

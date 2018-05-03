@@ -1,44 +1,59 @@
-statusquo_catch <- function(ABC.DATA) {
+statusquo_catch <- function(ABC.DATA,scenario) {
     
-    logABC.DATA <- log(ABC.DATA)
+    if (scenario == 1) {
+        FISH.DATA <- ABC.DATA
+    }   else if (scenario == 1.1) {
+        FISH.DATA <- log(ABC.DATA)
+    } 
     
-    logABC.DATA$flex <-  1  # introduction of flatfish flex
-    logABC.DATA$A80 <-  1  # introduction of A80
-    logABC.DATA$pollock.bs.UB <-  as.numeric(ABC.DATA$ABC.BS.201 > 1.2e6)
-    logABC.DATA$po10 <- 1
-    logABC.DATA$pre97 <- 0
-    logABC.DATA$is93 <- 0
-    logABC.DATA$WAISSLadj <- 1
-    logABC.DATA$solegone <-  1
-    logABC.DATA$plaicegone <-  1
-    logABC.DATA$kamsplit <-  1
-    logABC.DATA$AFA <-  1
-    logABC.DATA$pollockAIchange <-  1 
-    logABC.DATA$A28 <- 1
-    logABC.DATA$atkadisp <- 0
-    logABC.DATA$SSL <-  1 # stellar sea lion closure
-    logABC.DATA$WAISSL <- 0
-    logABC.DATA$A80.ask.POP <- 1
-    logABC.DATA$is93 <- 0
-    logABC.DATA$ABCboth.UB.150 <- as.numeric(ABC.DATA$ABC.BS.201 + ABC.DATA$ABC.BSAI.202 >= 1.5e6)
-    logABC.DATA$A82 <- 1
-
-    #devtools::use_data(mean.BS.AI.ABCs, catch_BOTHBIND_nosur, catch_BOTHBIND_sur, tac_BOTHBIND_sur, tac_BOTHBIND_FLATSUR_sur, catch_BOTHBIND_FLATSUR_sur, internal = T, overwrite = T)
+    FISH.DATA$flex <-  1  # introduction of flatfish flex
+    FISH.DATA$A80 <-  1  # introduction of A80
+    FISH.DATA$pollock.bs.UB <-  as.numeric(ABC.DATA$ABC.BS.201 > 1.2e6)
+    FISH.DATA$po10 <- 1
+    FISH.DATA$pre97 <- 0
+    FISH.DATA$is93 <- 0
+    FISH.DATA$WAISSLadj <- 1
+    FISH.DATA$solegone <-  1
+    FISH.DATA$plaicegone <-  1
+    FISH.DATA$kamsplit <-  1
+    FISH.DATA$AFA <-  1
+    FISH.DATA$pollockAIchange <-  1 
+    FISH.DATA$A28 <- 1
+    FISH.DATA$atkadisp <- 0
+    FISH.DATA$SSL <-  1 # stellar sea lion closure
+    FISH.DATA$WAISSL <- 0
+    FISH.DATA$A80.ask.POP <- 1
+    FISH.DATA$is93 <- 0
+    FISH.DATA$ABCboth.UB.150 <- as.numeric(ABC.DATA$ABC.BS.201 + ABC.DATA$ABC.BSAI.202 >= 1.5e6)
+    FISH.DATA$A82 <- 1
     
-
-        TAC.BOTHBIND <- predict.tac.function(model="SUR",fit_sur=tac_BOTHBIND_sur,fit_nosur=tac_fit_nosur,logABC.DATA)
+    
+    if (scenario == 1) {
+        TAC.BOTHBIND <- predict.tac.function(scenario = 1, model="SUR",fit=tac_BOTHBIND_loglin_sur,FISH.DATA)
         
-        CATCH.BOTHBIND.SURSUR <- predict.catch.function(model="SUR",fit_sur=catch_BOTHBIND_sur,fit_nosur = catch_BOTHBIND_nosur,TAC.BOTHBIND )
-        CATCH.BOTHBIND.SUROLS <- predict.catch.function(model="NOSUR",fit_sur=catch_BOTHBIND_sur,fit_nosur = catch_BOTHBIND_nosur,TAC.BOTHBIND )
-
-        TAC.BOTHBIND.FLATSUR <- predict.tac.function(model="FLATSUR",fit_sur=tac_BOTHBIND_FLATSUR_sur,fit_nosur=tac_fit_nosur,logABC.DATA)
+        CATCH.BOTHBIND.SURSUR <- predict.catch.function(model="SUR",fit=catch_BOTHBIND_loglin_sur,TAC.BOTHBIND )
+        CATCH.BOTHBIND.SUROLS <- predict.catch.function(model="NOSUR",fit = catch_BOTHBIND_loglin_nosur,TAC.BOTHBIND )
         
-        CATCH.BOTHBIND.FLATSUR.SURSUR <- predict.catch.function(model="FLATSUR",fit_sur=catch_BOTHBIND_FLATSUR_sur,fit_nosur = catch_BOTHBIND_SIMPLER_nosur,TAC.BOTHBIND.FLATSUR )
+        TAC.BOTHBIND.FLATSUR <- predict.tac.function(scenario = 1, model="FLATSUR",fit=tac_BOTHBIND_FLATSUR_loglin_sur,FISH.DATA)
+        
+        CATCH.BOTHBIND.FLATSUR.SURSUR <- predict.catch.function(model="FLATSUR",fit=catch_BOTHBIND_FLATSUR_loglin_sur,TAC.BOTHBIND.FLATSUR )
+        
+    } else if (scenario == 1.1) {
+        TAC.BOTHBIND <- predict.tac.function(scenario = 1.1,model="SUR",fit=tac_BOTHBIND_sur,FISH.DATA)
+        
+        CATCH.BOTHBIND.SURSUR <- predict.catch.function(model="SUR",fit=catch_BOTHBIND_sur,TAC.BOTHBIND )
+        CATCH.BOTHBIND.SUROLS <- predict.catch.function(model="NOSUR",fit = catch_BOTHBIND_nosur,TAC.BOTHBIND )
+        
+        TAC.BOTHBIND.FLATSUR <- predict.tac.function(scenario = 1.1,model="FLATSUR",fit=tac_BOTHBIND_FLATSUR_sur,FISH.DATA)
+        
+        CATCH.BOTHBIND.FLATSUR.SURSUR <- predict.catch.function(model="FLATSUR",fit=catch_BOTHBIND_FLATSUR_sur,TAC.BOTHBIND.FLATSUR )
+        
+    }
     
-        
+    
+    
     # create ensemble
     # 
-    #CATCH.PRED <-  (CATCH.SURSUR + CATCH.SURNOSUR + CATCH.NOFIRSTYEAR.SURNOSUR + CATCH.NOFIRSTYEAR.SURSUR + CATCH.FLATSUR + CATCH.NOROCKSOLE)/6
     CATCH.PRED <- (CATCH.BOTHBIND.SURSUR + CATCH.BOTHBIND.SUROLS + CATCH.BOTHBIND.FLATSUR.SURSUR)/3
     
     output <- CATCH.PRED[c("CATCH.BS.141",

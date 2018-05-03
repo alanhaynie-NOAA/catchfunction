@@ -9,7 +9,7 @@ catch_function(scenario, Arrowtooth, Atka, Flathead, Greenland, Kamchatka,
   Rougheye, Sablefish, Sculpin, Shark, Shortraker, Skate, Squid, Yellowfin)
 }
 \arguments{
-\item{scenario}{The economic scenario number (1 through 5). 1: Status Quo, 2: Eliminate 2 million ton cap, 3: No fishing, 4: MEY, 5: "Fleet Dynamics"}
+\item{scenario}{The economic scenario number. 1: Status Quo (log-linear). 1.1: Status quo (log-log.  This fits just as well as log-linear in retrospect, but assumes if the target dissapears (e.g. Atka) then the catch of the bycatch (e.g. Northern) would go to 0.  This assumption is problematic so this is an "alternative" status quo but not the "go to").  3. No fishing (will only return 0's)}
 
 \item{Arrowtooth}{Optional.  ABC of Arrowtooth Flounder.}
 
@@ -60,7 +60,7 @@ This function predicts the BSAI catch for each species whose ABC is given.  It i
 
 If you have any questions, please contact me (e-mail: amanda.faig@noaa.gov, call: X-4281).
 
-Currently programmed scenarios: Scenario 1 & Scenario 3
+Currently programmed scenarios: Scenario 1, Scenario 1.1 & Scenario 3
 }
 \examples{
 catch_function(1, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
