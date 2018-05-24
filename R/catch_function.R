@@ -3,11 +3,16 @@
 #' @description 
 #' This function predicts the BSAI catch for each species whose ABC is given.  It is meant to work with the ACLIM bio models.
 #' 
-#' If you have any questions, please contact me (e-mail: amanda.faig@noaa.gov, call: X-4281).
+#' If you have any questions, please contact Amanda Faig (e-mail: amanda.faig@noaa.gov, call: X-4281).
 #' 
-#' Currently programmed scenarios: Scenario 1, Scenario 1.1 & Scenario 3
+#' Currently programmed scenarios:
+#' Scenario 1: Status Quo (Log-Linear)
+#' Scenario 1.1: Status Quo alternative: Log-Log
+#' Scenario 2: Whitefish (Pollock and Cod) Political (aka TAC-setting) Preference
+#' Scenario 3: Flatfish Political (aka TAC-setting) Preference
+#' Scenario 4: No Fishing (will return all zeros)
 #' 
-#' @param scenario The economic scenario number. 1: Status Quo (log-linear). 1.1: Status quo (log-log.  This fits just as well as log-linear in retrospect, but assumes if the target dissapears (e.g. Atka) then the catch of the bycatch (e.g. Northern) would go to 0.  This assumption is problematic so this is an "alternative" status quo but not the "go to").  3. No fishing (will only return 0's)
+#' @param scenario The economic scenario number. Current options: 1, 1.1, 2, 3, or 4
 #' @param Arrowtooth Optional.  ABC of Arrowtooth Flounder.
 #' @param Atka Optional.  ABC of Atka Mackerel.
 #' @param Flathead Optional.  ABC of Flathead Sole.
@@ -194,8 +199,8 @@ ABC.DATA <- BSAIfun(ABC.DATA,"65")
 ABC.DATA <- BSAIfun(ABC.DATA,"90")
 ABC.DATA <- BSAIfun(ABC.DATA,"202")
 
-#return(ABC.DATA)
-# ## Second, pass ABCs to status quo function to get catch
+
+## Second, pass ABCs to status quo function to get catch
 
  if (scenario == 1) {
      catch <- statusquo_catch(ABC.DATA,1)
@@ -204,20 +209,17 @@ ABC.DATA <- BSAIfun(ABC.DATA,"202")
      catch <- statusquo_catch(ABC.DATA,1.1)
      # log log
  } else if (scenario == 2) {
-     print("Scenario 2: No 2MT cap. This scenario not yet programmed.")
+     catch <- statusquo_catch(ABC.DATA,2)
  } else if (scenario == 3) {
-    catch <- statusquo_catch(ABC.DATA)*0
+    catch <- statusquo_catch(ABC.DATA,3)
  } else if (scenario == 4) {
-     catch <- ABC.DATA
-     print("Scenario 4: MEY.  Speak with Steve about this one.")
- } else if (scenario == 5) {
-     print("Scenario 5: Fleet dynamics.  See notes from socio-econ workshop")
+     catch <- statusquo_catch(ABC.DATA,1)*0
  }
 
  # Third, pick only species that were passed in to pass back out.
 output <- catch[!missingspp]
 colnames(output) <- sppnames[!missingspp]
-
+output[is.na(output)] <- 0
 return(output)
 
 }
