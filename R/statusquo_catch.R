@@ -69,9 +69,9 @@ statusquo_catch <- function(ABC.DATA,scenario) {
         TAC.BOTHBIND.flatfishdom <- predict.tac.function(predictmethod = 1,model="SUR_FFDOM",fit=tac_BOTHBIND_loglin_sur,FISH.DATA)
         TAC.BOTHBIND.flatfishdom$ABCboth.UB.150 <- as.numeric(TAC.BOTHBIND.flatfishdom$ABC.BS.201 + TAC.BOTHBIND.flatfishdom$ABC.BSAI.202 >= 1.50e6*0.9)
         
-       CATCH.BOTHBIND.SURSUR <- predict.catch.function(model="SUR",fit=catch_BOTHBIND_loglin_sur,TAC.BOTHBIND.flatfishdom )
-        CATCH.BOTHBIND.SUROLS <- predict.catch.function(model="NOSUR",fit = catch_BOTHBIND_loglin_nosur,TAC.BOTHBIND.flatfishdom )
-        CATCH.BOTHBIND.FLATSUR.SURSUR <- predict.catch.function(model="FLATSUR",fit=catch_BOTHBIND_FLATSUR_loglin_sur,TAC.BOTHBIND.FLATSUR.flatfishdom )
+       CATCH.BOTHBIND.SURSUR <- predict.catch.function(model="SUR_FFDOM",fit=catch_BOTHBIND_loglin_sur,TAC.BOTHBIND.flatfishdom )
+        CATCH.BOTHBIND.SUROLS <- predict.catch.function(model="NOSUR_FFDOM",fit = catch_BOTHBIND_loglin_nosur,TAC.BOTHBIND.flatfishdom )
+        CATCH.BOTHBIND.FLATSUR.SURSUR <- predict.catch.function(model="FLATSUR_FFDOM",fit=catch_BOTHBIND_FLATSUR_loglin_sur,TAC.BOTHBIND.FLATSUR.flatfishdom )
     }
     
     
