@@ -2,17 +2,22 @@ statusquo_catch <- function(ABC.DATA,scenario) {
     
     if (scenario == 1 | scenario == 2 | scenario == 3) {
         FISH.DATA <- ABC.DATA
+        FISH.DATA$ABCboth <- FISH.DATA$ABC.BSAI.202 + FISH.DATA$ABC.BS.201
+        FISH.DATA$ABCboth.UB.150 <- as.numeric(FISH.DATA$ABC.BS.201 + FISH.DATA$ABC.BSAI.202 >= 1.5e6)
+        FISH.DATA$pollock.bs.UB <-  as.numeric(FISH.DATA$ABC.BS.201 > 1.2e6)
     }   else if (scenario == 1.1) {
         FISH.DATA <- log(ABC.DATA)
+        FISH.DATA$ABCboth <- exp(FISH.DATA$ABC.BSAI.202) + exp(FISH.DATA$ABC.BS.201)
+        FISH.DATA$ABCboth.UB.150 <- as.numeric(exp(FISH.DATA$ABC.BS.201) + exp(FISH.DATA$ABC.BSAI.202) >= 1.5e6)
+        FISH.DATA$pollock.bs.UB <-  as.numeric(exp(ABC.DATA$ABC.BS.201) > 1.2e6)
     } 
     
     FISH.DATA$flex <-  1  # introduction of flatfish flex
     FISH.DATA$A80 <-  1  # introduction of A80
-    FISH.DATA$pollock.bs.UB <-  as.numeric(ABC.DATA$ABC.BS.201 > 1.2e6)
     FISH.DATA$po10 <- 1
     FISH.DATA$pre97 <- 0
     FISH.DATA$is93 <- 0
-    FISH.DATA$WAISSLadj <- 11.
+    FISH.DATA$WAISSLadj <- 1
     FISH.DATA$solegone <-  1
     FISH.DATA$plaicegone <-  1
     FISH.DATA$kamsplit <-  1
@@ -24,10 +29,8 @@ statusquo_catch <- function(ABC.DATA,scenario) {
     FISH.DATA$WAISSL <- 0
     FISH.DATA$A80.ask.POP <- 1
     FISH.DATA$is93 <- 0
-    FISH.DATA$ABCboth.UB.150 <- as.numeric(FISH.DATA$ABC.BS.201 + FISH.DATA$ABC.BSAI.202 >= 1.5e6)
     FISH.DATA$A82 <- 1
-    FISH.DATA$ABCboth <- FISH.DATA$ABC.BSAI.202 + FISH.DATA$ABC.BS.201
-    
+
     
     if (scenario == 1) {
         TAC.BOTHBIND <- predict.tac.function(predictmethod = 1, model="SUR",fit=tac_BOTHBIND_loglin_sur,FISH.DATA)
