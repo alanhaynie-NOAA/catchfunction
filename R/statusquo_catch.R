@@ -12,7 +12,7 @@ statusquo_catch <- function(ABC.DATA,scenario) {
     FISH.DATA$po10 <- 1
     FISH.DATA$pre97 <- 0
     FISH.DATA$is93 <- 0
-    FISH.DATA$WAISSLadj <- 1
+    FISH.DATA$WAISSLadj <- 11.
     FISH.DATA$solegone <-  1
     FISH.DATA$plaicegone <-  1
     FISH.DATA$kamsplit <-  1
@@ -24,7 +24,7 @@ statusquo_catch <- function(ABC.DATA,scenario) {
     FISH.DATA$WAISSL <- 0
     FISH.DATA$A80.ask.POP <- 1
     FISH.DATA$is93 <- 0
-    FISH.DATA$ABCboth.UB.150 <- as.numeric(ABC.DATA$ABC.BS.201 + ABC.DATA$ABC.BSAI.202 >= 1.5e6)
+    FISH.DATA$ABCboth.UB.150 <- as.numeric(FISH.DATA$ABC.BS.201 + FISH.DATA$ABC.BSAI.202 >= 1.5e6)
     FISH.DATA$A82 <- 1
     FISH.DATA$ABCboth <- FISH.DATA$ABC.BSAI.202 + FISH.DATA$ABC.BS.201
     

@@ -501,21 +501,34 @@ predict.catch.function <- function(model,fit,FISH.DATA) {
         return(DT)
     }
     
-        bsaicatchnogreaterthan <- function(bsvec,aivec,maxbsaivec){
+        bsaicatchnogreaterthan <- function(bsvec,aivec,maxbsvec,maxaivec,maxbsaivec){
         for (i in 1:length(bsvec)) {
             bs <- exp(bsvec[i])
             ai <- exp(aivec[i])
             if (is.na(bs)) bs <- 0
             if (is.na(ai)) ai <- 0
-            maxbsai <- exp(maxbsaivec[i])
+            maxbsai <- maxbsaivec[i] 
+            maxbs <- maxbsvec[i]
+            maxai <- maxaivec[i]
             if (is.na(maxbsai)) {
                 bsvec[i] <- -Inf
                 aivec[i] <- -Inf
             } else if (bs + ai > maxbsai) { # if adjustment is necessary
                 bsai <- bs + ai # current sum
                 # replace the old bs/ai estimate with adjusted estimate
-                bsvec[i] <- log(maxbsai*bs/bsai)
-                aivec[i] <- log(maxbsai*ai/bsai)
+                if (bs - ai > 0 & bs > maxbs) { # if the bering sea is the one that may 'take' from the ai
+                    bs <- min(maxbs,maxbsai)
+                    ai <- maxbsai - bs
+                } else if (ai - bs > 0 & ai > maxai) {
+                    ai <- min(maxai*maxbsai/(maxai+maxbs),ai*maxbsai/(ai+bs),maxai)
+                    bs <- maxbsai - ai
+                } else {
+                    ai <- maxbsai*ai/bsai
+                    bs <- maxbsai*bs/bsai
+                }
+                
+                bsvec[i] <- log(bs)
+                aivec[i] <- log(ai)
             } 
             
         }
@@ -525,73 +538,73 @@ predict.catch.function <- function(model,fit,FISH.DATA) {
     
     checkeach_maxbsai <- function(PREDICTIONS) {
         # Octopus
-        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.60,PREDICTIONS$CATCH.AI.60,log(FISH.DATA$ABC.BSAI.60))
+        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.60,PREDICTIONS$CATCH.AI.60, FISH.DATA$ABC.BS.60,FISH.DATA$ABC.AI.60, FISH.DATA$ABC.BSAI.60)
         PREDICTIONS$CATCH.BS.60 <- result[[1]]
         PREDICTIONS$CATCH.AI.60 <- result[[2]]
         # Sharks
-        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.65,PREDICTIONS$CATCH.AI.65,log(FISH.DATA$ABC.BSAI.65))
+        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.65,PREDICTIONS$CATCH.AI.65,FISH.DATA$ABC.BS.65,FISH.DATA$ABC.AI.65,FISH.DATA$ABC.BSAI.65)
         PREDICTIONS$CATCH.BS.65 <- result[[1]]
         PREDICTIONS$CATCH.AI.65 <- result[[2]]
         # Skates
-        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.90,PREDICTIONS$CATCH.AI.90,log(FISH.DATA$ABC.BSAI.90))
+        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.90,PREDICTIONS$CATCH.AI.90, FISH.DATA$ABC.BS.90, FISH.DATA$ABC.AI.90, FISH.DATA$ABC.BSAI.90)
         PREDICTIONS$CATCH.BS.90 <- result[[1]]
         PREDICTIONS$CATCH.AI.90 <- result[[2]]
         #Sculpin
-        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.400,PREDICTIONS$CATCH.AI.400,log(FISH.DATA$ABC.BSAI.400))
+        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.400,PREDICTIONS$CATCH.AI.400, FISH.DATA$ABC.BS.400, FISH.DATA$ABC.AI.400, FISH.DATA$ABC.BSAI.400)
         PREDICTIONS$CATCH.BS.400 <- result[[1]]
         PREDICTIONS$CATCH.AI.400 <- result[[2]]
         #Squid
-        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.50,PREDICTIONS$CATCH.AI.50,log(FISH.DATA$ABC.BSAI.50))
+        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.50,PREDICTIONS$CATCH.AI.50, FISH.DATA$ABC.BS.50, FISH.DATA$ABC.AI.50, FISH.DATA$ABC.BSAI.50)
         PREDICTIONS$CATCH.BS.50 <- result[[1]]
         PREDICTIONS$CATCH.AI.50 <- result[[2]]
         
         # Shortraker
-        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.326,PREDICTIONS$CATCH.AI.326,log(FISH.DATA$TAC.BSAI.326))
+        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.326,PREDICTIONS$CATCH.AI.326,FISH.DATA$ABC.BS.326,FISH.DATA$ABC.AI.326,FISH.DATA$TAC.BSAI.326)
         PREDICTIONS$CATCH.BS.326 <- result[[1]]
         PREDICTIONS$CATCH.AI.326 <- result[[2]]
         # Rougheye
-        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.307,PREDICTIONS$CATCH.AI.307,log(FISH.DATA$TAC.BSAI.307))
+        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.307,PREDICTIONS$CATCH.AI.307, FISH.DATA$ABC.BS.307,FISH.DATA$ABC.AI.307,FISH.DATA$TAC.BSAI.307)
         PREDICTIONS$CATCH.BS.307 <- result[[1]]
         PREDICTIONS$CATCH.AI.307 <- result[[2]]
         # Other rock fish should be handled without this
         # Northern
-        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.303,PREDICTIONS$CATCH.AI.303,log(FISH.DATA$TAC.BSAI.303))
+        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.303,PREDICTIONS$CATCH.AI.303, FISH.DATA$ABC.BS.303,FISH.DATA$ABC.AI.303,FISH.DATA$TAC.BSAI.303)
         PREDICTIONS$CATCH.BS.303 <- result[[1]]
         PREDICTIONS$CATCH.AI.303 <- result[[2]]
         # POP should be handled without this
         
         # Pollock should be handled without this
         # PCod
-        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.202,PREDICTIONS$CATCH.AI.202,log(FISH.DATA$TAC.BSAI.202))
+        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.202,PREDICTIONS$CATCH.AI.202,FISH.DATA$ABC.BS.202,FISH.DATA$ABC.AI.202,FISH.DATA$TAC.BSAI.202)
         PREDICTIONS$CATCH.BS.202 <- result[[1]]
         PREDICTIONS$CATCH.AI.202 <- result[[2]]
         # Sablefish should be handled without this
         # Atka 
-        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.204,PREDICTIONS$CATCH.AI.204,log(FISH.DATA$TAC.BSAI.204))
+        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.204,PREDICTIONS$CATCH.AI.204,FISH.DATA$ABC.BS.204,FISH.DATA$ABC.AI.204,FISH.DATA$TAC.BSAI.204)
         PREDICTIONS$CATCH.BS.204 <- result[[1]]
         PREDICTIONS$CATCH.AI.204 <- result[[2]]
         
         # Yellowfin should be handled without this (no AI)
         # Arrowtooth
-        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.141,PREDICTIONS$CATCH.AI.141,pmin(log(3700 + FISH.DATA$TAC.BSAI.141), log(FISH.DATA$ABC.BSAI.141)))
+        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.141,PREDICTIONS$CATCH.AI.141,FISH.DATA$ABC.BS.141,FISH.DATA$ABC.AI.141, pmin(3700 + FISH.DATA$TAC.BSAI.141, FISH.DATA$ABC.BSAI.141))
         PREDICTIONS$CATCH.BS.141 <- result[[1]]
         PREDICTIONS$CATCH.AI.141 <- result[[2]]
         # Kamchatka
-        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.147,PREDICTIONS$CATCH.AI.147, log(FISH.DATA$TAC.BSAI.147))
+        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.147,PREDICTIONS$CATCH.AI.147,FISH.DATA$ABC.BS.147,FISH.DATA$ABC.AI.147, FISH.DATA$TAC.BSAI.147)
         PREDICTIONS$CATCH.BS.147 <- result[[1]]
         PREDICTIONS$CATCH.AI.147 <- result[[2]]
         
         # Other Flatfish
-        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.100,PREDICTIONS$CATCH.AI.100,pmin(pmax(log(FISH.DATA$TAC.BSAI.100),2e3), log(FISH.DATA$ABC.BSAI.100)))
+        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.100,PREDICTIONS$CATCH.AI.100,FISH.DATA$ABC.BS.100,FISH.DATA$ABC.AI.100,pmin(pmax(FISH.DATA$TAC.BSAI.100,2e3), FISH.DATA$ABC.BSAI.100))
         PREDICTIONS$CATCH.BS.100 <- result[[1]]
         PREDICTIONS$CATCH.AI.100 <- result[[2]]
         # Greenland Turbot should be handled without this
         # Flathead Sole
-        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.103,PREDICTIONS$CATCH.AI.103,log(FISH.DATA$TAC.BSAI.103))
+        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.103,PREDICTIONS$CATCH.AI.103,FISH.DATA$ABC.BS.103,FISH.DATA$ABC.AI.103,FISH.DATA$TAC.BSAI.103)
         PREDICTIONS$CATCH.BS.103 <- result[[1]]
         PREDICTIONS$CATCH.AI.103 <- result[[2]]
         # Rock Sole
-        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.104,PREDICTIONS$CATCH.AI.104,pmin(pmax(35e3,log(FISH.DATA$TAC.BSAI.104)), log(FISH.DATA$ABC.BSAI.104)))
+        result <- bsaicatchnogreaterthan(PREDICTIONS$CATCH.BS.104,PREDICTIONS$CATCH.AI.104,FISH.DATA$ABC.BS.104,FISH.DATA$ABC.AI.104,pmin(pmax(35e3,FISH.DATA$TAC.BSAI.104), FISH.DATA$ABC.BSAI.104))
         PREDICTIONS$CATCH.BS.104 <- result[[1]]
         PREDICTIONS$CATCH.AI.104 <- result[[2]]
         # Plaice should be handled without this (no AI)
@@ -718,7 +731,7 @@ predict.catch.function <- function(model,fit,FISH.DATA) {
         PREDICTIONS$CATCH.AI.201 <- pmin(predict(fit[[37]], FISH.DATA),log(FISH.DATA$TAC.AI.201))
         # PCod
         PREDICTIONS$CATCH.BS.202 <- Pred.SUR.A80$PCod.pred
-        PREDICTIONS$CATCH.AI.202 <- pmin(predict(fit[[36]], FISH.DATA),log(FISH.DATA$TAC.BSAI.202))
+        PREDICTIONS$CATCH.AI.202 <- predict(fit[[36]], FISH.DATA)
         # Sablefish
         PREDICTIONS$CATCH.BS.203 <- pmin(Pred.SUR.A80$sablefish.pred,log(FISH.DATA$TAC.BS.203))
         PREDICTIONS$CATCH.AI.203 <- pmin(predict(fit[[34]], FISH.DATA),log(FISH.DATA$TAC.AI.203))
