@@ -341,8 +341,8 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
             abcdt <- FFABCS[rownum, ]
             while (goalamt > 0) {
                 # calculate the distance (from tac to abc) to tac ratio for each flatfish.
-                disttoabc <- round(abcdt - dt, digits = 9) # assume if you're within 1e-9 of another number its basically the same number, yea?
-                disttoabc_to_tac_ratio <- disttoabc/dt
+                disttoabc <- round(abcdt - dt, digits = 3) # assume if you're within 1e-9 of another number its basically the same number, yea?
+                disttoabc_to_tac_ratio <- disttoabc/round(dt, digits = 3)
                 # the minimum, nonzero, ratio is the one that will determine how the goal amt is spread across the species, this round
                 x <- min(disttoabc_to_tac_ratio[disttoabc_to_tac_ratio != 0], na.rm = T)
                 if (x < 0) stop('x is negative!! something went horribly wrong')
@@ -356,7 +356,7 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
                     # increase all TAC proportionally, by the allowable distance given tac<abc constraint
                     dt <- dt + xvec*dt
                     # and go back to the beginning and do it again until goalamt = 0
-                    if (goalamt < -1e-9) stop('goalamt is negative, but it shouldnt be.  something went horribly wrong') else if (goalamt < 1e-9) {goalamt <- 0} # if it's between 0 and -1e-9 just set it to 0; it's close enough.
+                    if (goalamt < -1e-3) stop('goalamt is negative, but it shouldnt be.  something went horribly wrong') else if (goalamt < 1e-3) {goalamt <- 0} # if it's between 0 and -1e-9 just set it to 0; it's close enough.
                 } else {
                     dtvec <- dt
                     dtvec[xvec == 0] <- 0 # so you don't go above abc!
@@ -364,7 +364,7 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
                     dt <- dt + (dtvec/sum(dtvec))*goalamt
                     # calculate remaining goalamt
                     goalamt <- goalamt - sum((dtvec/sum(dtvec))*goalamt)
-                    if (goalamt > 1e-9) stop('goalamt should be 0, but its not.  something went horribly wrong') else goalamt <- 0 #numerically it'll get super close but due to rounding you have to manually set to 0
+                    if (goalamt > 1e-3) stop('goalamt should be 0, but its not.  something went horribly wrong') else goalamt <- 0 #numerically it'll get super close but due to rounding you have to manually set to 0
                 }
             }
             # put the results into the prediction dataframe and move on to the next row
@@ -395,7 +395,7 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
             while (goalamt > 0) {
                 # calculate the distance (from tac to abc) to tac ratio for each flatfish.
                 disttoabc <- round(abcdt - dt, digits = 3) # if its within 1e-3 ton (less than a kg) we'll assume its just a numerical rounding error type issue and let it go..
-                disttoabc_to_tac_ratio <- disttoabc/dt
+                disttoabc_to_tac_ratio <- disttoabc/round(dt, digits = 3)
                 # the minimum, nonzero, ratio is the one that will determine how the goal amt is spread across the species, this round
                 x <- min(disttoabc_to_tac_ratio[disttoabc_to_tac_ratio != 0], na.rm = T)
                 if (x < 0) stop('x is negative!! something went horribly wrong') 
