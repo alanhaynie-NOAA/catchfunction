@@ -398,11 +398,12 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
                 disttoabc <- round(abcdt - dt, digits = 3) # if its within 1e-3 ton (less than a kg) we'll assume its just a numerical rounding error type issue and let it go..
                 disttoabc_to_tac_ratio <- disttoabc/round(dt, digits = 3)
                 # the minimum, nonzero, ratio is the one that will determine how the goal amt is spread across the species, this round
-                x <- min(disttoabc_to_tac_ratio[disttoabc_to_tac_ratio != 0], na.rm = T)
-                if (x < 0) stop('x is negative!! something went horribly wrong') 
+                if (min(disttoabc_to_tac_ratio, na.rm = T) < -1e-3) stop('x is negative!! something went horribly wrong')
+                x <- min(disttoabc_to_tac_ratio[disttoabc_to_tac_ratio > 1e-3], na.rm = T)
                 xvec <- disttoabc_to_tac_ratio
-                xvec[xvec != 0] <- x
+                xvec[xvec > 1e-3] <- x
                 xvec[is.na(xvec)] <- 0
+                xvec[abs(xvec) < 1e-3] <- 0
                 # check that another loop is needed at all.  
                 if (sum(xvec*dt) < goalamt) {
                     # decrease remaining goalamt to distribute
