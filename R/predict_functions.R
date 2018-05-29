@@ -349,7 +349,7 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
                 xvec <- disttoabc_to_tac_ratio
                 xvec[xvec > 1e-3] <- x
                 xvec[is.na(xvec)] <- 0
-                xvec[xvec < 1e-3] <- 0
+                xvec[abs(xvec) < 1e-3] <- 0
                 # check that another loop is needed at all.  
                 if (sum(xvec*dt) < goalamt) {
                     # decrease remaining goalamt to distribute
