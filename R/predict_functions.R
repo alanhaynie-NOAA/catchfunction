@@ -339,17 +339,18 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
             goalamt <- PREDICTIONS$goal[rownum]
             dt <- PREDICTIONS[rownum,c("TAC.BSAI.140","TAC.BSAI.104","TAC.BSAI.147","TAC.BSAI.106","TAC.BS.102","TAC.AI.102","TAC.BSAI.100","TAC.BSAI.103","TAC.BSAI.141")] # just to keep things clean..
             abcdt <- FFABCS[rownum, ]
-            while (goalamt > 1e-6) {
+            while (goalamt > 0) {
                 # calculate the distance (from tac to abc) to tac ratio for each flatfish.
-                disttoabc <- abcdt - dt # assume if you're within 1e-9 of another number its basically the same number, yea?
+                disttoabc <- abcdt - dt 
                 disttoabc_to_tac_ratio <- disttoabc/dt
                 # the minimum, nonzero, ratio is the one that will determine how the goal amt is spread across the species, this round
                 if (min(disttoabc_to_tac_ratio, na.rm = T) < -1e-6) stop('x is negative!! something went horribly wrong')
                 x <- min(disttoabc_to_tac_ratio[disttoabc_to_tac_ratio > 0], na.rm = T)
                 xvec <- disttoabc_to_tac_ratio
-                xvec[xvec > 1e-6] <- x
+                xvec[xvec > 0] <- x
                 xvec[is.na(xvec)] <- 0
-                xvec[abs(xvec) < 1e-6] <- 0
+                xvec[abs(xvec) < 0] <- 0
+                if (sum(xvec*dt)==0 & goalamt !=0) stop('infinite loop')
                 # check that another loop is needed at all.  
                 if (sum(xvec*dt) < goalamt) {
                     # decrease remaining goalamt to distribute
@@ -393,7 +394,7 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
             goalamt <- PREDICTIONS$goal[rownum]
             dt <- PREDICTIONS[rownum,c("TAC.BS.201","TAC.BSAI.202") ]# just to keep things clean..
             abcdt <- FISH.DATA[rownum,c("ABC.BS.201","ABC.BSAI.202")]
-            while (goalamt > 1e-6) {
+            while (goalamt > 0) {
                 # calculate the distance (from tac to abc) to tac ratio for each flatfish.
                 disttoabc <- abcdt - dt # assume if you're within 1e-9 of another number its basically the same number, yea?
                 disttoabc_to_tac_ratio <- disttoabc/dt
@@ -401,9 +402,10 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
                 if (min(disttoabc_to_tac_ratio, na.rm = T) < -1e-6) stop('x is negative!! something went horribly wrong')
                 x <- min(disttoabc_to_tac_ratio[disttoabc_to_tac_ratio > 0], na.rm = T)
                 xvec <- disttoabc_to_tac_ratio
-                xvec[xvec > 1e-6] <- x
+                xvec[xvec > 0] <- x
                 xvec[is.na(xvec)] <- 0
-                xvec[abs(xvec) < 1e-6] <- 0
+                xvec[abs(xvec) < 0] <- 0
+                if (sum(xvec*dt)==0 & goalamt !=0) stop('infinite loop')
                 # check that another loop is needed at all.  
                 if (sum(xvec*dt) < goalamt) {
                     # decrease remaining goalamt to distribute
