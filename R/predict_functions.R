@@ -329,7 +329,7 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
         PREDICTIONS$FFTAC <- rowSums(FFTACS,na.rm=T)
         # goal will the minimum of 0.1*oldTAC; oldTAC - (1-0.1)*1.5e6; and flatfishABC-flatfishTAC
         # Aka the minimum of the fraction of the whitefish tac we want to take; the whitefish tac available to take; and the flatfish abc available to turn to tac
-        PREDICTIONS$goal <- pmin(0.1*(PREDICTIONS$TAC.BS.201 + PREDICTIONS$TAC.BSAI.202), pmax((PREDICTIONS$TAC.BS.201 + PREDICTIONS$TAC.BSAI.202) - 1.50e6*(1-0.1),0), PREDICTIONS$FFABC - PREDICTIONS$FFTAC)
+        PREDICTIONS$goal <- pmin(0.1*(PREDICTIONS$TAC.BS.201 + PREDICTIONS$TAC.BSAI.202), pmax((PREDICTIONS$TAC.BS.201 + PREDICTIONS$TAC.BSAI.202) - 1.50e6*(1-0.1),0), pmax(PREDICTIONS$FFABC - PREDICTIONS$FFTAC, 0))
         # decrease cod and pollock, if applicable (goal may be 0)
         PREDICTIONS$whitefishtac <- PREDICTIONS$TAC.BS.201 + PREDICTIONS$TAC.BSAI.202
         PREDICTIONS$TAC.BS.201 <- PREDICTIONS$TAC.BS.201 - (PREDICTIONS$TAC.BS.201/PREDICTIONS$whitefishtac)*PREDICTIONS$goal
@@ -339,17 +339,17 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
             goalamt <- PREDICTIONS$goal[rownum]
             dt <- PREDICTIONS[rownum,c("TAC.BSAI.140","TAC.BSAI.104","TAC.BSAI.147","TAC.BSAI.106","TAC.BS.102","TAC.AI.102","TAC.BSAI.100","TAC.BSAI.103","TAC.BSAI.141")] # just to keep things clean..
             abcdt <- FFABCS[rownum, ]
-            while (goalamt > 0) {
+            while (goalamt > 1e-6) {
                 # calculate the distance (from tac to abc) to tac ratio for each flatfish.
                 disttoabc <- abcdt - dt # assume if you're within 1e-9 of another number its basically the same number, yea?
                 disttoabc_to_tac_ratio <- disttoabc/dt
                 # the minimum, nonzero, ratio is the one that will determine how the goal amt is spread across the species, this round
-                if (min(disttoabc_to_tac_ratio, na.rm = T) < -1e-3) stop('x is negative!! something went horribly wrong')
-                x <- min(disttoabc_to_tac_ratio[disttoabc_to_tac_ratio > 1e-3], na.rm = T)
+                if (min(disttoabc_to_tac_ratio, na.rm = T) < -1e-6) stop('x is negative!! something went horribly wrong')
+                x <- min(disttoabc_to_tac_ratio[disttoabc_to_tac_ratio > 0], na.rm = T)
                 xvec <- disttoabc_to_tac_ratio
-                xvec[xvec > 1e-3] <- x
+                xvec[xvec > 1e-6] <- x
                 xvec[is.na(xvec)] <- 0
-                xvec[abs(xvec) < 1e-3] <- 0
+                xvec[abs(xvec) < 1e-6] <- 0
                 # check that another loop is needed at all.  
                 if (sum(xvec*dt) < goalamt) {
                     # decrease remaining goalamt to distribute
@@ -357,7 +357,7 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
                     # increase all TAC proportionally, by the allowable distance given tac<abc constraint
                     dt <- dt + xvec*dt
                     # and go back to the beginning and do it again until goalamt = 0
-                    if (goalamt < -1e-3) stop('goalamt is negative, but it shouldnt be.  something went horribly wrong') else if (goalamt < 1e-3) {goalamt <- 0} # if it's between 0 and -1e-9 just set it to 0; it's close enough.
+                    if (goalamt < -1e-6) stop('goalamt is negative, but it shouldnt be.  something went horribly wrong') else if (goalamt < 1e-6) {goalamt <- 0} # if it's between 0 and -1e-9 just set it to 0; it's close enough.
                 } else {
                     dtvec <- dt
                     dtvec[xvec == 0] <- 0 # so you don't go above abc!
@@ -365,7 +365,7 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
                     dt <- dt + (dtvec/sum(dtvec))*goalamt
                     # calculate remaining goalamt
                     goalamt <- goalamt - sum((dtvec/sum(dtvec))*goalamt)
-                    if (goalamt > 1e-3) stop('goalamt should be 0, but its not.  something went horribly wrong') else goalamt <- 0 #numerically it'll get super close but due to rounding you have to manually set to 0
+                    if (goalamt > 1e-6) stop('goalamt should be 0, but its not.  something went horribly wrong') else goalamt <- 0 #numerically it'll get super close but due to rounding you have to manually set to 0
                 }
             }
             # put the results into the prediction dataframe and move on to the next row
@@ -386,24 +386,24 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
         
         # goal will the minimum of 0.1*oldTAC; whitefishABC-whitefishTAC; and 
         # Aka the minimum of the fraction of the whitefish tac we want to add; the max flatfish reduction allowed; and the whitefish abc available to turn to tac
-        PREDICTIONS$goal <- pmin(0.1*(PREDICTIONS$TAC.BS.201 + PREDICTIONS$TAC.BSAI.202), 0.5*PREDICTIONS$FFTAC, FISH.DATA$ABC.BS.201 + FISH.DATA$ABC.BSAI.202 - PREDICTIONS$TAC.BS.201 - PREDICTIONS$TAC.BSAI.202)
+        PREDICTIONS$goal <- pmin(0.1*(PREDICTIONS$TAC.BS.201 + PREDICTIONS$TAC.BSAI.202), 0.5*PREDICTIONS$FFTAC, pmax(FISH.DATA$ABC.BS.201 + FISH.DATA$ABC.BSAI.202 - PREDICTIONS$TAC.BS.201 - PREDICTIONS$TAC.BSAI.202,0))
         
         # increase cod and pollock, if applicable (goal may be 0), up to ABC
         for (rownum in 1:nrow(PREDICTIONS)) { 
             goalamt <- PREDICTIONS$goal[rownum]
             dt <- PREDICTIONS[rownum,c("TAC.BS.201","TAC.BSAI.202") ]# just to keep things clean..
             abcdt <- FISH.DATA[rownum,c("ABC.BS.201","ABC.BSAI.202")]
-            while (goalamt > 0) {
+            while (goalamt > 1e-6) {
                 # calculate the distance (from tac to abc) to tac ratio for each flatfish.
-                disttoabc <- round(abcdt - dt, digits = 3) # if its within 1e-3 ton (less than a kg) we'll assume its just a numerical rounding error type issue and let it go..
-                disttoabc_to_tac_ratio <- disttoabc/round(dt, digits = 3)
+                disttoabc <- abcdt - dt # assume if you're within 1e-9 of another number its basically the same number, yea?
+                disttoabc_to_tac_ratio <- disttoabc/dt
                 # the minimum, nonzero, ratio is the one that will determine how the goal amt is spread across the species, this round
-                if (min(disttoabc_to_tac_ratio, na.rm = T) < -1e-3) stop('x is negative!! something went horribly wrong')
-                x <- min(disttoabc_to_tac_ratio[disttoabc_to_tac_ratio > 1e-3], na.rm = T)
+                if (min(disttoabc_to_tac_ratio, na.rm = T) < -1e-6) stop('x is negative!! something went horribly wrong')
+                x <- min(disttoabc_to_tac_ratio[disttoabc_to_tac_ratio > 0], na.rm = T)
                 xvec <- disttoabc_to_tac_ratio
-                xvec[xvec > 1e-3] <- x
+                xvec[xvec > 1e-6] <- x
                 xvec[is.na(xvec)] <- 0
-                xvec[abs(xvec) < 1e-3] <- 0
+                xvec[abs(xvec) < 1e-6] <- 0
                 # check that another loop is needed at all.  
                 if (sum(xvec*dt) < goalamt) {
                     # decrease remaining goalamt to distribute
@@ -411,7 +411,7 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
                     # increase all TAC proportionally, by the allowable distance given tac<abc constraint
                     dt <- dt + xvec*dt
                     # and go back to the beginning and do it again until goalamt = 0
-                    if (goalamt < -1e-3) stop('goalamt is negative, but it shouldnt be.  something went horribly wrong') else if (goalamt < 1e-3) {goalamt <- 0} # if it's between 1e-9 and -1e-9 just set it to 0; it's close enough.
+                    if (goalamt < -1e-6) stop('goalamt is negative, but it shouldnt be.  something went horribly wrong') else if (goalamt < 1e-6) {goalamt <- 0} # if it's between 1e-9 and -1e-9 just set it to 0; it's close enough.
                 } else {
                     dtvec <- dt
                     dtvec[xvec == 0] <- 0 # so you don't go above abc!
@@ -419,7 +419,7 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
                     dt <- dt + (dtvec/sum(dtvec))*goalamt
                     # calculate remaining goalamt
                     goalamt <- goalamt - sum((dtvec/sum(dtvec))*goalamt)
-                    if (goalamt > 1e-3) stop('goalamt should be 0, but its not.  something went horribly wrong') else goalamt <- 0 #numerically it'll get super close but due to rounding you have to manually set to 0
+                    if (goalamt > 1e-6) stop('goalamt should be 0, but its not.  something went horribly wrong') else goalamt <- 0 #numerically it'll get super close but due to rounding you have to manually set to 0
                 }
             }
             PREDICTIONS[rownum,c('TAC.BSAI.202','TAC.BS.201')] <- dt[c('TAC.BSAI.202','TAC.BS.201')]
