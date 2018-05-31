@@ -202,26 +202,26 @@ ABC.DATA <- BSAIfun(ABC.DATA,"202")
 
 ## Second, pass ABCs to status quo function to get catch
 
- if (scenario == 1) {
-     catch <- statusquo_catch(ABC.DATA,1)
-     # log linear
- } else if (scenario == 1.1) {
-     catch <- statusquo_catch(ABC.DATA,1.1)
-     # log log
- } else if (scenario == 2) {
-     catch <- statusquo_catch(ABC.DATA,2)
- } else if (scenario == 3) {
-    catch <- statusquo_catch(ABC.DATA,3)
- } else if (scenario == 4) {
-     catch <- statusquo_catch(ABC.DATA,1)*0
- }
-
- # Third, pick only species that were passed in to pass back out.
-output <- catch[!missingspp]
-colnames(output) <- sppnames[!missingspp]
-output[is.na(output)] <- 0
-return(output)
-#return(ABC.DATA)
+#  if (scenario == 1) {
+#      catch <- statusquo_catch(ABC.DATA,1)
+#      # log linear
+#  } else if (scenario == 1.1) {
+#      catch <- statusquo_catch(ABC.DATA,1.1)
+#      # log log
+#  } else if (scenario == 2) {
+#      catch <- statusquo_catch(ABC.DATA,2)
+#  } else if (scenario == 3) {
+#     catch <- statusquo_catch(ABC.DATA,3)
+#  } else if (scenario == 4) {
+#      catch <- statusquo_catch(ABC.DATA,1)*0
+#  }
+# 
+#  # Third, pick only species that were passed in to pass back out.
+# output <- catch[!missingspp]
+# colnames(output) <- sppnames[!missingspp]
+# output[is.na(output)] <- 0
+# return(output)
+return(ABC.DATA)
 }
 
     
