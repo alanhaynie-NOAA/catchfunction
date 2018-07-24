@@ -9,7 +9,7 @@ catch_function(scenario, Arrowtooth, Atka, Flathead, Greenland, Kamchatka,
   Rougheye, Sablefish, Sculpin, Shark, Shortraker, Skate, Squid, Yellowfin)
 }
 \arguments{
-\item{scenario}{The economic scenario number. 1: Status Quo (log-linear). 1.1: Status quo (log-log.  This fits just as well as log-linear in retrospect, but assumes if the target dissapears (e.g. Atka) then the catch of the bycatch (e.g. Northern) would go to 0.  This assumption is problematic so this is an "alternative" status quo but not the "go to").  2. Whitefish dominate--the council moves TAC from flatfish to pollock and pcod. 3. Flatfish dominate--the council moves TAC from pollock and pcod to flatfish.  Also assumes 30% increase in flatfish catch over the baseline fishing scenario, or else why would the council move TAC? 4. No fishing (will only return 0's)}
+\item{scenario}{The economic scenario number. Current options: 1, 1.1, 2, 3, or 4}
 
 \item{Arrowtooth}{Optional.  ABC of Arrowtooth Flounder.}
 
@@ -58,9 +58,16 @@ catch_function(scenario, Arrowtooth, Atka, Flathead, Greenland, Kamchatka,
 \description{
 This function predicts the BSAI catch for each species whose ABC is given.  It is meant to work with the ACLIM bio models.
 
-If you have any questions, please contact me (e-mail: amanda.faig@noaa.gov, call: X-4281).
+If you have any questions, please contact Amanda Faig (e-mail: amanda.faig@noaa.gov, call: X-4281).
 
-Currently programmed scenarios: Scenario 1, Scenario 1.1 & Scenario 3
+This version last updated June 2018
+
+Currently programmed scenarios: \cr
+Scenario 1: Status Quo (Log-Linear) \cr
+Scenario 1.1: Status Quo alternative: Log-Log \cr
+Scenario 2: Whitefish (Pollock and Cod) Political (aka TAC-setting) Preference \cr
+Scenario 3: Flatfish Political (aka TAC-setting) Preference \cr
+Scenario 4: No Fishing (will return all zeros) \cr
 }
 \examples{
 catch_function(1, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
