@@ -5,12 +5,14 @@
 #' 
 #' If you have any questions, please contact Amanda Faig (e-mail: amanda.faig@noaa.gov, call: X-4281).
 #' 
-#' Currently programmed scenarios:
-#' Scenario 1: Status Quo (Log-Linear)
-#' Scenario 1.1: Status Quo alternative: Log-Log
-#' Scenario 2: Whitefish (Pollock and Cod) Political (aka TAC-setting) Preference
-#' Scenario 3: Flatfish Political (aka TAC-setting) Preference
-#' Scenario 4: No Fishing (will return all zeros)
+#' This version last updated June 2018
+#' 
+#' Currently programmed scenarios: \cr
+#' Scenario 1: Status Quo (Log-Linear) \cr
+#' Scenario 1.1: Status Quo alternative: Log-Log \cr
+#' Scenario 2: Whitefish (Pollock and Cod) Political (aka TAC-setting) Preference \cr
+#' Scenario 3: Flatfish Political (aka TAC-setting) Preference \cr
+#' Scenario 4: No Fishing (will return all zeros) \cr
 #' 
 #' @param scenario The economic scenario number. Current options: 1, 1.1, 2, 3, or 4
 #' @param Arrowtooth Optional.  ABC of Arrowtooth Flounder.
