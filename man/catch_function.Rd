@@ -6,7 +6,8 @@
 \usage{
 catch_function(scenario, Arrowtooth, Atka, Flathead, Greenland, Kamchatka,
   Northern, Octopus, OtherFlat, OtherRock, PCod, Plaice, POP, Pollock, Rock,
-  Rougheye, Sablefish, Sculpin, Shark, Shortraker, Skate, Squid, Yellowfin)
+  Rougheye, Sablefish, Sculpin, Shark, Shortraker, Skate, Squid, Yellowfin,
+  spptomult, multiplier)
 }
 \arguments{
 \item{scenario}{The economic scenario number. Current options: 1, 1.1, 2, 3, or 4}
@@ -54,6 +55,10 @@ catch_function(scenario, Arrowtooth, Atka, Flathead, Greenland, Kamchatka,
 \item{Squid}{Optional.  ABC of Squid.}
 
 \item{Yellowfin}{Optional.  ABC of Yellowfin Sole.}
+
+\item{spptomult}{Required if running scenario 5.  Will be discarded otherwise.  Choose a species catch to override with N*ABC.  Must be spelt exactly as one of the species parameters, case sensitive.  Must be in quotation marks.  See examples.}
+
+\item{multiplier}{Required if running scenario 5.  Will be discarded otherwise.  The N which will be multiplied with ABC to override the species designated by spptomult.}
 }
 \description{
 This function predicts the BSAI catch for each species whose ABC is given.  It is meant to work with the ACLIM bio models.
@@ -68,8 +73,10 @@ Scenario 1.1: Status Quo alternative: Log-Log \cr
 Scenario 2: Whitefish (Pollock and Cod) Political (aka TAC-setting) Preference \cr
 Scenario 3: Flatfish Political (aka TAC-setting) Preference \cr
 Scenario 4: No Fishing (will return all zeros) \cr
+Scenario 5: Fiddle with a single species. \cr
 }
 \examples{
 catch_function(1, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 catch_function(3, Pollock = 2e6, Yellowfin = 2e5, PCod = 1e5)
+catch_function(5, spptomult = "Arrowtooth", multiplier = 2, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 }
