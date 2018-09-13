@@ -13,6 +13,7 @@
 #' Scenario 2: Whitefish (Pollock and Cod) Political (aka TAC-setting) Preference \cr
 #' Scenario 3: Flatfish Political (aka TAC-setting) Preference \cr
 #' Scenario 4: No Fishing (will return all zeros) \cr
+#' Scenario 5: Fiddle with a single species. \cr
 #' 
 #' @param scenario The economic scenario number. Current options: 1, 1.1, 2, 3, or 4
 #' @param Arrowtooth Optional.  ABC of Arrowtooth Flounder.
@@ -37,7 +38,8 @@
 #' @param Skate Optional.  ABC of Skate.
 #' @param Squid Optional.  ABC of Squid.
 #' @param Yellowfin Optional.  ABC of Yellowfin Sole.
-#' 
+#' @param spptomult Required if running scenario 5.  Will be discarded otherwise.  Choose a species catch to override with N*ABC.  Must be spelt exactly as one of the species parameters, case sensitive.  Must be in quotation marks.  See examples.
+#' @param multiplier Required if running scenario 5.  Will be discarded otherwise.  The N which will be multiplied with ABC to override the species designated by spptomult.
 #' 
 #' @import systemfit
 #'
@@ -46,6 +48,7 @@
 #' @examples 
 #' catch_function(1, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 #' catch_function(3, Pollock = 2e6, Yellowfin = 2e5, PCod = 1e5)
+#' catch_function(5, spptomult = "Arrowtooth", multiplier = 2, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 
 
 # Above is what creates the help document.  It's easier to read by 
@@ -74,7 +77,9 @@ catch_function <- function(scenario,
                           Shortraker, 
                           Skate, 
                           Squid, 
-                          Yellowfin) {
+                          Yellowfin,
+                          spptomult,
+                          multiplier) {
     
     # I start by giving myself a list of all the species numbers
     allspp <- c("141",
@@ -148,7 +153,14 @@ catch_function <- function(scenario,
                   missing(Squid), 
                   missing(Yellowfin))
     
-# Load the mean ABCs from system data.  This was calculated by just finding a 
+    if (scenario == 5) { # if we're running scenario =5 we need some checks
+        if (!spptomult %in% sppnames) {stop("spptomult needs to be match one of the species inputs exactly.  Check spelling and capitalization compared to help file.")}
+        if (missing(spptomult) | missing(multiplier)) {stop("Scenario 5 requires that a species to override catch with N*ABC be designated, and also that the multiplier (N) is desginated.  Check that you have both.")}
+        
+    }
+        
+    
+    # Load the mean ABCs from system data.  This was calculated by just finding a 
 # simple mean using all the available data.
     ABC.DATA <- mean.BS.AI.ABCs
     
@@ -216,12 +228,18 @@ ABC.DATA <- BSAIfun(ABC.DATA,"202")
     catch <- statusquo_catch(ABC.DATA,3)
  } else if (scenario == 4) {
      catch <- statusquo_catch(ABC.DATA,1)*0
+ } else if (scenario == 5) {
+     catch <- statusquo_catch(ABC.DATA,1)
  }
 
  # Third, pick only species that were passed in to pass back out.
 output <- catch[!missingspp]
 colnames(output) <- sppnames[!missingspp]
 output[is.na(output)] <- 0
+
+if (scenario == 5) {  # in scenario 5 override.
+    eval(parse(text = paste("output$",spptomult,"<-",spptomult,"*",multiplier,sep="")))
+}
 return(output)
 #return(ABC.DATA)
 }
