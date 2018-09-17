@@ -38,8 +38,8 @@
 #' @param Skate Optional.  ABC of Skate.
 #' @param Squid Optional.  ABC of Squid.
 #' @param Yellowfin Optional.  ABC of Yellowfin Sole.
-#' @param spptomult Required if running scenario 5.  Will be discarded otherwise.  Choose a species catch to override with N*ABC.  Must be spelt exactly as one of the species parameters, case sensitive.  Must be in quotation marks.  See examples.
-#' @param multiplier Required if running scenario 5.  Will be discarded otherwise.  The N which will be multiplied with ABC to override the species designated by spptomult.
+#' @param spptomult Required if running scenario 5.  Will be discarded otherwise.  Choose a species catch to override with N*ABC.  Must be spelt exactly as one of the species parameters, case sensitive.  Must be in quotation marks.  If you want to replace more than one species, create a vector of strings (e.g. c("Arrowtooth","Atka"))
+#' @param multiplier Required if running scenario 5.  Will be discarded otherwise.  The N which will be multiplied with ABC to override the species designated by spptomult. If you are replacing more than one species, the order of the numbers corresponds to the order of the names in the spptomult string. (e.g. c(1,5) would imply the first species listed in spptomult has its catch replaced with 1*ABC_spp1 and the second is replaced with 5*ABC_spp2)
 #' 
 #' @import systemfit
 #'
@@ -49,6 +49,7 @@
 #' catch_function(1, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 #' catch_function(3, Pollock = 2e6, Yellowfin = 2e5, PCod = 1e5)
 #' catch_function(5, spptomult = "Arrowtooth", multiplier = 2, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
+#' catch_function(5, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(2,1), Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 
 
 # Above is what creates the help document.  It's easier to read by 
@@ -154,7 +155,7 @@ catch_function <- function(scenario,
                   missing(Yellowfin))
     
     if (scenario == 5) { # if we're running scenario =5 we need some checks
-        if (!spptomult %in% sppnames) {stop("spptomult needs to be match one of the species inputs exactly.  Check spelling and capitalization compared to help file.")}
+        if (sum(spptomult %in% sppnames) < length(spptomult)) {stop("spptomult needs to be match one of the species inputs exactly.  Check spelling and capitalization compared to help file.")}
         if (missing(spptomult) | missing(multiplier)) {stop("Scenario 5 requires that a species to override catch with N*ABC be designated, and also that the multiplier (N) is desginated.  Check that you have both.")}
         
     }
@@ -238,7 +239,9 @@ colnames(output) <- sppnames[!missingspp]
 output[is.na(output)] <- 0
 
 if (scenario == 5) {  # in scenario 5 override.
-    eval(parse(text = paste("output$",spptomult,"<-",spptomult,"*",multiplier,sep="")))
+    for (i in 1:length(spptomult)) {
+        eval(parse(text = paste("output$",spptomult[i],"<-",spptomult[i],"*",multiplier[i],sep="")))
+    }
 }
 return(output)
 #return(ABC.DATA)
