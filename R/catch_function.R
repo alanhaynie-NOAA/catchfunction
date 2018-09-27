@@ -13,10 +13,11 @@
 #' Scenario 2: Whitefish (Pollock and Cod) Political (aka TAC-setting) Preference \cr
 #' Scenario 3: Flatfish Political (aka TAC-setting) Preference \cr
 #' Scenario 4: No Fishing (will return all zeros) \cr
-#' Scenario 5: Fiddle with a single species. \cr
-#' Scenario 5.5: Fiddle with a single species, but in this case remove that species from TAC considerations under 2mt cap \cr
+#' Scenario 5.1: Fiddle with a single species. \cr
+#' Scenario 5.2: Fiddle with a single species, but in this case remove that species from TAC considerations under 2mt cap. \cr
+#' Scenario 5.3: Fiddle with a single species, remove that species from 2mt cap; put excess TAC specifically to species that typically get 'excess' TAC when pollock/cod are low. \cr
 #' 
-#' @param scenario The economic scenario number. Current options: 1, 1.1, 2, 3, or 4
+#' @param scenario The economic scenario number. Current options: 1, 1.1, 2, 3, 4, 5.1, 5.2, or 5.3
 #' @param Arrowtooth Optional.  ABC of Arrowtooth Flounder.
 #' @param Atka Optional.  ABC of Atka Mackerel.
 #' @param Flathead Optional.  ABC of Flathead Sole.
@@ -49,10 +50,10 @@
 #' @examples 
 #' catch_function(1, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 #' catch_function(3, Pollock = 2e6, Yellowfin = 2e5, PCod = 1e5)
-#' catch_function(5, spptomult = "Arrowtooth", multiplier = 2, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-#' catch_function(5, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(2,1), Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-#' catch_function(5.5, spptomult = "Arrowtooth", multiplier = 2, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-#' catch_function(5.5, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(2,1), Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
+#' catch_function(5.1, spptomult = "Arrowtooth", multiplier = 2, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
+#' catch_function(5.1, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(2,1), Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
+#' catch_function(5.2, spptomult = "Arrowtooth", multiplier = 2, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
+#' catch_function(5.2, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(2,1), Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 
 
 # Above is what creates the help document.  It's easier to read by 
@@ -232,9 +233,9 @@ ABC.DATA <- BSAIfun(ABC.DATA,"202")
     catch <- statusquo_catch(ABC.DATA,3)
  } else if (scenario == 4) {
      catch <- statusquo_catch(ABC.DATA,1)*0
- } else if (scenario == 5) {
+ } else if (scenario == 5.1) {
      catch <- statusquo_catch(ABC.DATA,1)
- } else if (scenario == 5.5) {
+ } else if (scenario == 5.2) {
     for (i in 1:length(spptomult)) {
         eval(parse(text = paste("ABC.DATA$ABC.BSAI.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
         eval(parse(text = paste("ABC.DATA$ABC.BS.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
@@ -248,7 +249,7 @@ output <- catch[!missingspp]
 colnames(output) <- sppnames[!missingspp]
 output[is.na(output)] <- 0
 
-if (scenario == 5) {  # in scenario 5 override.
+if (scenario == 5.1) {  # in scenario 5 override.
     for (i in 1:length(spptomult)) {
         eval(parse(text = paste("output$",spptomult[i],"<-",spptomult[i],"*",multiplier[i],sep="")))
     }

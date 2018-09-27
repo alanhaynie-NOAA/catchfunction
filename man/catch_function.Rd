@@ -10,7 +10,7 @@ catch_function(scenario, Arrowtooth, Atka, Flathead, Greenland, Kamchatka,
   spptomult, multiplier)
 }
 \arguments{
-\item{scenario}{The economic scenario number. Current options: 1, 1.1, 2, 3, or 4}
+\item{scenario}{The economic scenario number. Current options: 1, 1.1, 2, 3, 4, 5.1, 5.2, or 5.3}
 
 \item{Arrowtooth}{Optional.  ABC of Arrowtooth Flounder.}
 
@@ -73,14 +73,15 @@ Scenario 1.1: Status Quo alternative: Log-Log \cr
 Scenario 2: Whitefish (Pollock and Cod) Political (aka TAC-setting) Preference \cr
 Scenario 3: Flatfish Political (aka TAC-setting) Preference \cr
 Scenario 4: No Fishing (will return all zeros) \cr
-Scenario 5: Fiddle with a single species. \cr
-Scenario 5.5: Fiddle with a single species, but in this case remove that species from TAC considerations under 2mt cap \cr
+Scenario 5.1: Fiddle with a single species. \cr
+Scenario 5.2: Fiddle with a single species, but in this case remove that species from TAC considerations under 2mt cap. \cr
+Scenario 5.3: Fiddle with a single species, remove that species from 2mt cap; put excess TAC specifically to species that typically get 'excess' TAC when pollock/cod are low. \cr
 }
 \examples{
 catch_function(1, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 catch_function(3, Pollock = 2e6, Yellowfin = 2e5, PCod = 1e5)
-catch_function(5, spptomult = "Arrowtooth", multiplier = 2, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-catch_function(5, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(2,1), Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-catch_function(5.5, spptomult = "Arrowtooth", multiplier = 2, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-catch_function(5.5, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(2,1), Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
+catch_function(5.1, spptomult = "Arrowtooth", multiplier = 2, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
+catch_function(5.1, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(2,1), Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
+catch_function(5.2, spptomult = "Arrowtooth", multiplier = 2, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
+catch_function(5.2, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(2,1), Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 }
