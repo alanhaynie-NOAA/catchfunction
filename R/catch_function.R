@@ -14,6 +14,7 @@
 #' Scenario 3: Flatfish Political (aka TAC-setting) Preference \cr
 #' Scenario 4: No Fishing (will return all zeros) \cr
 #' Scenario 5: Fiddle with a single species. \cr
+#' Scenario 5.5: Fiddle with a single species, but in this case remove that species from TAC considerations under 2mt cap \cr
 #' 
 #' @param scenario The economic scenario number. Current options: 1, 1.1, 2, 3, or 4
 #' @param Arrowtooth Optional.  ABC of Arrowtooth Flounder.
@@ -38,8 +39,8 @@
 #' @param Skate Optional.  ABC of Skate.
 #' @param Squid Optional.  ABC of Squid.
 #' @param Yellowfin Optional.  ABC of Yellowfin Sole.
-#' @param spptomult Required if running scenario 5.  Will be discarded otherwise.  Choose a species catch to override with N*ABC.  Must be spelt exactly as one of the species parameters, case sensitive.  Must be in quotation marks.  If you want to replace more than one species, create a vector of strings (e.g. c("Arrowtooth","Atka"))
-#' @param multiplier Required if running scenario 5.  Will be discarded otherwise.  The N which will be multiplied with ABC to override the species designated by spptomult. If you are replacing more than one species, the order of the numbers corresponds to the order of the names in the spptomult string. (e.g. c(1,5) would imply the first species listed in spptomult has its catch replaced with 1*ABC_spp1 and the second is replaced with 5*ABC_spp2)
+#' @param spptomult Required if running scenario 5 or 5.5.  Will be discarded otherwise.  Choose a species catch to override with N*ABC.  Must be spelt exactly as one of the species parameters, case sensitive.  Must be in quotation marks.  If you want to replace more than one species, create a vector of strings (e.g. c("Arrowtooth","Atka"))
+#' @param multiplier Required if running scenario 5 or 5.5.  Will be discarded otherwise.  The N which will be multiplied with ABC to override the species designated by spptomult. If you are replacing more than one species, the order of the numbers corresponds to the order of the names in the spptomult string. (e.g. c(1,5) would imply the first species listed in spptomult has its catch replaced with 1*ABC_spp1 and the second is replaced with 5*ABC_spp2)
 #' 
 #' @import systemfit
 #'
@@ -50,6 +51,8 @@
 #' catch_function(3, Pollock = 2e6, Yellowfin = 2e5, PCod = 1e5)
 #' catch_function(5, spptomult = "Arrowtooth", multiplier = 2, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 #' catch_function(5, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(2,1), Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
+#' catch_function(5.5, spptomult = "Arrowtooth", multiplier = 2, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
+#' catch_function(5.5, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(2,1), Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 
 
 # Above is what creates the help document.  It's easier to read by 
@@ -230,6 +233,13 @@ ABC.DATA <- BSAIfun(ABC.DATA,"202")
  } else if (scenario == 4) {
      catch <- statusquo_catch(ABC.DATA,1)*0
  } else if (scenario == 5) {
+     catch <- statusquo_catch(ABC.DATA,1)
+ } else if (scenario == 5.5) {
+    for (i in 1:length(spptomult)) {
+        eval(parse(text = paste("ABC.DATA$ABC.BSAI.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
+        eval(parse(text = paste("ABC.DATA$ABC.BS.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
+        eval(parse(text = paste("ABC.DATA$ABC.AI.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
+    }
      catch <- statusquo_catch(ABC.DATA,1)
  }
 

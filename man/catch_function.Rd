@@ -56,9 +56,9 @@ catch_function(scenario, Arrowtooth, Atka, Flathead, Greenland, Kamchatka,
 
 \item{Yellowfin}{Optional.  ABC of Yellowfin Sole.}
 
-\item{spptomult}{Required if running scenario 5.  Will be discarded otherwise.  Choose a species catch to override with N*ABC.  Must be spelt exactly as one of the species parameters, case sensitive.  Must be in quotation marks.  If you want to replace more than one species, create a vector of strings (e.g. c("Arrowtooth","Atka"))}
+\item{spptomult}{Required if running scenario 5 or 5.5.  Will be discarded otherwise.  Choose a species catch to override with N*ABC.  Must be spelt exactly as one of the species parameters, case sensitive.  Must be in quotation marks.  If you want to replace more than one species, create a vector of strings (e.g. c("Arrowtooth","Atka"))}
 
-\item{multiplier}{Required if running scenario 5.  Will be discarded otherwise.  The N which will be multiplied with ABC to override the species designated by spptomult. If you are replacing more than one species, the order of the numbers corresponds to the order of the names in the spptomult string. (e.g. c(1,5) would imply the first species listed in spptomult has its catch replaced with 1*ABC_spp1 and the second is replaced with 5*ABC_spp2)}
+\item{multiplier}{Required if running scenario 5 or 5.5.  Will be discarded otherwise.  The N which will be multiplied with ABC to override the species designated by spptomult. If you are replacing more than one species, the order of the numbers corresponds to the order of the names in the spptomult string. (e.g. c(1,5) would imply the first species listed in spptomult has its catch replaced with 1*ABC_spp1 and the second is replaced with 5*ABC_spp2)}
 }
 \description{
 This function predicts the BSAI catch for each species whose ABC is given.  It is meant to work with the ACLIM bio models.
@@ -74,10 +74,13 @@ Scenario 2: Whitefish (Pollock and Cod) Political (aka TAC-setting) Preference \
 Scenario 3: Flatfish Political (aka TAC-setting) Preference \cr
 Scenario 4: No Fishing (will return all zeros) \cr
 Scenario 5: Fiddle with a single species. \cr
+Scenario 5.5: Fiddle with a single species, but in this case remove that species from TAC considerations under 2mt cap \cr
 }
 \examples{
 catch_function(1, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 catch_function(3, Pollock = 2e6, Yellowfin = 2e5, PCod = 1e5)
 catch_function(5, spptomult = "Arrowtooth", multiplier = 2, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 catch_function(5, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(2,1), Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
+catch_function(5.5, spptomult = "Arrowtooth", multiplier = 2, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
+catch_function(5.5, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(2,1), Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 }
