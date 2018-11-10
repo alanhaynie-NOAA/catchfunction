@@ -61,30 +61,30 @@
 # 
 # Below is the function users call.
 catch_function <- function(scenario, 
-                          Arrowtooth, 
-                          Atka, 
-                          Flathead, 
-                          Greenland, 
-                          Kamchatka, 
-                          Northern, 
-                          Octopus, 
-                          OtherFlat, 
-                          OtherRock, 
-                          PCod, 
-                          Plaice, 
-                          POP, 
-                          Pollock, 
-                          Rock, 
-                          Rougheye, 
-                          Sablefish, 
-                          Sculpin, 
-                          Shark,
-                          Shortraker, 
-                          Skate, 
-                          Squid, 
-                          Yellowfin,
-                          spptomult,
-                          multiplier) {
+                           Arrowtooth, 
+                           Atka, 
+                           Flathead, 
+                           Greenland, 
+                           Kamchatka, 
+                           Northern, 
+                           Octopus, 
+                           OtherFlat, 
+                           OtherRock, 
+                           PCod, 
+                           Plaice, 
+                           POP, 
+                           Pollock, 
+                           Rock, 
+                           Rougheye, 
+                           Sablefish, 
+                           Sculpin, 
+                           Shark,
+                           Shortraker, 
+                           Skate, 
+                           Squid, 
+                           Yellowfin,
+                           spptomult,
+                           multiplier) {
     
     # I start by giving myself a list of all the species numbers
     allspp <- c("141",
@@ -109,9 +109,9 @@ catch_function <- function(scenario,
                 "90",
                 "50",
                 "140")
-# And their corresponding names, alphabetically.  
-# Honestly this could be saved in sysdata and loaded but it's not bad to have 
-# handy in case if you forget what number = what species
+    # And their corresponding names, alphabetically.  
+    # Honestly this could be saved in sysdata and loaded but it's not bad to have 
+    # handy in case if you forget what number = what species
     sppnames <- c("Arrowtooth", 
                   "Atka", 
                   "Flathead", 
@@ -134,42 +134,42 @@ catch_function <- function(scenario,
                   "Skate", 
                   "Squid", 
                   "Yellowfin")
-# Figure out which species' ABCs WERE NOT passed through by the user.
+    # Figure out which species' ABCs WERE NOT passed through by the user.
     missingspp <- c(missing(Arrowtooth), 
-                  missing(Atka), 
-                  missing(Flathead), 
-                  missing(Greenland), 
-                  missing(Kamchatka), 
-                  missing(Northern), 
-                  missing(Octopus), 
-                  missing(OtherFlat), 
-                  missing(OtherRock), 
-                  missing(PCod), 
-                  missing(Plaice), 
-                  missing(POP), 
-                  missing(Pollock), 
-                  missing(Rock), 
-                  missing(Rougheye), 
-                  missing(Sablefish), 
-                  missing(Sculpin), 
-                  missing(Shark),
-                  missing(Shortraker), 
-                  missing(Skate), 
-                  missing(Squid), 
-                  missing(Yellowfin))
+                    missing(Atka), 
+                    missing(Flathead), 
+                    missing(Greenland), 
+                    missing(Kamchatka), 
+                    missing(Northern), 
+                    missing(Octopus), 
+                    missing(OtherFlat), 
+                    missing(OtherRock), 
+                    missing(PCod), 
+                    missing(Plaice), 
+                    missing(POP), 
+                    missing(Pollock), 
+                    missing(Rock), 
+                    missing(Rougheye), 
+                    missing(Sablefish), 
+                    missing(Sculpin), 
+                    missing(Shark),
+                    missing(Shortraker), 
+                    missing(Skate), 
+                    missing(Squid), 
+                    missing(Yellowfin))
     
     if (scenario == 5) { # if we're running scenario =5 we need some checks
         if (sum(spptomult %in% sppnames) < length(spptomult)) {stop("spptomult needs to be match one of the species inputs exactly.  Check spelling and capitalization compared to help file.")}
         if (missing(spptomult) | missing(multiplier)) {stop("Scenario 5 requires that a species to override catch with N*ABC be designated, and also that the multiplier (N) is desginated.  Check that you have both.")}
         
     }
-        
+    
     
     # Load the mean ABCs from system data.  This was calculated by just finding a 
-# simple mean using all the available data.
+    # simple mean using all the available data.
     ABC.DATA <- mean.BS.AI.ABCs
     
-
+    
     # For any species given (not missing) replace the ABC.DATA$ABC.BS mean with the given.
     # Also, replace ABC.DATA$ABC.AI mean with the relative increase/decrease in the BS.
     # (i.e. assume AI ABC rises and falls with BS.)
@@ -184,78 +184,88 @@ catch_function <- function(scenario,
     
     ## Create BSAI where necessary
     
-BSAIfun <- function(DT, code) {
-    if (eval(parse(text= paste("DT$ABC.BS.",code,"[1] == 0",sep="")))) {
-        # If the ABC passed through was 0, assume entire BSAI ABC is wiped out (0)
-        eval(parse(text= paste("DT$ABC.BSAI.",code," <- DT$ABC.BS.",code,sep="")))
-    } else {
-        # Otherwise, assume BSAI ABC is the sum of BS and AI.  
-        eval(parse(text= paste("DT$ABC.BSAI.",code,"<- DT$ABC.BS.",code,"+ DT$ABC.AI.",code,sep="")))
+    BSAIfun <- function(DT, code) {
+        if (eval(parse(text= paste("DT$ABC.BS.",code,"[1] == 0",sep="")))) {
+            # If the ABC passed through was 0, assume entire BSAI ABC is wiped out (0)
+            eval(parse(text= paste("DT$ABC.BSAI.",code," <- DT$ABC.BS.",code,sep="")))
+        } else {
+            # Otherwise, assume BSAI ABC is the sum of BS and AI.  
+            eval(parse(text= paste("DT$ABC.BSAI.",code,"<- DT$ABC.BS.",code,"+ DT$ABC.AI.",code,sep="")))
+        }
+        return(DT)
     }
-    return(DT)
-}
-
-# Honestly the first else in the above loop should be redundant, since we already 
-# assume AI rises and falls with BS.  At some point I probably should remove this redundancy.
-
-ABC.DATA <- BSAIfun(ABC.DATA,"100")
-ABC.DATA <- BSAIfun(ABC.DATA,"103")
-ABC.DATA <- BSAIfun(ABC.DATA,"104")
-ABC.DATA <- BSAIfun(ABC.DATA,"106")
-#ABC.DATA <- BSAIfun(ABC.DATA,"140")
-ABC.DATA$ABC.BSAI.140 <- ABC.DATA$ABC.BS.140  
-# For yellowfin (140), assume BS ABC makes up entire BSAI. In practice it appears the AI ABC is ignored when decision making/harvesting.
-ABC.DATA <- BSAIfun(ABC.DATA,"141")
-ABC.DATA <- BSAIfun(ABC.DATA,"147")
-ABC.DATA <- BSAIfun(ABC.DATA,"204")
-ABC.DATA <- BSAIfun(ABC.DATA,"303")
-ABC.DATA <- BSAIfun(ABC.DATA,"307")
-ABC.DATA <- BSAIfun(ABC.DATA,"326")
-ABC.DATA <- BSAIfun(ABC.DATA,"400")
-ABC.DATA <- BSAIfun(ABC.DATA,"50")
-ABC.DATA <- BSAIfun(ABC.DATA,"60")
-ABC.DATA <- BSAIfun(ABC.DATA,"65")
-ABC.DATA <- BSAIfun(ABC.DATA,"90")
-ABC.DATA <- BSAIfun(ABC.DATA,"202")
-
-
-## Second, pass ABCs to status quo function to get catch
-
- if (scenario == 1) {
-     catch <- statusquo_catch(ABC.DATA,1)
-     # log linear
- } else if (scenario == 1.1) {
-     catch <- statusquo_catch(ABC.DATA,1.1)
-     # log log
- } else if (scenario == 2) {
-     catch <- statusquo_catch(ABC.DATA,2)
- } else if (scenario == 3) {
-    catch <- statusquo_catch(ABC.DATA,3)
- } else if (scenario == 4) {
-     catch <- statusquo_catch(ABC.DATA,1)*0
- } else if (scenario == 5.1) {
-     catch <- statusquo_catch(ABC.DATA,1)
- } else if (scenario == 5.2) {
-    for (i in 1:length(spptomult)) {
-        eval(parse(text = paste("ABC.DATA$ABC.BSAI.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
-        eval(parse(text = paste("ABC.DATA$ABC.BS.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
-        eval(parse(text = paste("ABC.DATA$ABC.AI.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
-    }
-     catch <- statusquo_catch(ABC.DATA,1)
- }
-
- # Third, pick only species that were passed in to pass back out.
-output <- catch[!missingspp]
-colnames(output) <- sppnames[!missingspp]
-output[is.na(output)] <- 0
-
-if (scenario == 5.1) {  # in scenario 5 override.
-    for (i in 1:length(spptomult)) {
-        eval(parse(text = paste("output$",spptomult[i],"<-",spptomult[i],"*",multiplier[i],sep="")))
-    }
-}
-return(output)
-#return(ABC.DATA)
-}
-
     
+    # Honestly the first else in the above loop should be redundant, since we already 
+    # assume AI rises and falls with BS.  At some point I probably should remove this redundancy.
+    
+    ABC.DATA <- BSAIfun(ABC.DATA,"100")
+    ABC.DATA <- BSAIfun(ABC.DATA,"103")
+    ABC.DATA <- BSAIfun(ABC.DATA,"104")
+    ABC.DATA <- BSAIfun(ABC.DATA,"106")
+    #ABC.DATA <- BSAIfun(ABC.DATA,"140")
+    ABC.DATA$ABC.BSAI.140 <- ABC.DATA$ABC.BS.140  
+    # For yellowfin (140), assume BS ABC makes up entire BSAI. In practice it appears the AI ABC is ignored when decision making/harvesting.
+    ABC.DATA <- BSAIfun(ABC.DATA,"141")
+    ABC.DATA <- BSAIfun(ABC.DATA,"147")
+    ABC.DATA <- BSAIfun(ABC.DATA,"204")
+    ABC.DATA <- BSAIfun(ABC.DATA,"303")
+    ABC.DATA <- BSAIfun(ABC.DATA,"307")
+    ABC.DATA <- BSAIfun(ABC.DATA,"326")
+    ABC.DATA <- BSAIfun(ABC.DATA,"400")
+    ABC.DATA <- BSAIfun(ABC.DATA,"50")
+    ABC.DATA <- BSAIfun(ABC.DATA,"60")
+    ABC.DATA <- BSAIfun(ABC.DATA,"65")
+    ABC.DATA <- BSAIfun(ABC.DATA,"90")
+    ABC.DATA <- BSAIfun(ABC.DATA,"202")
+    
+    
+    ## Second, pass ABCs to status quo function to get catch
+    
+    if (scenario == 1) {
+        catch <- statusquo_catch(ABC.DATA,1)
+        # log linear
+    } else if (scenario == 1.1) {
+        catch <- statusquo_catch(ABC.DATA,1.1)
+        # log log
+    } else if (scenario == 2) {
+        catch <- statusquo_catch(ABC.DATA,2)
+    } else if (scenario == 3) {
+        catch <- statusquo_catch(ABC.DATA,3)
+    } else if (scenario == 4) {
+        catch <- statusquo_catch(ABC.DATA,1)*0
+    } else if (scenario == 5.1) {
+        catch <- statusquo_catch(ABC.DATA,1)
+    } else if (scenario == 5.2 | 5.3 | 5.4) {
+        for (i in 1:length(spptomult)) {
+            eval(parse(text = paste("ABC.DATA$ABC.BSAI.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
+            eval(parse(text = paste("ABC.DATA$ABC.BS.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
+            eval(parse(text = paste("ABC.DATA$ABC.AI.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
+        }
+        if (scenario == 5.2) {
+            catch <- statusquo_catch(ABC.DATA,1)
+        } else if (scenario == 5.3) {
+            catch <- removefromcap_catch(ABC.DATA,5.3,spptomult)
+        } else if (scenario == 5.4) {
+            catch <- removefromcap_catch(ABC.DATA,5.4,spptomult)
+        }
+    }
+    
+    # Third, pick only species that were passed in to pass back out.
+    output <- catch[!missingspp]
+    colnames(output) <- sppnames[!missingspp]
+    output[is.na(output)] <- 0
+    
+    if (scenario == 5.1) {  # in scenario 5 override.
+        for (i in 1:length(spptomult)) {
+            eval(parse(text = paste("output$",spptomult[i],"<-",spptomult[i],"*",multiplier[i],sep="")))
+        }
+    } else if (scenario == 5.3 | scenario == 5.4) { # scenario 5.3 & 5.4 ovverride.. if pollock set tac=abc 
+        if (spptomult[i] != "pollock") {
+            eval(parse(text = paste("output$",spptomult[i],"<-",spptomult[i],"*",multiplier[i],sep="")))
+        }
+    }
+    #return(output)
+    return(ABC.DATA)
+}
+
+
