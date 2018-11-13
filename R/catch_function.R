@@ -13,9 +13,10 @@
 #' Scenario 2: Whitefish (Pollock and Cod) Political (aka TAC-setting) Preference \cr
 #' Scenario 3: Flatfish Political (aka TAC-setting) Preference \cr
 #' Scenario 4: No Fishing (will return all zeros) \cr
-#' Scenario 5.1: Fiddle with a single species. \cr
-#' Scenario 5.2: Fiddle with a single species, but in this case remove that species from TAC considerations under 2mt cap. \cr
-#' Scenario 5.3: Fiddle with a single species, remove that species from 2mt cap; put excess TAC specifically to species that typically get 'excess' TAC when pollock/cod are low. \cr
+#' Scenario 5.1: Fiddle with a single species--calculate the rest still taking the ABC of the removed sp. in to account. \cr
+#' Scenario 5.2: Fiddle with a single species--calculate the rest assuming the ABC of the removed sp. does not influence the sp. under the cap at all. \cr
+#' Scenario 5.3: Fiddle with a single species--calculate the rest assuming the ABC of the removed sp. does not influence the sp. under the cap at all and then increase the TAC of all the remaining species until the sum of the tAC = 2mmt \cr
+#' Scenario 5.4: Scenario 5.3, but in this case let catch range from the old predicted catch to TAC.  The amount which catch improves from old predicted catch to TAC can be dialed 0 to 1 using "improvscatchscale". \cr
 #' 
 #' @param scenario The economic scenario number. Current options: 1, 1.1, 2, 3, 4, 5.1, 5.2, or 5.3
 #' @param Arrowtooth Optional.  ABC of Arrowtooth Flounder.
@@ -40,8 +41,9 @@
 #' @param Skate Optional.  ABC of Skate.
 #' @param Squid Optional.  ABC of Squid.
 #' @param Yellowfin Optional.  ABC of Yellowfin Sole.
-#' @param spptomult Required if running scenario 5 or 5.5.  Will be discarded otherwise.  Choose a species catch to override with N*ABC.  Must be spelt exactly as one of the species parameters, case sensitive.  Must be in quotation marks.  If you want to replace more than one species, create a vector of strings (e.g. c("Arrowtooth","Atka"))
-#' @param multiplier Required if running scenario 5 or 5.5.  Will be discarded otherwise.  The N which will be multiplied with ABC to override the species designated by spptomult. If you are replacing more than one species, the order of the numbers corresponds to the order of the names in the spptomult string. (e.g. c(1,5) would imply the first species listed in spptomult has its catch replaced with 1*ABC_spp1 and the second is replaced with 5*ABC_spp2)
+#' @param spptomult Required if running any of the 5-series scenarios.  Will be discarded otherwise.  Choose a species catch to override with N*ABC.  Must be spelt exactly as one of the species parameters, case sensitive.  Must be in quotation marks.  If you want to replace more than one species, create a vector of strings (e.g. c("Arrowtooth","Atka"))
+#' @param multiplier Required if running scenario 5-series scenarios.  Will be discarded otherwise.  The N which will be multiplied with ABC to override the species designated by spptomult. If you are replacing more than one species, the order of the numbers corresponds to the order of the names in the spptomult string. (e.g. c(1,5) would imply the first species listed in spptomult has its catch replaced with 1*ABC_spp1 and the second is replaced with 5*ABC_spp2)
+#' @param improvedcatchscale Required if running scenario 5.4.  Will be discarded otherwise.  Choose the level to which catch has improved from status quo.  If 0, 5.4 collapses to 5.3.  If 1, Catch = TAC.
 #' 
 #' @import systemfit
 #'
@@ -54,6 +56,7 @@
 #' catch_function(5.1, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(2,1), Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 #' catch_function(5.2, spptomult = "Arrowtooth", multiplier = 2, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 #' catch_function(5.2, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(2,1), Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
+#' catch_function(5.3, spptomult="Arrowtooth", multiplier = 2, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 
 
 # Above is what creates the help document.  It's easier to read by 
@@ -84,8 +87,8 @@ catch_function <- function(scenario,
                            Squid, 
                            Yellowfin,
                            spptomult,
-                           multiplier) {
-    
+                           multiplier,
+                           improvedcatchscale) {
     # I start by giving myself a list of all the species numbers
     allspp <- c("141",
                 "204",
@@ -235,37 +238,34 @@ catch_function <- function(scenario,
         catch <- statusquo_catch(ABC.DATA,1)*0
     } else if (scenario == 5.1) {
         catch <- statusquo_catch(ABC.DATA,1)
-    } else if (scenario == 5.2 | 5.3 | 5.4) {
+    } else if (scenario == 5.2) {
         for (i in 1:length(spptomult)) {
             eval(parse(text = paste("ABC.DATA$ABC.BSAI.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
             eval(parse(text = paste("ABC.DATA$ABC.BS.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
             eval(parse(text = paste("ABC.DATA$ABC.AI.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
-        }
-        if (scenario == 5.2) {
-            catch <- statusquo_catch(ABC.DATA,1)
-        } else if (scenario == 5.3) {
-            catch <- removefromcap_catch(ABC.DATA,5.3,spptomult)
-        } else if (scenario == 5.4) {
-            catch <- removefromcap_catch(ABC.DATA,5.4,spptomult)
-        }
+        } 
+        catch <- statusquo_catch(ABC.DATA,1)
+    } else if (scenario == 5.3) {
+        catch <- removefromcap_catch(ABC.DATA,5.3,spptomult,0)
+    } else if (scenario == 5.4) {
+        catch <- removefromcap_catch(ABC.DATA,5.4,spptomult,improvedcatchscale)
     }
-    
-    # Third, pick only species that were passed in to pass back out.
-    output <- catch[!missingspp]
-    colnames(output) <- sppnames[!missingspp]
-    output[is.na(output)] <- 0
-    
-    if (scenario == 5.1) {  # in scenario 5 override.
-        for (i in 1:length(spptomult)) {
-            eval(parse(text = paste("output$",spptomult[i],"<-",spptomult[i],"*",multiplier[i],sep="")))
-        }
-    } else if (scenario == 5.3 | scenario == 5.4) { # scenario 5.3 & 5.4 ovverride.. if pollock set tac=abc 
-        if (spptomult[i] != "pollock") {
-            eval(parse(text = paste("output$",spptomult[i],"<-",spptomult[i],"*",multiplier[i],sep="")))
-        }
+
+
+# Third, pick only species that were passed in to pass back out.
+output <- catch[!missingspp]
+colnames(output) <- sppnames[!missingspp]
+output[is.na(output)] <- 0
+
+if (scenario == 5.1 | scenario == 5.3 | scenario == 5.4) {  # in scenario 5 override.
+    for (i in 1:length(spptomult)) {
+        eval(parse(text = paste("output$",spptomult[i],"<-",spptomult[i],"*",multiplier[i],sep="")))
     }
-    #return(output)
-    return(ABC.DATA)
+} 
+
+return(output)
+# return(ABC.DATA)
+
+
+
 }
-
-
