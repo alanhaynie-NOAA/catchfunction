@@ -57,7 +57,7 @@
 #' catch_function(5.2, spptomult = "Arrowtooth", multiplier = 2, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 #' catch_function(5.2, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(2,1), Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 #' catch_function(5.3, spptomult="Arrowtooth", multiplier = 2, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-
+#' catch_function(5.4, spptomult="Arrowtooth", multiplier = 2, improvedcatchscale=0.5, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 
 # Above is what creates the help document.  It's easier to read by 
 # running ?catch_function once you've loaded the package.

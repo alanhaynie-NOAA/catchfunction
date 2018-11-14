@@ -24,6 +24,54 @@ removefromcap_catch <- function(ABC.DATA,scenario,spptomult,improvedcatchscale) 
     FISH.DATA$is93 <- 0
     FISH.DATA$A82 <- 1
     
+        # I start by giving myself a list of all the species numbers
+    allspp <- c("141",
+                "204",
+                "103",
+                "102",
+                "147",
+                "303",
+                "60",
+                "100",
+                "310",
+                "202",
+                "106",
+                "301",
+                "201",
+                "104",
+                "307",
+                "203",
+                "400",
+                "65",
+                "326",
+                "90",
+                "50",
+                "140")
+    # And their corresponding names, alphabetically.  
+    # Honestly this could be saved in sysdata and loaded but it's not bad to have 
+    # handy in case if you forget what number = what species
+    sppnames <- c("Arrowtooth", 
+                  "Atka", 
+                  "Flathead", 
+                  "Greenland", 
+                  "Kamchatka", 
+                  "Northern", 
+                  "Octopus", 
+                  "OtherFlat", 
+                  "OtherRock", 
+                  "PCod", 
+                  "Plaice", 
+                  "POP", 
+                  "Pollock", 
+                  "Rock", 
+                  "Rougheye", 
+                  "Sablefish", 
+                  "Sculpin", 
+                  "Shark",
+                  "Shortraker", 
+                  "Skate", 
+                  "Squid", 
+                  "Yellowfin")
     
     # calculate TAC.
     #   rule 1: if pollock has been removed from 2mmt cap, assume everything else is TAC = ABC
@@ -84,6 +132,17 @@ removefromcap_catch <- function(ABC.DATA,scenario,spptomult,improvedcatchscale) 
     } else {
         TAC.BOTHBIND <- predict.tac.function(predictmethod = 1, model="SUR",fit=tac_BOTHBIND_loglin_sur,FISH.DATA)
         TAC.BOTHBIND.FLATSUR <- predict.tac.function(predictmethod = 1, model="FLATSUR",fit=tac_BOTHBIND_FLATSUR_loglin_sur,FISH.DATA)
+   
+        for (i in 1:length(spptomult)) {
+            eval(parse(text = paste("TAC.BOTHBIND$TAC.BSAI.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
+            eval(parse(text = paste("TAC.BOTHBIND$TAC.BS.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
+            eval(parse(text = paste("TAC.BOTHBIND$TAC.AI.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
+        } 
+             for (i in 1:length(spptomult)) {
+            eval(parse(text = paste("TAC.BOTHBIND.FLATSUR$TAC.BSAI.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
+            eval(parse(text = paste("TAC.BOTHBIND.FLATSUR$TAC.BS.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
+            eval(parse(text = paste("TAC.BOTHBIND.FLATSUR$TAC.AI.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
+             } 
         
         # Reallocate the remaining TAC.
         # 
@@ -102,9 +161,9 @@ removefromcap_catch <- function(ABC.DATA,scenario,spptomult,improvedcatchscale) 
             goal <- pmin(FORWHITEFISH,FISH.DATA$ABC.BS.201 - DT$TAC.BS.201 + FISH.DATA$ABC.BSAI.202 - DT$TAC.BSAI.202)
             goalamt <- goal
             
+            
             dt <- DT[c("TAC.BS.201","TAC.BSAI.202") ]# just to keep things clean..
             abcdt <- FISH.DATA[c("ABC.BS.201","ABC.BSAI.202")]
-            
             distributefun <- function(goal,abcdt,dt) {
                 while (goal > 0) {
                     # calculate the distance (from tac to abc) to tac ratio for each flatfish.
@@ -257,10 +316,11 @@ removefromcap_catch <- function(ABC.DATA,scenario,spptomult,improvedcatchscale) 
             return(DT_orig)
         }
         
+
         TAC.BOTHBIND <- TAC.reallocate(TAC.BOTHBIND,0.7)
+
         TAC.BOTHBIND.FLATSUR <- TAC.reallocate(TAC.BOTHBIND.FLATSUR,0.7)
     }
-    
     
     # catch depending on 
     CATCH.BOTHBIND.SURSUR <- predict.catch.function(model="SUR",fit=catch_BOTHBIND_loglin_sur,TAC.BOTHBIND )
@@ -298,34 +358,82 @@ removefromcap_catch <- function(ABC.DATA,scenario,spptomult,improvedcatchscale) 
     
     if (scenario == 5.4) {
         # improved catch--linear combination of predicted catch and improved catch on a scale of 0 to 1
-        catchisTAC <- TAC.BOTHBIND[c("CATCH.BS.141",
-                           "CATCH.BS.204",
-                           "CATCH.BS.103",
-                           "CATCH.BS.102",
-                           "CATCH.BS.147",
-                           "CATCH.BS.303",
-                           "CATCH.BS.60",
-                           "CATCH.BS.100",
-                           "CATCH.BS.310",
-                           "CATCH.BS.202",
-                           "CATCH.BS.106",
-                           "CATCH.BS.301",
-                           "CATCH.BS.201",
-                           "CATCH.BS.104",
-                           "CATCH.BS.307",
-                           "CATCH.BS.203",
-                           "CATCH.BS.400",
-                           "CATCH.BS.65",
-                           "CATCH.BS.326",
-                           "CATCH.BS.90",
-                           "CATCH.BS.50",
-                           "CATCH.BS.140")]
+        TAC <- TAC.BOTHBIND[c("TAC.BSAI.141",
+                              "TAC.BSAI.204",
+                              "TAC.BSAI.103",
+                              "TAC.BS.102",
+                              "TAC.BSAI.147",
+                              "TAC.BSAI.303",
+                              "TAC.BSAI.60",
+                              "TAC.BSAI.100",
+                              "TAC.BS.310",
+                              "TAC.BSAI.202",
+                              "TAC.BSAI.106",
+                              "TAC.BS.301",
+                              "TAC.BS.201",
+                              "TAC.AI.201",
+                              "TAC.BSAI.104",
+                              "TAC.BSAI.307",
+                              "TAC.BS.203",
+                              "TAC.BSAI.400",
+                              "TAC.BSAI.65",
+                              "TAC.BSAI.326",
+                              "TAC.BSAI.90",
+                              "TAC.BSAI.50",
+                              "TAC.BSAI.140")]/2 + TAC.BOTHBIND.FLATSUR[c("TAC.BSAI.141",
+                                                                          "TAC.BSAI.204",
+                                                                          "TAC.BSAI.103",
+                                                                          "TAC.BS.102",
+                                                                          "TAC.BSAI.147",
+                                                                          "TAC.BSAI.303",
+                                                                          "TAC.BSAI.60",
+                                                                          "TAC.BSAI.100",
+                                                                          "TAC.BS.310",
+                                                                          "TAC.BSAI.202",
+                                                                          "TAC.BSAI.106",
+                                                                          "TAC.BS.301",
+                                                                          "TAC.BS.201",
+                                                                          "TAC.AI.201",
+                                                                          "TAC.BSAI.104",
+                                                                          "TAC.BSAI.307",
+                                                                          "TAC.BS.203",
+                                                                          "TAC.BSAI.400",
+                                                                          "TAC.BSAI.65",
+                                                                          "TAC.BSAI.326",
+                                                                          "TAC.BSAI.90",
+                                                                          "TAC.BSAI.50",
+                                                                          "TAC.BSAI.140")]/2
+   
+        catchisTAC <- TAC[c("TAC.BSAI.141")]
+        names(catchisTAC) <- c("CATCH.BSAI.141")
+        catchisTAC$CATCH.BSAI.141 <- TAC$TAC.BSAI.141*CATCH.AVG.BS$CODE.141
+        catchisTAC$CATCH.BSAI.204 <- TAC$TAC.BSAI.204*CATCH.AVG.BS$CODE.204
+        catchisTAC$CATCH.BSAI.103 <- TAC$TAC.BSAI.103*CATCH.AVG.BS$CODE.103
+        catchisTAC$CATCH.BS.102 <- TAC$TAC.BS.102
+        catchisTAC$CATCH.BSAI.147 <- TAC$TAC.BSAI.147*CATCH.AVG.BS$CODE.147
+        catchisTAC$CATCH.BSAI.303 <- TAC$TAC.BSAI.303*CATCH.AVG.BS$CODE.303
+        catchisTAC$CATCH.BSAI.60 <- TAC$TAC.BSAI.60*CATCH.AVG.BS$CODE.60
+        catchisTAC$CATCH.BSAI.100 <- TAC$TAC.BSAI.100*CATCH.AVG.BS$CODE.100
+        catchisTAC$CATCH.BS.310 <- TAC$TAC.BS.310
+        catchisTAC$CATCH.BSAI.202 <- TAC$TAC.BSAI.202*CATCH.AVG.BS$CODE.202
+        catchisTAC$CATCH.BSAI.106 <- TAC$TAC.BSAI.106*CATCH.AVG.BS$CODE.106
+        catchisTAC$CATCH.BS.301 <- TAC$TAC.BS.301
+        catchisTAC$CATCH.BS.201 <- (TAC$TAC.BS.201 + TAC$TAC.AI.201)*CATCH.AVG.BS$CODE.201
+        catchisTAC$CATCH.BSAI.104 <- TAC$TAC.BSAI.104*CATCH.AVG.BS$CODE.104
+        catchisTAC$CATCH.BSAI.307 <- TAC$TAC.BSAI.307*CATCH.AVG.BS$CODE.307
+        catchisTAC$CATCH.BS.203 <- TAC$TAC.BS.203
+        catchisTAC$CATCH.BSAI.400 <- TAC$TAC.BSAI.400*CATCH.AVG.BS$CODE.400
+        catchisTAC$CATCH.BSAI.65 <- TAC$TAC.BSAI.65*CATCH.AVG.BS$CODE.65
+        catchisTAC$CATCH.BSAI.326 <- TAC$TAC.BSAI.326*CATCH.AVG.BS$CODE.326
+        catchisTAC$CATCH.BSAI.90 <- TAC$TAC.BSAI.90*CATCH.AVG.BS$CODE.90
+        catchisTAC$CATCH.BSAI.50 <- TAC$TAC.BSAI.50*CATCH.AVG.BS$CODE.50
+        catchisTAC$CATCH.BSAI.140 <- TAC$TAC.BSAI.140*CATCH.AVG.BS$CODE.140
         
         # TAC.BS DNE for many species!!! 
-            
-            CATCH.PRED <- improvedcatchscale*catchisTAC + (1-improvedcatchscale)*CATCH.PRED
-    } 
 
+        output <- improvedcatchscale*catchisTAC + (1-improvedcatchscale)*output
+    } 
+    
     
     return (output)
 }
