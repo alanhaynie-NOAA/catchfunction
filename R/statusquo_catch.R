@@ -12,6 +12,11 @@ statusquo_catch <- function(ABC.DATA,scenario) {
         FISH.DATA$pollock.bs.UB <-  as.numeric(exp(ABC.DATA$ABC.BS.201) > 1.2e6)
     } 
     
+    # These are all the indicators required in the regressions (I honestly think some of them are no longer needed, so this could probably
+    # do to be cleaned up a bit, but its not hurting anyone.)
+    # 
+    # 1 means active in scenarios (2018+), 0 means inactive.  So for example flatfish flex is active from 2018 onwards; the strict SSL closure (WAISSL) from 2011-2014 is not.
+    
     FISH.DATA$flex <-  1  # introduction of flatfish flex
     FISH.DATA$A80 <-  1  # introduction of A80
     FISH.DATA$po10 <- 1
@@ -28,7 +33,6 @@ statusquo_catch <- function(ABC.DATA,scenario) {
     FISH.DATA$SSL <-  1 # stellar sea lion closure
     FISH.DATA$WAISSL <- 0
     FISH.DATA$A80.ask.POP <- 1
-    FISH.DATA$is93 <- 0
     FISH.DATA$A82 <- 1
 
     

@@ -161,7 +161,7 @@ catch_function <- function(scenario,
                     missing(Squid), 
                     missing(Yellowfin))
     
-    if (scenario == 5) { # if we're running scenario =5 we need some checks
+    if (scenario %in% c(5.1,5.2,5.3,5.4)) { # if we're running scenario 5 we need some checks to make sure the inputs work well.
         if (sum(spptomult %in% sppnames) < length(spptomult)) {stop("spptomult needs to be match one of the species inputs exactly.  Check spelling and capitalization compared to help file.")}
         if (missing(spptomult) | missing(multiplier)) {stop("Scenario 5 requires that a species to override catch with N*ABC be designated, and also that the multiplier (N) is desginated.  Check that you have both.")}
         

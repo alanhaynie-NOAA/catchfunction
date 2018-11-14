@@ -24,7 +24,7 @@ removefromcap_catch <- function(ABC.DATA,scenario,spptomult,improvedcatchscale) 
     FISH.DATA$is93 <- 0
     FISH.DATA$A82 <- 1
     
-        # I start by giving myself a list of all the species numbers
+    # I start by giving myself a list of all the species numbers
     allspp <- c("141",
                 "204",
                 "103",
@@ -132,20 +132,53 @@ removefromcap_catch <- function(ABC.DATA,scenario,spptomult,improvedcatchscale) 
     } else {
         TAC.BOTHBIND <- predict.tac.function(predictmethod = 1, model="SUR",fit=tac_BOTHBIND_loglin_sur,FISH.DATA)
         TAC.BOTHBIND.FLATSUR <- predict.tac.function(predictmethod = 1, model="FLATSUR",fit=tac_BOTHBIND_FLATSUR_loglin_sur,FISH.DATA)
-   
+        
         for (i in 1:length(spptomult)) {
             eval(parse(text = paste("TAC.BOTHBIND$TAC.BSAI.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
             eval(parse(text = paste("TAC.BOTHBIND$TAC.BS.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
             eval(parse(text = paste("TAC.BOTHBIND$TAC.AI.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
         } 
-             for (i in 1:length(spptomult)) {
+        for (i in 1:length(spptomult)) {
             eval(parse(text = paste("TAC.BOTHBIND.FLATSUR$TAC.BSAI.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
             eval(parse(text = paste("TAC.BOTHBIND.FLATSUR$TAC.BS.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
             eval(parse(text = paste("TAC.BOTHBIND.FLATSUR$TAC.AI.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
-             } 
+        } 
         
         # Reallocate the remaining TAC.
         # 
+         distributefun <- function(goal,abcdt,dt) {
+                while (goal > 0) {
+                    # calculate the distance (from tac to abc) to tac ratio for each flatfish.
+                    disttoabc_to_tac_ratio <- (abcdt - dt)/dt
+                    disttoabc_to_tac_ratio[disttoabc_to_tac_ratio < 1e-9] <- 0 # close enough to zero
+                    # the minimum, nonzero, ratio is the one that will determine how the goal amt is spread across the species, this round
+                    if (min(disttoabc_to_tac_ratio, na.rm = T) < -1e-6) stop('x is negative!! something went horribly wrong')  # close enough to zero--a little coarser, was running in to trouble here 
+                    xvec <- disttoabc_to_tac_ratio
+                    xvec[xvec > 0] <- min(disttoabc_to_tac_ratio[disttoabc_to_tac_ratio > 0], na.rm = T)
+                    xvec[is.na(xvec)] <- 0
+                    xvec[xvec < 0] <- 0
+                    if (sum(xvec*dt)==0 & goal > 1e-9) stop('infinite loop')
+                    # check that another loop is needed at all.  
+                    if (sum(xvec*dt) < goal) {
+                        # decrease remaining goalamt to distribute
+                        goal <- goal - sum(xvec*dt)
+                        # increase all TAC proportionally, by the allowable distance given tac<abc constraint
+                        dt <- dt + xvec*dt
+                        # and go back to the beginning and do it again until goalamt = 0
+                        if (goal < -1e-6) stop('goalamt is negative, but it shouldnt be.  something went horribly wrong') else if (goal < 1e-8) {goal <- 0} # if it's between 1e-9 and -1e-9 just set it to 0; it's close enough.
+                    } else {
+                        dtvec <- dt
+                        dtvec[xvec == 0] <- 0 # so you don't go above abc!
+                        # increase all TAC proportionally, by the remaining goalamt
+                        dt <- dt + (dtvec/sum(dtvec))*goal
+                        # calculate remaining goalamt
+                        goal <- goal - sum((dtvec/sum(dtvec))*goal)
+                        if (goal > 1e-9) stop('goalamt should be 0, but its not.  something went horribly wrong') else goal <- 0 #numerically it'll get super close but due to rounding you have to manually set to 0
+                    }
+                }
+                return(dt)
+         }
+         
         TAC.reallocate <- function(DT_orig,split_param) {
             DT <- DT_orig %>% select(starts_with("TAC"))
             # If prediction exceeds cap, trim down from the LARGEST stocks
@@ -164,38 +197,6 @@ removefromcap_catch <- function(ABC.DATA,scenario,spptomult,improvedcatchscale) 
             
             dt <- DT[c("TAC.BS.201","TAC.BSAI.202") ]# just to keep things clean..
             abcdt <- FISH.DATA[c("ABC.BS.201","ABC.BSAI.202")]
-            distributefun <- function(goal,abcdt,dt) {
-                while (goal > 0) {
-                    # calculate the distance (from tac to abc) to tac ratio for each flatfish.
-                    disttoabc_to_tac_ratio <- (abcdt - dt)/dt
-                    disttoabc_to_tac_ratio[disttoabc_to_tac_ratio < 1e-9] <- 0 # close enough to zero
-                    # the minimum, nonzero, ratio is the one that will determine how the goal amt is spread across the species, this round
-                    if (min(disttoabc_to_tac_ratio, na.rm = T) < -1e-6) stop('x is negative!! something went horribly wrong')  # close enough to zero--a little coarser, was running in to trouble here 
-                    xvec <- disttoabc_to_tac_ratio
-                    xvec[xvec > 0] <- min(disttoabc_to_tac_ratio[disttoabc_to_tac_ratio > 0], na.rm = T)
-                    xvec[is.na(xvec)] <- 0
-                    xvec[xvec < 0] <- 0
-                    if (sum(xvec*dt)==0 & goal > 1e-9) stop('infinite loop')
-                    # check that another loop is needed at all.  
-                    if (sum(xvec*dt) < goal) {
-                        # decrease remaining goalamt to distribute
-                        goalamt <- goalamt - sum(xvec*dt)
-                        # increase all TAC proportionally, by the allowable distance given tac<abc constraint
-                        dt <- dt + xvec*dt
-                        # and go back to the beginning and do it again until goalamt = 0
-                        if (goal < -1e-6) stop('goalamt is negative, but it shouldnt be.  something went horribly wrong') else if (goal < 1e-8) {goal <- 0} # if it's between 1e-9 and -1e-9 just set it to 0; it's close enough.
-                    } else {
-                        dtvec <- dt
-                        dtvec[xvec == 0] <- 0 # so you don't go above abc!
-                        # increase all TAC proportionally, by the remaining goalamt
-                        dt <- dt + (dtvec/sum(dtvec))*goalamt
-                        # calculate remaining goalamt
-                        goal <- goal - sum((dtvec/sum(dtvec))*goalamt)
-                        if (goal > 1e-9) stop('goalamt should be 0, but its not.  something went horribly wrong') else goal <- 0 #numerically it'll get super close but due to rounding you have to manually set to 0
-                    }
-                }
-                return(dt)
-            }
             
             dt <- distributefun(goalamt,abcdt,dt)
             
@@ -316,9 +317,9 @@ removefromcap_catch <- function(ABC.DATA,scenario,spptomult,improvedcatchscale) 
             return(DT_orig)
         }
         
-
+        
         TAC.BOTHBIND <- TAC.reallocate(TAC.BOTHBIND,0.7)
-
+        
         TAC.BOTHBIND.FLATSUR <- TAC.reallocate(TAC.BOTHBIND.FLATSUR,0.7)
     }
     
@@ -333,6 +334,162 @@ removefromcap_catch <- function(ABC.DATA,scenario,spptomult,improvedcatchscale) 
     CATCH.PRED <- (CATCH.BOTHBIND.SURSUR + CATCH.BOTHBIND.SUROLS + CATCH.BOTHBIND.FLATSUR.SURSUR)/3
     
     
+    
+    
+    if (scenario == 5.4) {
+        # Improved catch scenario
+        # Note from Amanda to Alan: There is an easier way to automate this list, I'm sure of it, but 
+        # I'm really tired right now and my contractions are picking up. so while this is a bit more work for 
+        # you to edit later, since it requires you edit multiple lists, its less likely I code it wrong right now 
+        # because its more straightforward... and thats valuable.
+        # 
+        # Take any 'leftover' from catch to 2MMT and spread it out across pollock, cod, A80 targets
+        # 
+        NETTAC <- rowSums(CATCH.PRED, na.rm = TRUE) 
+        EXTRACATCH <- as.numeric(NETTAC < 2e6)*(2e6 - NETTAC)
+        CATCH.PRED <- CATCH.PRED[order(CATCH.PRED, decreasing = T)]
+        
+        # If there's any remaining TAC give it to pollock (201), cod (202), yfin sole (140), sablefish (203), atka (204), POP (301), Flathead (103), Rock sole (104), Greenland turbot (102)
+        
+        # goal: to increase above listed species catch up to ABC/2MMT
+        # Note: we're only increasing BS catch.  That's a fun little assumption? If you want to do AI too, just.. add the CATCH.AI.X list.
+        # 
+        # Here is the list of species that will be getting extra catch.  
+        DT <- CATCH.PRED[c("CATCH.BS.201", #pollock
+                           "CATCH.BS.202", #cod
+                           "CATCH.BS.140", # yfin
+                           "CATCH.BS.203", # sablefish
+                           "CATCH.BS.204", #atka
+                           "CATCH.BS.301", #POP
+                           "CATCH.BS.103", #flathead
+                           "CATCH.BS.104", #rock sole
+                           "CATCH.BS.102")] #greenland
+        
+        # We need to do the ABCs too.  Easiest to just copy and paste the above list and ctrl+F "in selection" CATCH.BS <- ABC.BSAI
+        # Remember there are 5 species that get BS allocated in the bering sea and ai 
+        # seperately: pollock, sablefish, other rock fish, POP and Greenaldn turbot.  In these it should be ABC.BS.X
+        ABCDT <- FISH.DATA[c("ABC.BS.201", #pollock
+                             "ABC.BSAI.202", #cod
+                             "ABC.BSAI.140", # yfin
+                             "ABC.BS.203", # sablefish
+                             "ABC.BSAI.204", #atka
+                             "ABC.BS.301", #POP
+                             "ABC.BSAI.103", #flathead
+                             "ABC.BSAI.104", #rock sole
+                             "ABC.BS.102")] #greenland  
+        
+        # goal: to increase above listed species catch up to ABC/2MMT
+        goalamt <- pmin(EXTRACATCH,rowSums(ABCDT) - rowSums(DT))
+        
+        DT <- distributefun(goalamt,ABCDT,DT) # already coded up on line 167
+        
+        # Replace old catch with these new ones.
+        # One more place you need to add/remove species.  Sorry. I just copy lines 357-end and paste as appropriate, and that works well..
+        CATCH.PRED[c("CATCH.BS.201", #pollock
+                     "CATCH.BS.202", #cod
+                     "CATCH.BS.140", # yfin
+                     "CATCH.BS.203", # sablefish
+                     "CATCH.BS.204", #atka
+                     "CATCH.BS.301", #POP
+                     "CATCH.BS.103", #flathead
+                     "CATCH.BS.104", #rock sole
+                     "CATCH.BS.102")] <- DT[c("CATCH.BS.201", #pollock
+                                              "CATCH.BS.202", #cod
+                                              "CATCH.BS.140", # yfin
+                                              "CATCH.BS.203", # sablefish
+                                              "CATCH.BS.204", #atka
+                                              "CATCH.BS.301", #POP
+                                              "CATCH.BS.103", #flathead
+                                              "CATCH.BS.104", #rock sole
+                                              "CATCH.BS.102")]#greenland 
+        
+        
+        
+    }
+    
+    # # This is the old version of 5.4, where we scaled from catch to TAC.  This didn't work because, well.. TAC < catch in some cases. (Due to in-season management)
+    # I'll eventaully just delete this all, since its a relic and messy, its just here while I'm on Mat leave so other ppl can follow what happened, if need be.
+    # 
+    # if (scenario == 5.4) {
+    #     # improved catch--linear combination of predicted catch and improved catch on a scale of 0 to 1
+    #     TAC <- TAC.BOTHBIND[c("TAC.BSAI.141",
+    #                           "TAC.BSAI.204",
+    #                           "TAC.BSAI.103",
+    #                           "TAC.BS.102",
+    #                           "TAC.BSAI.147",
+    #                           "TAC.BSAI.303",
+    #                           "TAC.BSAI.60",
+    #                           "TAC.BSAI.100",
+    #                           "TAC.BS.310",
+    #                           "TAC.BSAI.202",
+    #                           "TAC.BSAI.106",
+    #                           "TAC.BS.301",
+    #                           "TAC.BS.201",
+    #                           "TAC.AI.201",
+    #                           "TAC.BSAI.104",
+    #                           "TAC.BSAI.307",
+    #                           "TAC.BS.203",
+    #                           "TAC.BSAI.400",
+    #                           "TAC.BSAI.65",
+    #                           "TAC.BSAI.326",
+    #                           "TAC.BSAI.90",
+    #                           "TAC.BSAI.50",
+    #                           "TAC.BSAI.140")]/2 + TAC.BOTHBIND.FLATSUR[c("TAC.BSAI.141",
+    #                                                                       "TAC.BSAI.204",
+    #                                                                       "TAC.BSAI.103",
+    #                                                                       "TAC.BS.102",
+    #                                                                       "TAC.BSAI.147",
+    #                                                                       "TAC.BSAI.303",
+    #                                                                       "TAC.BSAI.60",
+    #                                                                       "TAC.BSAI.100",
+    #                                                                       "TAC.BS.310",
+    #                                                                       "TAC.BSAI.202",
+    #                                                                       "TAC.BSAI.106",
+    #                                                                       "TAC.BS.301",
+    #                                                                       "TAC.BS.201",
+    #                                                                       "TAC.AI.201",
+    #                                                                       "TAC.BSAI.104",
+    #                                                                       "TAC.BSAI.307",
+    #                                                                       "TAC.BS.203",
+    #                                                                       "TAC.BSAI.400",
+    #                                                                       "TAC.BSAI.65",
+    #                                                                       "TAC.BSAI.326",
+    #                                                                       "TAC.BSAI.90",
+    #                                                                       "TAC.BSAI.50",
+    #                                                                       "TAC.BSAI.140")]/2
+    # 
+    #     catchisTAC <- TAC[c("TAC.BSAI.141")]
+    #     names(catchisTAC) <- c("CATCH.BSAI.141")
+    #     catchisTAC$CATCH.BSAI.141 <- TAC$TAC.BSAI.141*CATCH.AVG.BS$CODE.141
+    #     catchisTAC$CATCH.BSAI.204 <- TAC$TAC.BSAI.204*CATCH.AVG.BS$CODE.204
+    #     catchisTAC$CATCH.BSAI.103 <- TAC$TAC.BSAI.103*CATCH.AVG.BS$CODE.103
+    #     catchisTAC$CATCH.BS.102 <- TAC$TAC.BS.102
+    #     catchisTAC$CATCH.BSAI.147 <- TAC$TAC.BSAI.147*CATCH.AVG.BS$CODE.147
+    #     catchisTAC$CATCH.BSAI.303 <- TAC$TAC.BSAI.303*CATCH.AVG.BS$CODE.303
+    #     catchisTAC$CATCH.BSAI.60 <- TAC$TAC.BSAI.60*CATCH.AVG.BS$CODE.60
+    #     catchisTAC$CATCH.BSAI.100 <- TAC$TAC.BSAI.100*CATCH.AVG.BS$CODE.100
+    #     catchisTAC$CATCH.BS.310 <- TAC$TAC.BS.310
+    #     catchisTAC$CATCH.BSAI.202 <- TAC$TAC.BSAI.202*CATCH.AVG.BS$CODE.202
+    #     catchisTAC$CATCH.BSAI.106 <- TAC$TAC.BSAI.106*CATCH.AVG.BS$CODE.106
+    #     catchisTAC$CATCH.BS.301 <- TAC$TAC.BS.301
+    #     catchisTAC$CATCH.BS.201 <- (TAC$TAC.BS.201 + TAC$TAC.AI.201)*CATCH.AVG.BS$CODE.201
+    #     catchisTAC$CATCH.BSAI.104 <- TAC$TAC.BSAI.104*CATCH.AVG.BS$CODE.104
+    #     catchisTAC$CATCH.BSAI.307 <- TAC$TAC.BSAI.307*CATCH.AVG.BS$CODE.307
+    #     catchisTAC$CATCH.BS.203 <- TAC$TAC.BS.203
+    #     catchisTAC$CATCH.BSAI.400 <- TAC$TAC.BSAI.400*CATCH.AVG.BS$CODE.400
+    #     catchisTAC$CATCH.BSAI.65 <- TAC$TAC.BSAI.65*CATCH.AVG.BS$CODE.65
+    #     catchisTAC$CATCH.BSAI.326 <- TAC$TAC.BSAI.326*CATCH.AVG.BS$CODE.326
+    #     catchisTAC$CATCH.BSAI.90 <- TAC$TAC.BSAI.90*CATCH.AVG.BS$CODE.90
+    #     catchisTAC$CATCH.BSAI.50 <- TAC$TAC.BSAI.50*CATCH.AVG.BS$CODE.50
+    #     catchisTAC$CATCH.BSAI.140 <- TAC$TAC.BSAI.140*CATCH.AVG.BS$CODE.140
+    #     
+    #     # TAC.BS DNE for many species!!! 
+    # 
+    #     output <- improvedcatchscale*catchisTAC + (1-improvedcatchscale)*output
+    # } 
+    
+    
+    # This just ensures the output is in a predictable order, and that we are only returning BS catch since this is a BS function.
     output <- CATCH.PRED[c("CATCH.BS.141",
                            "CATCH.BS.204",
                            "CATCH.BS.103",
@@ -355,85 +512,5 @@ removefromcap_catch <- function(ABC.DATA,scenario,spptomult,improvedcatchscale) 
                            "CATCH.BS.90",
                            "CATCH.BS.50",
                            "CATCH.BS.140")]
-    
-    if (scenario == 5.4) {
-        # improved catch--linear combination of predicted catch and improved catch on a scale of 0 to 1
-        TAC <- TAC.BOTHBIND[c("TAC.BSAI.141",
-                              "TAC.BSAI.204",
-                              "TAC.BSAI.103",
-                              "TAC.BS.102",
-                              "TAC.BSAI.147",
-                              "TAC.BSAI.303",
-                              "TAC.BSAI.60",
-                              "TAC.BSAI.100",
-                              "TAC.BS.310",
-                              "TAC.BSAI.202",
-                              "TAC.BSAI.106",
-                              "TAC.BS.301",
-                              "TAC.BS.201",
-                              "TAC.AI.201",
-                              "TAC.BSAI.104",
-                              "TAC.BSAI.307",
-                              "TAC.BS.203",
-                              "TAC.BSAI.400",
-                              "TAC.BSAI.65",
-                              "TAC.BSAI.326",
-                              "TAC.BSAI.90",
-                              "TAC.BSAI.50",
-                              "TAC.BSAI.140")]/2 + TAC.BOTHBIND.FLATSUR[c("TAC.BSAI.141",
-                                                                          "TAC.BSAI.204",
-                                                                          "TAC.BSAI.103",
-                                                                          "TAC.BS.102",
-                                                                          "TAC.BSAI.147",
-                                                                          "TAC.BSAI.303",
-                                                                          "TAC.BSAI.60",
-                                                                          "TAC.BSAI.100",
-                                                                          "TAC.BS.310",
-                                                                          "TAC.BSAI.202",
-                                                                          "TAC.BSAI.106",
-                                                                          "TAC.BS.301",
-                                                                          "TAC.BS.201",
-                                                                          "TAC.AI.201",
-                                                                          "TAC.BSAI.104",
-                                                                          "TAC.BSAI.307",
-                                                                          "TAC.BS.203",
-                                                                          "TAC.BSAI.400",
-                                                                          "TAC.BSAI.65",
-                                                                          "TAC.BSAI.326",
-                                                                          "TAC.BSAI.90",
-                                                                          "TAC.BSAI.50",
-                                                                          "TAC.BSAI.140")]/2
-   
-        catchisTAC <- TAC[c("TAC.BSAI.141")]
-        names(catchisTAC) <- c("CATCH.BSAI.141")
-        catchisTAC$CATCH.BSAI.141 <- TAC$TAC.BSAI.141*CATCH.AVG.BS$CODE.141
-        catchisTAC$CATCH.BSAI.204 <- TAC$TAC.BSAI.204*CATCH.AVG.BS$CODE.204
-        catchisTAC$CATCH.BSAI.103 <- TAC$TAC.BSAI.103*CATCH.AVG.BS$CODE.103
-        catchisTAC$CATCH.BS.102 <- TAC$TAC.BS.102
-        catchisTAC$CATCH.BSAI.147 <- TAC$TAC.BSAI.147*CATCH.AVG.BS$CODE.147
-        catchisTAC$CATCH.BSAI.303 <- TAC$TAC.BSAI.303*CATCH.AVG.BS$CODE.303
-        catchisTAC$CATCH.BSAI.60 <- TAC$TAC.BSAI.60*CATCH.AVG.BS$CODE.60
-        catchisTAC$CATCH.BSAI.100 <- TAC$TAC.BSAI.100*CATCH.AVG.BS$CODE.100
-        catchisTAC$CATCH.BS.310 <- TAC$TAC.BS.310
-        catchisTAC$CATCH.BSAI.202 <- TAC$TAC.BSAI.202*CATCH.AVG.BS$CODE.202
-        catchisTAC$CATCH.BSAI.106 <- TAC$TAC.BSAI.106*CATCH.AVG.BS$CODE.106
-        catchisTAC$CATCH.BS.301 <- TAC$TAC.BS.301
-        catchisTAC$CATCH.BS.201 <- (TAC$TAC.BS.201 + TAC$TAC.AI.201)*CATCH.AVG.BS$CODE.201
-        catchisTAC$CATCH.BSAI.104 <- TAC$TAC.BSAI.104*CATCH.AVG.BS$CODE.104
-        catchisTAC$CATCH.BSAI.307 <- TAC$TAC.BSAI.307*CATCH.AVG.BS$CODE.307
-        catchisTAC$CATCH.BS.203 <- TAC$TAC.BS.203
-        catchisTAC$CATCH.BSAI.400 <- TAC$TAC.BSAI.400*CATCH.AVG.BS$CODE.400
-        catchisTAC$CATCH.BSAI.65 <- TAC$TAC.BSAI.65*CATCH.AVG.BS$CODE.65
-        catchisTAC$CATCH.BSAI.326 <- TAC$TAC.BSAI.326*CATCH.AVG.BS$CODE.326
-        catchisTAC$CATCH.BSAI.90 <- TAC$TAC.BSAI.90*CATCH.AVG.BS$CODE.90
-        catchisTAC$CATCH.BSAI.50 <- TAC$TAC.BSAI.50*CATCH.AVG.BS$CODE.50
-        catchisTAC$CATCH.BSAI.140 <- TAC$TAC.BSAI.140*CATCH.AVG.BS$CODE.140
-        
-        # TAC.BS DNE for many species!!! 
-
-        output <- improvedcatchscale*catchisTAC + (1-improvedcatchscale)*output
-    } 
-    
-    
     return (output)
 }

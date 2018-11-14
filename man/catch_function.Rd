@@ -7,7 +7,7 @@
 catch_function(scenario, Arrowtooth, Atka, Flathead, Greenland, Kamchatka,
   Northern, Octopus, OtherFlat, OtherRock, PCod, Plaice, POP, Pollock, Rock,
   Rougheye, Sablefish, Sculpin, Shark, Shortraker, Skate, Squid, Yellowfin,
-  spptomult, multiplier)
+  spptomult, multiplier, improvedcatchscale)
 }
 \arguments{
 \item{scenario}{The economic scenario number. Current options: 1, 1.1, 2, 3, 4, 5.1, 5.2, or 5.3}
@@ -56,9 +56,11 @@ catch_function(scenario, Arrowtooth, Atka, Flathead, Greenland, Kamchatka,
 
 \item{Yellowfin}{Optional.  ABC of Yellowfin Sole.}
 
-\item{spptomult}{Required if running scenario 5 or 5.5.  Will be discarded otherwise.  Choose a species catch to override with N*ABC.  Must be spelt exactly as one of the species parameters, case sensitive.  Must be in quotation marks.  If you want to replace more than one species, create a vector of strings (e.g. c("Arrowtooth","Atka"))}
+\item{spptomult}{Required if running any of the 5-series scenarios.  Will be discarded otherwise.  Choose a species catch to override with N*ABC.  Must be spelt exactly as one of the species parameters, case sensitive.  Must be in quotation marks.  If you want to replace more than one species, create a vector of strings (e.g. c("Arrowtooth","Atka"))}
 
-\item{multiplier}{Required if running scenario 5 or 5.5.  Will be discarded otherwise.  The N which will be multiplied with ABC to override the species designated by spptomult. If you are replacing more than one species, the order of the numbers corresponds to the order of the names in the spptomult string. (e.g. c(1,5) would imply the first species listed in spptomult has its catch replaced with 1*ABC_spp1 and the second is replaced with 5*ABC_spp2)}
+\item{multiplier}{Required if running scenario 5-series scenarios.  Will be discarded otherwise.  The N which will be multiplied with ABC to override the species designated by spptomult. If you are replacing more than one species, the order of the numbers corresponds to the order of the names in the spptomult string. (e.g. c(1,5) would imply the first species listed in spptomult has its catch replaced with 1*ABC_spp1 and the second is replaced with 5*ABC_spp2)}
+
+\item{improvedcatchscale}{Required if running scenario 5.4.  Will be discarded otherwise.  Choose the level to which catch has improved from status quo.  If 0, 5.4 collapses to 5.3.  If 1, Catch = TAC.}
 }
 \description{
 This function predicts the BSAI catch for each species whose ABC is given.  It is meant to work with the ACLIM bio models.
@@ -73,9 +75,10 @@ Scenario 1.1: Status Quo alternative: Log-Log \cr
 Scenario 2: Whitefish (Pollock and Cod) Political (aka TAC-setting) Preference \cr
 Scenario 3: Flatfish Political (aka TAC-setting) Preference \cr
 Scenario 4: No Fishing (will return all zeros) \cr
-Scenario 5.1: Fiddle with a single species. \cr
-Scenario 5.2: Fiddle with a single species, but in this case remove that species from TAC considerations under 2mt cap. \cr
-Scenario 5.3: Fiddle with a single species, remove that species from 2mt cap; put excess TAC specifically to species that typically get 'excess' TAC when pollock/cod are low. \cr
+Scenario 5.1: Fiddle with a single species--calculate the rest still taking the ABC of the removed sp. in to account. \cr
+Scenario 5.2: Fiddle with a single species--calculate the rest assuming the ABC of the removed sp. does not influence the sp. under the cap at all. \cr
+Scenario 5.3: Fiddle with a single species--calculate the rest assuming the ABC of the removed sp. does not influence the sp. under the cap at all and then increase the TAC of all the remaining species until the sum of the tAC = 2mmt \cr
+Scenario 5.4: Scenario 5.3, but in this case let catch range from the old predicted catch to TAC.  The amount which catch improves from old predicted catch to TAC can be dialed 0 to 1 using "improvscatchscale". \cr
 }
 \examples{
 catch_function(1, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
@@ -84,4 +87,6 @@ catch_function(5.1, spptomult = "Arrowtooth", multiplier = 2, Pollock = 2e6, Arr
 catch_function(5.1, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(2,1), Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 catch_function(5.2, spptomult = "Arrowtooth", multiplier = 2, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 catch_function(5.2, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(2,1), Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
+catch_function(5.3, spptomult="Arrowtooth", multiplier = 2, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
+catch_function(5.4, spptomult="Arrowtooth", multiplier = 2, improvedcatchscale=0.5, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 }
