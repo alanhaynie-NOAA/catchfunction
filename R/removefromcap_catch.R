@@ -381,7 +381,7 @@ removefromcap_catch <- function(ABC.DATA,scenario,spptomult,improvedcatchscale) 
         # goal: to increase above listed species catch up to ABC/2MMT
         goalamt <- pmin(EXTRACATCH,rowSums(ABCDT) - rowSums(DT))
         
-        DT <- distributefun(goalamt,ABCDT,DT) # already coded up on line 167
+        DT <- distributefun(goalamt,ABCDT,DT) # already coded up on line 149
         
         # Replace old catch with these new ones.
         # One more place you need to add/remove species.  Sorry. I just copy lines 357-end and paste as appropriate, and that works well..
