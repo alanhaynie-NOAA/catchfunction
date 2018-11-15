@@ -86,6 +86,8 @@ removefromcap_catch <- function(ABC.DATA,scenario,spptomult,improvedcatchscale) 
             NETTAC <- rowSums(DT, na.rm = TRUE)
             if (NETTAC > 2e6) {
                 # first bring down the least valuable/zero value bycatch species
+                # These are first because these species really are almost nuisance
+                # catches.
                 TAC.BOTHBIND <- predict.tac.function(predictmethod = 1, model="SUR",fit=tac_BOTHBIND_loglin_sur,FISH.DATA)
                 DT_orig$TAC.BSAI.60 <- TAC.BOTHBIND$TAC.BSAI.60 # octopus
                 DT_orig$TAC.BSAI.65 <- TAC.BOTHBIND$TAC.BSAI.65 # sharks
@@ -96,7 +98,7 @@ removefromcap_catch <- function(ABC.DATA,scenario,spptomult,improvedcatchscale) 
             DT <- DT_orig %>% select(starts_with("TAC"))
             NETTAC <- rowSums(DT, na.rm = TRUE)
             if (NETTAC > 2e6) {
-                # if still over 2mmt, next bring down species for various reasons
+                # if still over 2mmt, next bring down species for various reasons (see below)
                 DT_orig$TAC.BSAI.50 <- TAC.BOTHBIND$TAC.BSAI.50 # squid -- pollock bycatch. Valuable (because pollock) but still pure bycatch
                 DT_orig$TAC.BSAI.141 <- TAC.BOTHBIND$TAC.BSAI.141 # arrowtooth -- halibut will continue to be limiting
                 DT_orig$TAC.BSAI.104 <- TAC.BOTHBIND$TAC.BSAI.104 # rock sole -- worry about market limits
@@ -105,8 +107,10 @@ removefromcap_catch <- function(ABC.DATA,scenario,spptomult,improvedcatchscale) 
             DT <- DT_orig %>% select(starts_with("TAC"))
             NETTAC <- rowSums(DT, na.rm = TRUE)
             if (NETTAC > 2e6) {
-                # if still over 2mmt, next bring down basically everything that doesnt tend to go up with pollock or isn't directly listed as a targeted species goes down
-                # pollock
+                # if still over 2mmt, next bring down basically everything that doesnt 
+                # tend to go up with pollock or isn't directly listed as a targeted species 
+                # 
+                # 
                 # non-AFA trawl cp targets: yfin, rock sole, flathead sole,atka, pop
                 # while cod isn't technically a target, its effectively one in terms of its value (as a bycatch)
                 # species that go up w. pollock going down: arrowtooth, flathead sole, rock sole, yellowfin
@@ -146,7 +150,7 @@ removefromcap_catch <- function(ABC.DATA,scenario,spptomult,improvedcatchscale) 
         
         # Reallocate the remaining TAC.
         # 
-         distributefun <- function(goal,abcdt,dt) {
+        distributefun <- function(goal,abcdt,dt) {
                 while (goal > 0) {
                     # calculate the distance (from tac to abc) to tac ratio for each flatfish.
                     disttoabc_to_tac_ratio <- (abcdt - dt)/dt
@@ -204,7 +208,12 @@ removefromcap_catch <- function(ABC.DATA,scenario,spptomult,improvedcatchscale) 
             DT_orig$TAC.BSAI.202 <- dt$TAC.BSAI.202 
             
             
-            # increase first the species that traditionally see increases when pollock is low
+            # increase first the species that empirically see increases when pollock is low
+            # this is yellowfin, arrowtooth, rock sole and flathead.  (see manuscript table)
+            # expert opinion is others (e.g. northern rockfish) should also go up but
+            # couldn't get a statistically significant result when this was tested, so leaving
+            # that out.
+            # 
             FORPOLRESFISH <- EXTRATAC - goalamt
             
             if (FORPOLRESFISH > 0) {
@@ -231,7 +240,7 @@ removefromcap_catch <- function(ABC.DATA,scenario,spptomult,improvedcatchscale) 
                                                    'TAC.BSAI.103',
                                                    'TAC.BSAI.141')]
                 #
-                # Next, if there is still any remaining 2mmt use it to increase the rest.
+                # Finally if there is still any remaining 2mmt use it to increase everything else.
                 FORRESTFISH <- FORPOLRESFISH - goalamt
                 if (FORRESTFISH > 0) {
                     dt <- DT[-c('TAC.BSAI.60',
