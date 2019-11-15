@@ -5,12 +5,7 @@ statusquo_catch <- function(ABC.DATA,scenario) {
         FISH.DATA$ABCboth <- FISH.DATA$ABC.BSAI.202 + FISH.DATA$ABC.BS.201
         FISH.DATA$ABCboth.UB.150 <- as.numeric(FISH.DATA$ABC.BS.201 + FISH.DATA$ABC.BSAI.202 >= 1.5e6)
         FISH.DATA$pollock.bs.UB <-  as.numeric(FISH.DATA$ABC.BS.201 > 1.2e6)
-    }   else if (scenario == 1.1) {
-        FISH.DATA <- log(ABC.DATA)
-        FISH.DATA$ABCboth <- exp(FISH.DATA$ABC.BSAI.202) + exp(FISH.DATA$ABC.BS.201)
-        FISH.DATA$ABCboth.UB.150 <- as.numeric(exp(FISH.DATA$ABC.BS.201) + exp(FISH.DATA$ABC.BSAI.202) >= 1.5e6)
-        FISH.DATA$pollock.bs.UB <-  as.numeric(exp(ABC.DATA$ABC.BS.201) > 1.2e6)
-    } 
+    }   
     
     # These are all the indicators required in the regressions (I honestly think some of them are no longer needed, so this could probably
     # do to be cleaned up a bit, but its not hurting anyone.)
@@ -46,17 +41,7 @@ statusquo_catch <- function(ABC.DATA,scenario) {
         
         CATCH.BOTHBIND.FLATSUR.SURSUR <- predict.catch.function(model="FLATSUR",fit=catch_BOTHBIND_FLATSUR_loglin_sur,TAC.BOTHBIND.FLATSUR )
         
-    } else if (scenario == 1.1) {
-        TAC.BOTHBIND <- predict.tac.function(scenario = 1.1,model="SUR",fit=tac_BOTHBIND_sur,FISH.DATA)
-        
-        CATCH.BOTHBIND.SURSUR <- predict.catch.function(model="SUR",fit=catch_BOTHBIND_sur,TAC.BOTHBIND )
-        CATCH.BOTHBIND.SUROLS <- predict.catch.function(model="NOSUR",fit = catch_BOTHBIND_nosur,TAC.BOTHBIND )
-        
-        TAC.BOTHBIND.FLATSUR <- predict.tac.function(scenario = 1.1,model="FLATSUR",fit=tac_BOTHBIND_FLATSUR_sur,FISH.DATA)
-        
-        CATCH.BOTHBIND.FLATSUR.SURSUR <- predict.catch.function(model="FLATSUR",fit=catch_BOTHBIND_FLATSUR_sur,TAC.BOTHBIND.FLATSUR )
-        
-    } else if (scenario == 2) {
+    }  else if (scenario == 2) {
         #whitefish dom
         TAC.BOTHBIND.FLATSUR.whitefishdom <- predict.tac.function(predictmethod = 1, model="FLAT_WFDOM",fit=tac_BOTHBIND_FLATSUR_loglin_sur,FISH.DATA)
         TAC.BOTHBIND.FLATSUR.whitefishdom$ABCboth.UB.150 <- as.numeric(TAC.BOTHBIND.FLATSUR.whitefishdom$ABC.BS.201 + TAC.BOTHBIND.FLATSUR.whitefishdom$ABC.BSAI.202 >= 1.50e6*1.1)

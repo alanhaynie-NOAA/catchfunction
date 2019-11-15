@@ -113,65 +113,7 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
             PREDICTIONS$TAC.BSAI.104 <- pmin(predict(fit[[19]], FISH.DATA) , log(FISH.DATA$ABC.BSAI.104))
             # Plaice
             PREDICTIONS$TAC.BSAI.106 <- pmin(predict(fit[[11]], FISH.DATA), log(FISH.DATA$ABC.BSAI.106))
-        } else if (predictmethod  == 1.1) {
-            # Octopus
-            PREDICTIONS$TAC.BSAI.60 <- pmin(predict(fit[[1]], FISH.DATA),FISH.DATA$ABC.BSAI.60)
-            # Sharks
-            PREDICTIONS$TAC.BSAI.65 <- pmin(predict(fit[[2]], FISH.DATA),FISH.DATA$ABC.BSAI.65)
-            # Skates
-            PREDICTIONS$TAC.BSAI.90 <- pmin(predict(fit[[3]], FISH.DATA),FISH.DATA$ABC.BSAI.90)
-            # Sculpin
-            PREDICTIONS$TAC.BSAI.400 <- pmin(predict(fit[[4]], FISH.DATA),FISH.DATA$ABC.BSAI.400)
-            # Squid
-            PREDICTIONS$TAC.BSAI.50 <- pmin(Pred.SUR$squid.pred,FISH.DATA$ABC.BSAI.50)
-            
-            #Shortraker
-            PREDICTIONS$TAC.BSAI.326 <- FISH.DATA$ABC.BSAI.326
-            
-            # Rougheye
-            PREDICTIONS$TAC.BSAI.307 <- pmin(predict(fit[[15]],FISH.DATA),FISH.DATA$ABC.BSAI.307)
-            # Other Rockfish
-            PREDICTIONS$TAC.BS.310 <- pmin(predict(fit[[8]], FISH.DATA),FISH.DATA$ABC.BS.310)
-            PREDICTIONS$TAC.AI.310 <- FISH.DATA$ABC.AI.310
-            
-            # Northern 
-            PREDICTIONS$TAC.BSAI.303 <- pmin(predict(fit[[7]], FISH.DATA), FISH.DATA$ABC.BSAI.303)
-            # POP
-            PREDICTIONS$TAC.BS.301 <- pmin(predict(fit[[6]], FISH.DATA),FISH.DATA$ABC.BS.301)
-            PREDICTIONS$TAC.AI.301 <- FISH.DATA$ABC.AI.301
-            
-            
-            # Pollock
-            PREDICTIONS$TAC.BS.201 <- pmin(Pred.SUR$pollock.pred ,FISH.DATA$ABC.BS.201)
-            PREDICTIONS$TAC.AI.201 <- pmin(predict(fit[[18]], FISH.DATA),FISH.DATA$ABC.AI.201)
-            # PCod
-            PREDICTIONS$TAC.BSAI.202 <- pmin(Pred.SUR$Pcod.pred ,FISH.DATA$ABC.BSAI.202)
-            # Sablefish
-            PREDICTIONS$TAC.BS.203 <- pmin(Pred.SUR$sablefish.pred ,FISH.DATA$ABC.BS.203)
-            PREDICTIONS$TAC.AI.203 <- pmin(predict(fit[[17]], FISH.DATA),FISH.DATA$ABC.AI.203)
-            # Atka
-            PREDICTIONS$TAC.BSAI.204 <- pmin(Pred.SUR$atka.pred ,FISH.DATA$ABC.BSAI.204)
-            
-            # Yellowfin
-            PREDICTIONS$TAC.BSAI.140 <- pmin(Pred.SUR$yellowfin.pred ,FISH.DATA$ABC.BSAI.140)
-            # Arrowtooth
-            PREDICTIONS$TAC.BSAI.141 <- pmin(predict(fit[[14]], FISH.DATA), FISH.DATA$ABC.BSAI.141)
-            # Kamchatka
-            PREDICTIONS$TAC.BSAI.147 <- pmin(predict(fit[[5]], FISH.DATA),FISH.DATA$ABC.BSAI.147)
-            
-            # Other FLatfish
-            PREDICTIONS$TAC.BSAI.100 <- pmin(predict(fit[[12]], FISH.DATA), FISH.DATA$ABC.BSAI.100)
-            # Greenland turbot
-            PREDICTIONS$TAC.BS.102 <-  pmin(predict(fit[[9]], FISH.DATA), FISH.DATA$ABC.BS.102)
-            PREDICTIONS$TAC.AI.102 <-  pmin(predict(fit[[10]], FISH.DATA), FISH.DATA$ABC.AI.102)
-            # Flathead sole
-            PREDICTIONS$TAC.BSAI.103 <- pmin(predict(fit[[13]], FISH.DATA), FISH.DATA$ABC.BSAI.103)
-            # Rock Sole
-            
-            PREDICTIONS$TAC.BSAI.104 <- pmin(predict(fit[[19]], FISH.DATA), FISH.DATA$ABC.BSAI.104)
-            # Plaice
-            PREDICTIONS$TAC.BSAI.106 <- pmin(predict(fit[[11]], FISH.DATA), FISH.DATA$ABC.BSAI.106)
-        }
+        } 
         
         
         PREDICTIONS[is.na(PREDICTIONS)] <- -Inf  # assume that any NaN comes from -Inf*0
@@ -245,69 +187,7 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
             PREDICTIONS$TAC.BSAI.104 <- pmin(predict(fit[[18]], FISH.DATA),log(FISH.DATA$ABC.BSAI.104))
             # Plaice
             PREDICTIONS$TAC.BSAI.106 <- pmin(predict(fit[[6]], FISH.DATA),log(FISH.DATA$ABC.BSAI.106))
-        } else if (predictmethod  == 1.1) {
-            # Octopus
-            PREDICTIONS$TAC.BSAI.60 <- pmin(predict(fit[[1]], FISH.DATA), FISH.DATA$ABC.BSAI.60)
-            # Sharks
-            PREDICTIONS$TAC.BSAI.65 <- pmin(predict(fit[[2]], FISH.DATA), FISH.DATA$ABC.BSAI.65)
-            # Skates
-            PREDICTIONS$TAC.BSAI.90 <- pmin(predict(fit[[3]], FISH.DATA), FISH.DATA$ABC.BSAI.90)
-            # Sculpin
-            PREDICTIONS$TAC.BSAI.400 <- pmin(predict(fit[[4]], FISH.DATA), FISH.DATA$ABC.BSAI.400)
-            # Squid
-            PREDICTIONS$TAC.BSAI.50 <- pmin(Pred.SUR.flat$squid.pred , FISH.DATA$ABC.BSAI.50)
-            
-            # Shortraker
-            
-            PREDICTIONS$TAC.BSAI.326 <- FISH.DATA$ABC.BSAI.326
-            
-            # Rougheye
-            PREDICTIONS$TAC.BSAI.307 <- pmin(predict(fit[[8]],FISH.DATA), FISH.DATA$ABC.BSAI.307)
-            # Other Rockfish
-            PREDICTIONS$TAC.BS.310 <- pmin(predict(fit[[9]],FISH.DATA), FISH.DATA$ABC.BS.310)
-            
-            PREDICTIONS$TAC.AI.310 <- FISH.DATA$ABC.AI.310
-            
-            # Northern 
-            PREDICTIONS$TAC.BSAI.303 <- pmin(predict(fit[[10]], FISH.DATA),FISH.DATA$ABC.BSAI.303)
-            # POP
-            PREDICTIONS$TAC.BS.301 <- pmin(predict(fit[[11]],FISH.DATA), FISH.DATA$ABC.BS.301)
-            
-            PREDICTIONS$TAC.AI.301 <- FISH.DATA$ABC.AI.301
-            
-            
-            # Pollock
-            PREDICTIONS$TAC.BS.201 <- pmin(Pred.SUR$pollock.pred , FISH.DATA$ABC.BS.201)
-            PREDICTIONS$TAC.AI.201 <- pmin(predict(fit[[16]],FISH.DATA), FISH.DATA$ABC.AI.201)
-            # PCod
-            PREDICTIONS$TAC.BSAI.202 <- pmin(Pred.SUR.flat$Pcod.pred , FISH.DATA$ABC.BSAI.202)
-            # Sablefish
-            PREDICTIONS$TAC.BS.203 <- pmin(Pred.SUR.flat$sablefish.pred , FISH.DATA$ABC.BS.203)
-            PREDICTIONS$TAC.AI.203 <- pmin(predict(fit[[15]],FISH.DATA), FISH.DATA$ABC.AI.203)
-            # Atka
-            PREDICTIONS$TAC.BSAI.204 <- pmin(Pred.SUR.flat$atka.pred , FISH.DATA$ABC.BSAI.204)
-            
-            
-            # Yellowfin
-            PREDICTIONS$TAC.BSAI.140 <- pmin(Pred.SUR.flat$yellowfin.pred , FISH.DATA$ABC.BSAI.140)
-            # Arrowtooth
-            PREDICTIONS$TAC.BSAI.141 <- pmin(Pred.SUR.flat$arrowtooth.pred, FISH.DATA$ABC.BSAI.141)
-            # Kamchatka
-            PREDICTIONS$TAC.BSAI.147 <- pmin(predict(fit[[5]], FISH.DATA), FISH.DATA$ABC.BSAI.147)
-            
-            # Other FLatfish
-            PREDICTIONS$TAC.BSAI.100 <- pmin(Pred.SUR.flat$Oflat.pred, FISH.DATA$ABC.BSAI.100)
-            # Greenland turbot
-            PREDICTIONS$TAC.BS.102 <- pmin(predict(fit[[17]],FISH.DATA), FISH.DATA$ABC.BS.102)
-            PREDICTIONS$TAC.AI.102 <- pmin(predict(fit[[14]],FISH.DATA), FISH.DATA$ABC.AI.102)
-            # Flathead sole
-            PREDICTIONS$TAC.BSAI.103 <- pmin(predict(fit[[7]],FISH.DATA), FISH.DATA$ABC.BSAI.103)
-            # Rock Sole
-            
-            PREDICTIONS$TAC.BSAI.104 <- pmin(predict(fit[[18]], FISH.DATA), FISH.DATA$ABC.BSAI.104)
-            # Plaice
-            PREDICTIONS$TAC.BSAI.106 <- pmin(predict(fit[[6]], FISH.DATA),FISH.DATA$ABC.BSAI.106)
-        }
+        } 
         
         PREDICTIONS[is.na(PREDICTIONS)] <- -Inf  # assume that any NaN comes from -Inf*0
         # This is crude, admittedly.. But this was the only time I was getting 

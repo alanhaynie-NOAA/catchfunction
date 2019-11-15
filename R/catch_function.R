@@ -9,7 +9,6 @@
 #' 
 #' Currently programmed scenarios: \cr
 #' Scenario 1: Status Quo (Log-Linear) \cr
-#' Scenario 1.1: Status Quo alternative: Log-Log \cr
 #' Scenario 2: Whitefish (Pollock and Cod) Political (aka TAC-setting) Preference \cr
 #' Scenario 3: Flatfish Political (aka TAC-setting) Preference \cr
 #' Scenario 4: No Fishing (will return all zeros) \cr
@@ -18,7 +17,7 @@
 #' Scenario 5.3: Fiddle with a single species--calculate the rest assuming the ABC of the removed sp. does not influence the sp. under the cap at all and then increase the TAC of all the remaining species until the sum of the tAC = 2mmt \cr
 #' Scenario 5.4: Scenario 5.3, but in this case let catch range from the old predicted catch to TAC.  The amount which catch improves from old predicted catch to TAC can be dialed 0 to 1 using "improvscatchscale". \cr
 #' 
-#' @param scenario The economic scenario number. Current options: 1, 1.1, 2, 3, 4, 5.1, 5.2, or 5.3
+#' @param scenario The economic scenario number. Current options: 1, 2, 3, 4, 5.1, 5.2, or 5.3
 #' @param Arrowtooth Optional.  ABC of Arrowtooth Flounder.
 #' @param Atka Optional.  ABC of Atka Mackerel.
 #' @param Flathead Optional.  ABC of Flathead Sole.
@@ -227,8 +226,8 @@ catch_function <- function(scenario,
     if (scenario == 1) {
         catch <- statusquo_catch(ABC.DATA,1)
         # log linear
-    } else if (scenario == 1.1) {
-        catch <- statusquo_catch(ABC.DATA,1.1)
+   # } else if (scenario == 1.1) {
+    #    catch <- statusquo_catch(ABC.DATA,1.1)
         # log log
     } else if (scenario == 2) {
         catch <- statusquo_catch(ABC.DATA,2)

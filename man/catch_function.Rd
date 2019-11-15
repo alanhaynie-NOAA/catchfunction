@@ -5,9 +5,9 @@
 \title{Catch Function}
 \usage{
 catch_function(scenario, Arrowtooth, Atka, Flathead, Greenland, Kamchatka,
-  Northern, Octopus, OtherFlat, OtherRock, PCod, Plaice, POP, Pollock, Rock,
-  Rougheye, Sablefish, Sculpin, Shark, Shortraker, Skate, Squid, Yellowfin,
-  spptomult, multiplier, improvedcatchscale)
+  Northern, Octopus, OtherFlat, OtherRock, PCod, Plaice, POP, Pollock,
+  Rock, Rougheye, Sablefish, Sculpin, Shark, Shortraker, Skate, Squid,
+  Yellowfin, spptomult, multiplier, improvedcatchscale)
 }
 \arguments{
 \item{scenario}{The economic scenario number. Current options: 1, 1.1, 2, 3, 4, 5.1, 5.2, or 5.3}
