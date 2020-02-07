@@ -25,8 +25,8 @@ statusquo_catch <- function(ABC.DATA,scenario) {
     FISH.DATA$pollockAIchange <-  1 
     FISH.DATA$A28 <- 1
     FISH.DATA$atkadisp <- 0
-    FISH.DATA$SSL <-  1 # stellar sea lion closure
-    FISH.DATA$WAISSL <- 0
+    FISH.DATA$SSL <-  1 # stellar sea lion closure + limited reopening
+    FISH.DATA$WAISSL <- 0 # stellar sea lion closure, no limited reopening
     FISH.DATA$A80.ask.POP <- 1
     FISH.DATA$A82 <- 1
 
