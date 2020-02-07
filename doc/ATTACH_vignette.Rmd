@@ -1,8 +1,9 @@
 ---
 title: "The ATTACH model"  
-subtitle: "How It Works And How It Came To Be"
-author: "Amanda Faig"
-date: "Feb 6 2020"
+subtitle: "Package Version 1.5.3"
+author: "Amanda Faig and Alan Haynie"
+date: "February 7, 2020"
+urlcolor: blue
 #output: rmarkdown::html_vignette
 output: rmarkdown::pdf_document
 vignette: >
@@ -36,8 +37,7 @@ library(catchfunction)
 ```
 
 ## 2. Predicting TAC
-
-We created ATTACH as a two-step model.  In the first step, TAC is predicted from ABC.  The user passes, as inputs, the Bering Sea ABCs into the model for as many species as are defined in their biological models; up to the 22 species under the BSAI 2 million ton ecosystem cap ("the ecosystem cap"). To see the full list of species included in the cap, see the list of arguments in the help file.
+We created ATTACH as a two-step model.  In the first step, TAC is predicted from ABC.  The user passes, as inputs, the Bering Sea ABCs into the model for as many species as are defined in their biological models; up to the 22 species under the BSAI 2 million ton ecosystem cap ("the ecosystem cap"). To see the full list of species included in the cap, see the list of arguments in the help file, or in the [pdf manual](https://github.com/amandafaig/catchfunction/blob/master/catchfunction_1.5.3.pdf).
 
 ```{r}
 ?catch_function
@@ -47,28 +47,43 @@ Since the ecosystem cap is for the entire BSAI, but the ABC input is only for th
 
 The entire set of BSAI ABCs is then passed into the first step of the model: estimating TAC.  Each year the North Pacific Fishery Management Council ("the Council") sets the TAC of individual stocks based on the ABC estimates for the individual stocks.  The ecosystem cap mandates that the Council must ensure the sum of these TACs does not exceed 2 million metric tons. The stock assessment ABCs and the TACs set by the Council are published annually in the [Alaska Region's groundfish harvest specifications](https://www.fisheries.noaa.gov/alaska/sustainable-fisheries/alaska-groundfish-harvest-specifications).  We used data from 1992 to 2017 to create the current version of the model (version 1). 
 
-TACs for each stock were estimated statistically using a log-linear model. For $j = 1, 2, … n$ stocks, the general model for stock $i$ took the form: 
+TACs for each stock were estimated statistically using a log-linear model. For $j = 1, 2, ... n$ stocks, the general model for stock $i$ took the form: 
 
 $$
 \ln(TAC_{i,t}) = \alpha_{i} + \beta_{i}\ln(ABC_{i,t}) + \sum_{j \neq i}^n \beta_{j} ABC_{j,t} + \sum_{k=1}^m \beta_{k}I_{k,t} + \varepsilon_{i,t}
 $$
 
-where $\alpha_{i}$ is the stock-specific intercept for species $i$, $\beta_i$ is the elasticity of the TAC of species $i$ with respect to its own ABC, and $\beta_j$ relates the ABC of some species $j \neq i$ to the TAC of species $i$. The effect ($\beta_k$) of $k =1, 2, … m$ events or policy changes (e.g., changes in management, area closures, or implementation of catch share programs) on TAC was also estimated where $I_{k,t}$ is an indicator variable for event $k$ in year $t$, and $\varepsilon_{i,t}$ denotes the residual error for the prediction in year $t$.  How the errors handled is discussed more in section 4.
+where $\alpha_{i}$ is the stock-specific intercept for species $i$, $\beta_i$ is the elasticity of the TAC of species $i$ with respect to its own ABC, and $\beta_j$ relates the ABC of some species $j \neq i$ to the TAC of species $i$. The effect ($\beta_k$) of $k =1, 2, ... m$ events or policy changes (e.g., changes in management, area closures, or implementation of catch share programs) on TAC was also estimated where $I_{k,t}$ is an indicator variable for event $k$ in year $t$, and $\varepsilon_{i,t}$ denotes the residual error for the prediction in year $t$.  How the errors handled is discussed more in section 4.
 
 ATTACH uses the predicted coefficients to predict TAC from ABCs. The events/policies are assumed to reflect the last year of the dataset.  So, for example, the Amendment 80 indicator variable is set to 1 in predictions, while the Steller Sea Lion closure of 2011 to 2014 is set to 0 (and the Steller Sea Lion limited reopening is set to 1).  
 
 When the model is passed a set of historical ABCs, the predicted TACs add up to less than 2 million metric tons, since necessarily these combinations led to a net TAC at or below the ecosystem cap. (Even this is not guaranteed, however, due to prediction error.)  When the set of ABCs input into ATTACH is not a historical set, it is possible the predicted TACs based on the regression estimates alone could together exceed the ecosystem cap.  To ensure ATTACH does not violate the ecosystem cap, we check the sum of the TACs and, if they exceed 2 million metric tons, we decrease all TACs proportionally, except for that of BS and AI Sablefish, BSAI Shortraker rockfish, and BSAI Northern rockfish.
 
 ## 3. Predicting Catch
+The output from the TAC prediction step is then passed to another sub-model, the catch prediction step.  Catch estimates are based on TAC data (from the aforementioned groundfish harvest specifications) and catch data from the [Catch Accounting System](https://www.fisheries.noaa.gov/alaska/sustainable-fisheries/alaska-catch-accounting-system).  As in the first step, we use data from 1992 to 2017.
 
-The output from the TAC prediction step is then passed to another sub-model, the catch prediction step.
+Catches for each stock were estimated statistically using a log-linear model. For $j = 1, 2, ... n$ stocks, the general model for stock $i$ took the form: 
+
+$$
+\ln(catch_{i,t}) = \alpha_{i} + \beta_{i}\ln(TAC_{i,t}) + \sum_{j \neq i}^n \beta_{j} TAC_{j,t} + \sum_{k=1}^m \beta_{k}I_{k,t} + \varepsilon_{i,t}
+$$
+
+where $\alpha_{i}$ is the stock-specific intercept for species $i$, $\beta_i$ is the elasticity of the catch of species $i$ with respect to its own TAC, and $\beta_j$ relates the TAC of some species $j \neq i$ to the catch of species $i$. The effect ($\beta_k$) of $k =1, 2, ... m$ events or policy changes (e.g., changes in management, area closures, or implementation of catch share programs) on TAC was also estimated where $I_{k,t}$ is an indicator variable for event $k$ in year $t$, and $\varepsilon_{i,t}$ denotes the residual error for the prediction in year $t$.  How the errors handled is discussed more in section 4.
+
+The catch estimate for a given species can exceed it's own TAC.  This is because the TAC measure we use is the TAC set at the beginning of the season, and in-season management can adjust TAC to an extent.  In ATTACH we check that catch does not exceed the BSAI wide ABC and that the ecosystem cap, but otherwise allow predicted catch to exceed TAC.
+
 
 ## 4. The Ensemble
+ATTACH is an ensemble of three models that include different explanatory variables that fit data better for different species.  We chose the ensemble rather than any individual model because it better captures possible environmental and policy uncertainty and is therefore more likely to be robust to ABC combinations and individual ABC levels outside of historical bounds. The three models in the ensemble differ in the error structures in both the TAC and catch estimation equations. In all of the models, the errors in the TAC estimation stage are linked via Seemingly Unrelated Regressions (SUR; [Zellner 1962](https://www.jstor.org/stable/2281644?seq=1)), a common econometric modeling technique. The format of the SUR here is a set of linear regression equations that are valid independently for each species; exogenous shocks which affect one species are then assumed to affect all the included species, implying the error terms are correlated across species. This error covariance is especially strong in the TAC stage, where the 2 million ton cap ensures the errors of all species sum to zero. In the catch estimation stage, model 1 assumes that each log-linear regression is independent, model 2 has two groups of SUR-linked regressions (representing species that are typically caught concurrently), and model 3 includes a group of species that are caught concurrently.  
+
+The ensemble averages the estimated catch of the three models equally before returning the estimated Bering Sea catch to the user.  Only the estimates for the species whose ABCs were specified by the user are returned.  
 
 ## 5. Performance
+Figure SXXX indicates the vast improvement of the ensemble relative to assuming catch is equal to ABC.
 
-## 6. Future Steps
+## 6. Scenarios
 
+## 7. Future Steps
 +  Version 2
     + New ensemble.  We have chosen a different set of models to make the ensemble, looking specifically for variation in predictive ability across species.
     + More data. 2018 and 2019 data is now available.
