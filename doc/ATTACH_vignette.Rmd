@@ -1,0 +1,81 @@
+---
+title: "The ATTACH model"  
+subtitle: "How It Works And How It Came To Be"
+author: "Amanda Faig"
+date: "Feb 6 2020"
+#output: rmarkdown::html_vignette
+output: rmarkdown::pdf_document
+vignette: >
+  %\VignetteIndexEntry{ATTACH_vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+## 1. Introduction
+The catchfunction package (which we refer to as the ABC To TAC and Commercial Harvest, aka ATTACH, model: R package rename forthcoming) was created for the [Alaska Climate Integrated Modeling Project](https://archive.fisheries.noaa.gov/afsc/REFM/REEM/ACLIM.htm) (ACLIM) by Amanda Faig (University of Washington; School of Aquatic Fisheries and Sciences) and Alan Haynie (NOAA; NMFS).  This function, in a nutshell, takes Bering Sea (BS) acceptable biological catch (ABC) as input and uses a series of regression estimates to predict total allowable catch (TAC) and from that the commercial harvest in the Bering Sea, based on ABC, TAC, and catch data from 1992 to 2017.
+
+If you have yet to install the R package (or if you want to upate your package, e.g. to see if a newer version has been released) run the following code:
+```{r, eval=F} 
+install.packages("devtools")
+library("devtools")
+install_github("amandafaig/catchfunction")
+library("catchfunction")
+```
+
+Otherwise, simply load the library in order to follow along as needed:
+```{r setup}
+library(catchfunction)
+```
+
+## 2. Predicting TAC
+
+We created ATTACH as a two-step model.  In the first step, TAC is predicted from ABC.  The user passes, as inputs, the Bering Sea ABCs into the model for as many species as are defined in their biological models; up to the 22 species under the BSAI 2 million ton ecosystem cap ("the ecosystem cap"). To see the full list of species included in the cap, see the list of arguments in the help file.
+
+```{r}
+?catch_function
+```
+
+Since the ecosystem cap is for the entire BSAI, but the ABC input is only for the Bering Sea, the ATTACH model first calculates BSAI ABCs from the BS ABC inputs. (The ABC input is only for the Bering Sea is this is the scope of the ACLIM project.) We calculate BSAI ABCs assuming that the Aleutian Island ABC rises and falls (relative to the historical mean) in proportion to how the (user defined) Bering Sea ABC compares to it's historical mean.  For ABCs left undefined by the user, we assume those species ABCs are at their historical means.
+
+The entire set of BSAI ABCs is then passed into the first step of the model: estimating TAC.  Each year the North Pacific Fishery Management Council ("the Council") sets the TAC of individual stocks based on the ABC estimates for the individual stocks.  The ecosystem cap mandates that the Council must ensure the sum of these TACs does not exceed 2 million metric tons. The stock assessment ABCs and the TACs set by the Council are published annually in the [Alaska Region's groundfish harvest specifications](https://www.fisheries.noaa.gov/alaska/sustainable-fisheries/alaska-groundfish-harvest-specifications).  We used data from 1992 to 2017 to create the current version of the model (version 1). 
+
+TACs for each stock were estimated statistically using a log-linear model. For $j = 1, 2, … n$ stocks, the general model for stock $i$ took the form: 
+
+$$
+\ln(TAC_{i,t}) = \alpha_{i} + \beta_{i}\ln(ABC_{i,t}) + \sum_{j \neq i}^n \beta_{j} ABC_{j,t} + \sum_{k=1}^m \beta_{k}I_{k,t} + \varepsilon_{i,t}
+$$
+
+where $\alpha_{i}$ is the stock-specific intercept for species $i$, $\beta_i$ is the elasticity of the TAC of species $i$ with respect to its own ABC, and $\beta_j$ relates the ABC of some species $j \neq i$ to the TAC of species $i$. The effect ($\beta_k$) of $k =1, 2, … m$ events or policy changes (e.g., changes in management, area closures, or implementation of catch share programs) on TAC was also estimated where $I_{k,t}$ is an indicator variable for event $k$ in year $t$, and $\varepsilon_{i,t}$ denotes the residual error for the prediction in year $t$.  How the errors handled is discussed more in section 4.
+
+ATTACH uses the predicted coefficients to predict TAC from ABCs. The events/policies are assumed to reflect the last year of the dataset.  So, for example, the Amendment 80 indicator variable is set to 1 in predictions, while the Steller Sea Lion closure of 2011 to 2014 is set to 0 (and the Steller Sea Lion limited reopening is set to 1).  
+
+When the model is passed a set of historical ABCs, the predicted TACs add up to less than 2 million metric tons, since necessarily these combinations led to a net TAC at or below the ecosystem cap. (Even this is not guaranteed, however, due to prediction error.)  When the set of ABCs input into ATTACH is not a historical set, it is possible the predicted TACs based on the regression estimates alone could together exceed the ecosystem cap.  To ensure ATTACH does not violate the ecosystem cap, we check the sum of the TACs and, if they exceed 2 million metric tons, we decrease all TACs proportionally, except for that of BS and AI Sablefish, BSAI Shortraker rockfish, and BSAI Northern rockfish.
+
+## 3. Predicting Catch
+
+The output from the TAC prediction step is then passed to another sub-model, the catch prediction step.
+
+## 4. The Ensemble
+
+## 5. Performance
+
+## 6. Future Steps
+
++  Version 2
+    + New ensemble.  We have chosen a different set of models to make the ensemble, looking specifically for variation in predictive ability across species.
+    + More data. 2018 and 2019 data is now available.
+    + Flatfish flex.  Now that 2018 and 2019 data is available, there are enough years with the flatfish flex policy (which began in 2015) that including it as a predictor variable in certain regression leads to significant coefficient estimates.
+    
++ TAC only estimation
+    + A function that takes BS ABC and returns only the BS TAC prediction
+    
++ BSAI wide estimation
+    + Catch (and TAC) function(s) that take BSAI inputs and returns BSAI outputs
