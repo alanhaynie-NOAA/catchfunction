@@ -31,7 +31,7 @@ install_github("amandafaig/catchfunction")
 library("catchfunction")
 ```
 
-Otherwise, simply load the library in order to follow along as needed:
+Otherwise, simply load the library:
 ```{r setup}
 library(catchfunction)
 ```
@@ -53,7 +53,7 @@ $$
 \ln(TAC_{i,t}) = \alpha_{i} + \beta_{i}\ln(ABC_{i,t}) + \sum_{j \neq i}^n \beta_{j} ABC_{j,t} + \sum_{k=1}^m \beta_{k}I_{k,t} + \varepsilon_{i,t}
 $$
 
-where $\alpha_{i}$ is the stock-specific intercept for species $i$, $\beta_i$ is the elasticity of the TAC of species $i$ with respect to its own ABC, and $\beta_j$ relates the ABC of some species $j \neq i$ to the TAC of species $i$. The effect ($\beta_k$) of $k =1, 2, ... m$ events or policy changes (e.g., changes in management, area closures, or implementation of catch share programs) on TAC was also estimated where $I_{k,t}$ is an indicator variable for event $k$ in year $t$, and $\varepsilon_{i,t}$ denotes the residual error for the prediction in year $t$.  How the errors handled is discussed more in section 4.
+where $\alpha_{i}$ is the stock-specific intercept for species $i$, $\beta_i$ is the elasticity of the TAC of species $i$ with respect to its own ABC, and $\beta_j$ relates the ABC of some species $j \neq i$ to the TAC of species $i$. The effect ($\beta_k$) of $k =1, 2, ... m$ events or policy changes (e.g., changes in management, area closures, or implementation of catch share programs) on TAC was also estimated where $I_{k,t}$ is an indicator variable for event $k$ in year $t$, and $\varepsilon_{i,t}$ denotes the residual error for the prediction in year $t$.  How the errors handled is discussed more in section 4.  To see each individual equation see Haynie et al. (in prep).
 
 ATTACH uses the predicted coefficients to predict TAC from ABCs. The events/policies are assumed to reflect the last year of the dataset.  So, for example, the Amendment 80 indicator variable is set to 1 in predictions, while the Steller Sea Lion closure of 2011 to 2014 is set to 0 (and the Steller Sea Lion limited reopening is set to 1).  
 
@@ -68,7 +68,7 @@ $$
 \ln(catch_{i,t}) = \alpha_{i} + \beta_{i}\ln(TAC_{i,t}) + \sum_{j \neq i}^n \beta_{j} TAC_{j,t} + \sum_{k=1}^m \beta_{k}I_{k,t} + \varepsilon_{i,t}
 $$
 
-where $\alpha_{i}$ is the stock-specific intercept for species $i$, $\beta_i$ is the elasticity of the catch of species $i$ with respect to its own TAC, and $\beta_j$ relates the TAC of some species $j \neq i$ to the catch of species $i$. The effect ($\beta_k$) of $k =1, 2, ... m$ events or policy changes (e.g., changes in management, area closures, or implementation of catch share programs) on TAC was also estimated where $I_{k,t}$ is an indicator variable for event $k$ in year $t$, and $\varepsilon_{i,t}$ denotes the residual error for the prediction in year $t$.  How the errors handled is discussed more in section 4.
+where $\alpha_{i}$ is the stock-specific intercept for species $i$, $\beta_i$ is the elasticity of the catch of species $i$ with respect to its own TAC, and $\beta_j$ relates the TAC of some species $j \neq i$ to the catch of species $i$. The effect ($\beta_k$) of $k =1, 2, ... m$ events or policy changes (e.g., changes in management, area closures, or implementation of catch share programs) on TAC was also estimated where $I_{k,t}$ is an indicator variable for event $k$ in year $t$, and $\varepsilon_{i,t}$ denotes the residual error for the prediction in year $t$.  How the errors handled is discussed more in section 4.  To see each individual equation see Haynie et al. (in prep).
 
 The catch estimate for a given species can exceed it's own TAC.  This is because the TAC measure we use is the TAC set at the beginning of the season, and in-season management can adjust TAC to an extent.  In ATTACH we check that catch does not exceed the BSAI wide ABC and that the ecosystem cap, but otherwise allow predicted catch to exceed TAC.
 
@@ -79,9 +79,37 @@ ATTACH is an ensemble of three models that include different explanatory variabl
 The ensemble averages the estimated catch of the three models equally before returning the estimated Bering Sea catch to the user.  Only the estimates for the species whose ABCs were specified by the user are returned.  
 
 ## 5. Performance
-Figure SXXX indicates the vast improvement of the ensemble relative to assuming catch is equal to ABC.
+As a rule, it is easier to predict TAC and catch in directed fisheries (e.g. pollock, Pacific cod, yellowfin sole) than in bycatch fisheries.  In particular in the catch prediction stage, there is a large degree of randomness in some of the bycatch fisheries.  Despite this, in all fisheries using the ATTACH estimate provides a better estimate of catch than the standard assumption made in biological modeling, which is to set catch equal to ABC.  In some fisheries outside of the BSAI this may not be a terrible assumption but in the BSAI, for most species managed under the ecosystem cap, this would result in the chronic overestimation of harvest.
+
+The following figure illustrates how the ATTACH predictions compare to setting catch equal to ABC in selected species, created originally for Reum et al. (in prep).
+
+![Comparison of observed catches in the Bering Sea-Aluetian Islands against predicted catches from the ATTACH fishery submodel (orange circles) and Allowable Biological Catch (ABC) values from stock assessments (blue symbols).  ATTACH accounts for policy considerations in the setting of catch limits and provides a more accurate representation of realized catches relative to information on ABC alone.  For each species, Pearson’s correlation coefficient (R) and the proportional bias (pb) are provided. The dashed black line corresponds to the 1:1 relationship and linear trend lines (orange and blue) are provided for each relationship. Data and predictions span the period 1992 to 2017.](~/Desktop/Picture1_ATTACH.png)
+
+For each stock, performance of the models was evaluated using leave-one-out cross-validation (LOO-CV). We estimated the coefficients of each model using all but one year in the data-set, and then used the estimators to predict the TAC and catch of the omitted year.  We followed this process for each year and saved the predicted catches of that year.  We calculated the difference between the predicted and actual catch for each year (1992-2017) and used this to create a variety of metrics: a simple sum of differences; a sum of percent differences; sums of squared differences, weighted by value, ABC, TAC, or catch; and the sum of squared percent differences.  We calculated these same metrics for in-sample predictions as well (that is, predictions were made for each year based on the complete sample of years).  
 
 ## 6. Scenarios
+
+### Whitefish Preference scenario (Scenario 2)
+In the "whitefish preference"" scenario the Council allocates an extra 10% TAC to whitefish, decreasing flatfish TAC by up to 50% in order to do so and still comply with the ecosystem cap.  (Whitefish are defined as Alaska pollock and Pacific cod; flatfish are defined as yellowfin sole, northern rock sole, Kamchatka flounder, Alaska plaice, Greenland turbot, Other flatfish, flathead sole, and arrowtooth flounder.)  
+
+We model this by first estimating TAC using the base model.  We then define $x$ as minimum of: 10% whitefish TAC; 50% flatfish TAC; and the difference between whitefish ABC and TAC.
+
+We increase pollock and Pacific cod TAC by raising both TACs equally until either the net increase in whitefish TAC is $x$, or one of the whitefish species' TAC is equal to it's respective ABC.  If the latter occurs, we then increase only the species whose TAC is less than it's ABC until the net increase in whitefish TAC is equal to $x$.
+
+We decrease flatfish TAC by $x$, spreading the decrease proportionally across the flatfish species.  
+
+We then pass these adjusted TACs to the catch portion of the model to estimate catch.
+      
+### Flatfish Preference scenario (Scenario 3)
+In the "flatfish preference" scenario the Council decreases whitefish TAC by up to 10%, and increases flatfish TAC by that amount.  (Whitefish and flatfish defined as in scenario 2.)  
+
+We model this by first estimating TAC using the base model.  We then define $y$ as the minimum of: 10% whitefish TAC; the difference between flatfish ABC and TAC; and the difference between whitefish TAC and the 'threshold'.  (Below a threshold of approximately 1.5 million tons, we have found that the Council sets TAC equal to ABC in whitefish.  For this scenario we adjust this threshold down by 10%, to 1.35 million tons.)
+
+We increase all flatfish proportionally until either the net increase in flatfish TAC is equal to $y$, or one of the flatfish species' TAC is equal to it's ABC.  If the latter occurs, we remove that species from the set and repeat the pattern until the net increase in TAC is equal to $y$.
+
+We decrease whitefish TAC proportionally so that the net decrease in whitefish TAC is $y$.
+
+We then pass the adjusted TACs to the catch portion of the model to estimate catch.  Unlike in scenario 2, where we assume catch behaves as usual relative to TAC, in the flatfish preference scenario we assume the fleet is better able to catch flatfish TAC.  We make this assumption because currently most flatfish species' catches are rarely limited by TAC.  We assume catch is up to 30% higher for each flatfish species than it would normally be for any given TAC; still respecting the rule that catch for any given species cannot exceed it's respective ABC and net catch cannot exceed the ecosystem cap.
 
 ## 7. Future Steps
 +  Version 2
@@ -94,3 +122,4 @@ Figure SXXX indicates the vast improvement of the ensemble relative to assuming 
     
 + BSAI wide estimation
     + Catch (and TAC) function(s) that take BSAI inputs and returns BSAI outputs
+    

@@ -203,7 +203,7 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
     if (SUR_FFDOM | FLAT_FFDOM) {
         # goal, to decrease pollock + cod tac by up to a factor of 0.1, and give that tac to flatfish
         FFABCS <- FISH.DATA[ ,c("ABC.BSAI.140","ABC.BSAI.104","ABC.BSAI.147","ABC.BSAI.106","ABC.BS.102","ABC.AI.102","ABC.BSAI.100","ABC.BSAI.103","ABC.BSAI.141")]
-
+        # flatfish include yellowfin sole (140), rock sole (104), kamchatka flounder (147), Alaska plaice (106), Greenland turbot (102), Other flatfish (100), Flathead sole (103), and arrowtooth flounder (141)
         PREDICTIONS$FFABC <- rowSums(FFABCS, na.rm = T)
         FFTACS <- PREDICTIONS[ ,c("TAC.BSAI.140","TAC.BSAI.104","TAC.BSAI.147","TAC.BSAI.106","TAC.BS.102","TAC.AI.102","TAC.BSAI.100","TAC.BSAI.103","TAC.BSAI.141")]
         PREDICTIONS$FFTAC <- rowSums(FFTACS,na.rm=T)
