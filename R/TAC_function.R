@@ -225,26 +225,26 @@ TAC_function <- function(scenario,
     ## Second, pass ABCs to status quo function to get TAC
     
     if (scenario == 1) {
-        TAC <- ensemble_fun(ABC.DATA,1,"catch")
+        TAC <- ensemble_fun(ABC.DATA,1,"TAC")
         # log linear
         # } else if (scenario == 1.1) {
-        #    TAC <- ensemble_fun(ABC.DATA,1.1,"catch")
+        #    TAC <- ensemble_fun(ABC.DATA,1.1,"TAC")
         # log log
     } else if (scenario == 2) {
-        TAC <- ensemble_fun(ABC.DATA,2,"catch")
+        TAC <- ensemble_fun(ABC.DATA,2,"TAC")
     } else if (scenario == 3) {
-        TAC <- ensemble_fun(ABC.DATA,3,"catch")
+        TAC <- ensemble_fun(ABC.DATA,3,"TAC")
     } else if (scenario == 4) {
-        TAC <- ensemble_fun(ABC.DATA,1,"catch")*0
+        TAC <- ensemble_fun(ABC.DATA,1,"TAC")*0
     } else if (scenario == 5.1) {
-        TAC <- ensemble_fun(ABC.DATA,1,"catch")
+        TAC <- ensemble_fun(ABC.DATA,1,"TAC")
     } else if (scenario == 5.2) {
         for (i in 1:length(spptomult)) {
             eval(parse(text = paste("ABC.DATA$ABC.BSAI.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
             eval(parse(text = paste("ABC.DATA$ABC.BS.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
             eval(parse(text = paste("ABC.DATA$ABC.AI.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
         } 
-        TAC <- ensemble_fun(ABC.DATA,1,"catch")
+        TAC <- ensemble_fun(ABC.DATA,1,"TAC")
     } else if (scenario == 5.3) {
         TAC <- removefromcap_TAC(ABC.DATA,5.3,spptomult,0)
     } 
