@@ -2,7 +2,7 @@
 title: "The ATTACH model"  
 subtitle: "Package Version 1.5.3"
 author: "Amanda Faig and Alan Haynie"
-date: "February 7, 2020"
+date: "February 10, 2020"
 urlcolor: blue
 #output: rmarkdown::html_vignette
 output: rmarkdown::pdf_document
@@ -111,14 +111,37 @@ We decrease whitefish TAC proportionally so that the net decrease in whitefish T
 
 We then pass the adjusted TACs to the catch portion of the model to estimate catch.  Unlike in scenario 2, where we assume catch behaves as usual relative to TAC, in the flatfish preference scenario we assume the fleet is better able to catch flatfish TAC.  We make this assumption because currently most flatfish species' catches are rarely limited by TAC.  We assume catch is up to 30% higher for each flatfish species than it would normally be for any given TAC; still respecting the rule that catch for any given species cannot exceed it's respective ABC and net catch cannot exceed the ecosystem cap.
 
-## 7. Future Steps
+## 7. Examples
+
+If you are interested in predicting what catch would be, assuming everything about the world stays as it was in 2017 (A80 and AFA alive and well, Steller Sea Lion closure partially reopened, etc...).  You would simply use:
+
+``` {r}
+AP_BS_ABC = 2e6
+ATF_BS_ABC = 2e5
+YFS_BS_ABC = 2e5
+catch_function(scenario = 1, 
+               Pollock = AP_BS_ABC, 
+               Arrowtooth = ATF_BS_ABC, 
+               Yellowfin = YFS_BS_ABC)
+```
+
+In the above example we defined the ABCs before calling catch_function simply to illustrate that the numbers chosen were not significant.  Scenario 1 is the status quo scenario.  Scenarios 2+ are defined in the help file, and correspond to alternative scenarios like the whitefish and flatfish preference scenarios described in the previous section.
+
+
+If for your purposes you only want the predicted TAC allocation for these species, you would simply use:
+
+``` {r}
+TAC_function(scenario = 1, 
+               Pollock = AP_BS_ABC, 
+               Arrowtooth = ATF_BS_ABC, 
+               Yellowfin = YFS_BS_ABC)
+```
+
+## 8. Future Steps
 +  Version 2
     + New ensemble.  We have chosen a different set of models to make the ensemble, looking specifically for variation in predictive ability across species.
     + More data. 2018 and 2019 data is now available.
     + Flatfish flex.  Now that 2018 and 2019 data is available, there are enough years with the flatfish flex policy (which began in 2015) that including it as a predictor variable in certain regression leads to significant coefficient estimates.
-    
-+ TAC only estimation
-    + A function that takes BS ABC and returns only the BS TAC prediction
     
 + BSAI wide estimation
     + Catch (and TAC) function(s) that take BSAI inputs and returns BSAI outputs

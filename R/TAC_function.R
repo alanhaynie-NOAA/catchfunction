@@ -1,11 +1,11 @@
-#' Catch Function
+#' TAC Function
 #'
 #' @description 
-#' This function predicts the BS catch for each species whose ABC is given.  It is meant to work with the ACLIM bio models.
+#' This function predicts the BS TAC for each species whose ABC is given.  
 #' 
 #' If you have any questions, please contact Amanda Faig (e-mail: amanda.faig@noaa.gov, call: X-4281).
 #' 
-#' This version last updated June 2018
+#' This version last updated Feb 2018
 #' 
 #' Currently programmed scenarios: \cr
 #' Scenario 1: Status Quo (Log-Linear) \cr
@@ -15,7 +15,6 @@
 #' Scenario 5.1: Fiddle with a single species--calculate the rest still taking the ABC of the removed sp. in to account. \cr
 #' Scenario 5.2: Fiddle with a single species--calculate the rest assuming the ABC of the removed sp. does not influence the sp. under the cap at all. \cr
 #' Scenario 5.3: Fiddle with a single species--calculate the rest assuming the ABC of the removed sp. does not influence the sp. under the cap at all and then increase the TAC of all the remaining species until the sum of the tAC = 2mmt \cr
-#' Scenario 5.4: Scenario 5.3, but in this case let catch range from the old predicted catch to TAC.  The amount which catch improves from old predicted catch to TAC can be dialed 0 to 1 using "improvscatchscale". \cr
 #' 
 #' @param scenario The economic scenario number. Current options: 1, 2, 3, 4, 5.1, 5.2, or 5.3
 #' @param Arrowtooth Optional.  ABC of Arrowtooth Flounder.
@@ -42,34 +41,30 @@
 #' @param Yellowfin Optional.  ABC of Yellowfin Sole.
 #' @param spptomult Required if running any of the 5-series scenarios.  Will be discarded otherwise.  Choose a species catch to override with N*ABC.  Must be spelt exactly as one of the species parameters, case sensitive.  Must be in quotation marks.  If you want to replace more than one species, create a vector of strings (e.g. c("Arrowtooth","Atka"))
 #' @param multiplier Required if running scenario 5-series scenarios.  Will be discarded otherwise.  The N which will be multiplied with ABC to override the species designated by spptomult. If you are replacing more than one species, the order of the numbers corresponds to the order of the names in the spptomult string. (e.g. c(1,5) would imply the first species listed in spptomult has its catch replaced with 1*ABC_spp1 and the second is replaced with 5*ABC_spp2)
-#' @param improvedcatchscale Required if running scenario 5.4.  Will be discarded otherwise.  Choose the level to which catch has improved from status quo.  If 0, 5.4 collapses to 5.3.  If 1, Catch = TAC.
 #' 
 #' @import systemfit
 #'
 #' @export
 #' 
 #' @examples 
-#' catch_function(1, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-#' catch_function(3, Pollock = 2e6, Yellowfin = 2e5, PCod = 1e5)
-#' catch_function(5.1, spptomult = "Arrowtooth", multiplier = 2, 
+#' TAC_function(1, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
+#' TAC_function(3, Pollock = 2e6, Yellowfin = 2e5, PCod = 1e5)
+#' TAC_function(5.1, spptomult = "Arrowtooth", multiplier = 2, 
 #'                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-#' catch_function(5.1, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(2,1), 
+#' TAC_function(5.1, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(2,1), 
 #'                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-#' catch_function(5.2, spptomult = "Arrowtooth", multiplier = 2, 
+#' TAC_function(5.2, spptomult = "Arrowtooth", multiplier = 2, 
 #'                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-#' catch_function(5.2, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(2,1), 
+#' TAC_function(5.2, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(2,1), 
 #'                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-#' catch_function(5.3, spptomult="Arrowtooth", multiplier = 2, 
-#'                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-#' catch_function(5.4, spptomult="Arrowtooth", multiplier = 2, improvedcatchscale=0.5, 
-#'                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-#'                  
+#' TAC_function(5.3, spptomult="Arrowtooth", multiplier = 2, 
+#'                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)#'                  
 
 # Above is what creates the help document.  It's easier to read by 
-# running ?catch_function once you've loaded the package.
+# running ?TAC_function once you've loaded the package.
 # 
 # Below is the function users call.
-catch_function <- function(scenario, 
+TAC_function <- function(scenario, 
                            Arrowtooth, 
                            Atka, 
                            Flathead, 
@@ -93,8 +88,7 @@ catch_function <- function(scenario,
                            Squid, 
                            Yellowfin,
                            spptomult,
-                           multiplier,
-                           improvedcatchscale) {
+                           multiplier) {
     # I start by giving myself a list of all the species numbers
     allspp <- c("141",
                 "204",
@@ -167,7 +161,7 @@ catch_function <- function(scenario,
                     missing(Squid), 
                     missing(Yellowfin))
     
-    if (scenario %in% c(5.1,5.2,5.3,5.4)) { # if we're running scenario 5 we need some checks to make sure the inputs work well.
+    if (scenario %in% c(5.1,5.2,5.3)) { # if we're running scenario 5 we need some checks to make sure the inputs work well.
         if (sum(spptomult %in% sppnames) < length(spptomult)) {stop("spptomult needs to be match one of the species inputs exactly.  Check spelling and capitalization compared to help file.")}
         if (missing(spptomult) | missing(multiplier)) {stop("Scenario 5 requires that a species to override catch with N*ABC be designated, and also that the multiplier (N) is desginated.  Check that you have both.")}
         
@@ -228,50 +222,48 @@ catch_function <- function(scenario,
     ABC.DATA <- BSAIfun(ABC.DATA,"202")
     
     
-    ## Second, pass ABCs to status quo function to get catch
+    ## Second, pass ABCs to status quo function to get TAC
     
     if (scenario == 1) {
-        catch <- ensemble_fun(ABC.DATA,1,"catch")
+        TAC <- ensemble_fun(ABC.DATA,1,"catch")
         # log linear
-   # } else if (scenario == 1.1) {
-    #    catch <- ensemble_fun(ABC.DATA,1.1,"catch")
+        # } else if (scenario == 1.1) {
+        #    TAC <- ensemble_fun(ABC.DATA,1.1,"catch")
         # log log
     } else if (scenario == 2) {
-        catch <- ensemble_fun(ABC.DATA,2,"catch")
+        TAC <- ensemble_fun(ABC.DATA,2,"catch")
     } else if (scenario == 3) {
-        catch <- ensemble_fun(ABC.DATA,3,"catch")
+        TAC <- ensemble_fun(ABC.DATA,3,"catch")
     } else if (scenario == 4) {
-        catch <- ensemble_fun(ABC.DATA,1,"catch")*0
+        TAC <- ensemble_fun(ABC.DATA,1,"catch")*0
     } else if (scenario == 5.1) {
-        catch <- ensemble_fun(ABC.DATA,1,"catch")
+        TAC <- ensemble_fun(ABC.DATA,1,"catch")
     } else if (scenario == 5.2) {
         for (i in 1:length(spptomult)) {
             eval(parse(text = paste("ABC.DATA$ABC.BSAI.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
             eval(parse(text = paste("ABC.DATA$ABC.BS.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
             eval(parse(text = paste("ABC.DATA$ABC.AI.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
         } 
-        catch <- ensemble_fun(ABC.DATA,1,"catch")
+        TAC <- ensemble_fun(ABC.DATA,1,"catch")
     } else if (scenario == 5.3) {
-        catch <- removefromcap_catch(ABC.DATA,5.3,spptomult,0)
-    } else if (scenario == 5.4) {
-        catch <- removefromcap_catch(ABC.DATA,5.4,spptomult,improvedcatchscale)
-    }
-
-
-# Third, pick only species that were passed in to pass back out.
-output <- catch[!missingspp]
-colnames(output) <- sppnames[!missingspp]
-output[is.na(output)] <- 0
-
-if (scenario == 5.1 | scenario == 5.3 | scenario == 5.4) {  # in scenario 5 override.
-    for (i in 1:length(spptomult)) {
-        eval(parse(text = paste("output$",spptomult[i],"<-",spptomult[i],"*",multiplier[i],sep="")))
-    }
-} 
-
-return(output)
-# return(ABC.DATA)
-
-
-
+        TAC <- removefromcap_TAC(ABC.DATA,5.3,spptomult,0)
+    } 
+    
+    
+    # Third, pick only species that were passed in to pass back out.
+    output <- TAC[!missingspp]
+    colnames(output) <- sppnames[!missingspp]
+    output[is.na(output)] <- 0
+    
+    if (scenario == 5.1 | scenario == 5.3) {  # in scenario 5 override.
+        for (i in 1:length(spptomult)) {
+            eval(parse(text = paste("output$",spptomult[i],"<-",spptomult[i],"*",multiplier[i],sep="")))
+        }
+    } 
+    
+    return(output)
+    # return(ABC.DATA)
+    
+    
+    
 }
