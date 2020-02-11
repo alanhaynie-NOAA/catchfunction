@@ -84,7 +84,13 @@ TAC_function(
 \item{multiplier}{Required if running scenario 5-series scenarios.  Will be discarded otherwise.  The N which will be multiplied with ABC to override the species designated by spptomult. If you are replacing more than one species, the order of the numbers corresponds to the order of the names in the spptomult string. (e.g. c(1,5) would imply the first species listed in spptomult has its catch replaced with 1*ABC_spp1 and the second is replaced with 5*ABC_spp2)}
 }
 \description{
-This function predicts the BS TAC for each species whose ABC is given.  
+This function predicts the BSAI TAC for each species whose ABC is given.  
+
+NOTE: TAC IS BSAI FOR ALL SPECIES EXCEPT THE FOLLOWING: Pollock, Greenland Turbot, Sablefish, Pacific Ocean Perch, and Other Rockfish.  
+This is because these are the only species for which TAC is set at the BS level, all other species are set at the BSAI level.*
+*Pacific Cod is the exception--it is currently set at the BS level, however this is a new change so our model at the moment does not model PCod TAC at the BS level.
+
+Scaling it to BS is in progress. 
 
 If you have any questions, please contact Amanda Faig (e-mail: amanda.faig@noaa.gov, call: X-4281).
 

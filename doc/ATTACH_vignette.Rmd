@@ -1,6 +1,6 @@
 ---
 title: "The ATTACH model"  
-subtitle: "Package Version 1.5.3"
+subtitle: "Package Version 1.6.0"
 author: "Amanda Faig and Alan Haynie"
 date: "February 10, 2020"
 urlcolor: blue
@@ -37,7 +37,7 @@ library(catchfunction)
 ```
 
 ## 2. Predicting TAC
-We created ATTACH as a two-step model.  In the first step, TAC is predicted from ABC.  The user passes, as inputs, the Bering Sea ABCs into the model for as many species as are defined in their biological models; up to the 22 species under the BSAI 2 million ton ecosystem cap ("the ecosystem cap"). To see the full list of species included in the cap, see the list of arguments in the help file, or in the [pdf manual](https://github.com/amandafaig/catchfunction/blob/master/catchfunction_1.5.3.pdf).
+We created ATTACH as a two-step model.  In the first step, TAC is predicted from ABC.  The user passes, as inputs, the Bering Sea ABCs into the model for as many species as are defined in their biological models; up to the 22 species under the BSAI 2 million ton ecosystem cap ("the ecosystem cap"). To see the full list of species included in the cap, see the list of arguments in the help file, or in the [pdf manual](https://github.com/amandafaig/catchfunction/blob/master/catchfunction_1.6.0.pdf).
 
 ```{r}
 ?catch_function
@@ -136,6 +136,10 @@ TAC_function(scenario = 1,
                Arrowtooth = ATF_BS_ABC, 
                Yellowfin = YFS_BS_ABC)
 ```
+
+Note, ```{r}TAC_function``` is based on annual allocations and thus returns BSAI TAC for all species except Alaska Pollock, Greenland turbot, Pacific oeach perch, Sablefish and Other rockfish.  This is because those are the species for which TAC is set on the BS level*.  
+
+*Pacific cod is also set on a BS level, but this is a more recent development, and so for now we still model TAC as being set on a BSAI level in Pacific cod.
 
 ## 8. Future Steps
 +  Version 2

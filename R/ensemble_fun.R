@@ -1,13 +1,3 @@
-#' Title
-#'
-#' @param ABC.DATA 
-#' @param scenario 
-#' @param outputtype 
-#'
-#' @return
-#' @export
-#'
-#' @examples
 ensemble_fun <- function(ABC.DATA,scenario,outputtype) {
     
     if (scenario == 1 | scenario == 2 | scenario == 3) {
