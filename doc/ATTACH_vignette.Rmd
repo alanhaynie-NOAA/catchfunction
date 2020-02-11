@@ -1,8 +1,8 @@
 ---
 title: "The ATTACH model"  
-subtitle: "Package Version 1.6.0"
+subtitle: "Package Version 2.0.0"
 author: "Amanda Faig and Alan Haynie"
-date: "February 10, 2020"
+date: "February 11, 2020"
 urlcolor: blue
 #output: rmarkdown::html_vignette
 output: rmarkdown::pdf_document
@@ -34,6 +34,21 @@ library("catchfunction")
 Otherwise, simply load the library:
 ```{r setup}
 library(catchfunction)
+```
+
+Please note that this manual is for version 2 of ATTACH.  To see the manual for version 1, the version used by Reum et al. and Holsman et al. (both forthcoming), [click here](https://github.com/amandafaig/catchfunction/blob/8e0a03f55ce1b11f73886e6fc93d8752853482c7/doc/ATTACH_vignette.pdf).
+
+Versions 1 and 2 differ in two key ways:
+
++ Version 2 uses 1992-2018 data, while Version 1 uses data from 1992-2017.
++ Version 2 uses a different ensemble.  Thus section 4 of the manual, which is dedicated to describing the ensemble, is where you will find most major differences between the Version 1 and Version 2 manual.
+
+To download version 1 of the R package, run the following code:
+```{r, eval=F} 
+install.packages("devtools")
+library("devtools")
+install_github("amandafaig/catchfunction@v1.6.0")
+library("catchfunction")
 ```
 
 ## 2. Predicting TAC
