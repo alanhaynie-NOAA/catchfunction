@@ -1,7 +1,13 @@
 #' TAC Function
 #'
 #' @description 
-#' This function predicts the BS TAC for each species whose ABC is given.  
+#' This function predicts the BSAI TAC for each species whose ABC is given.  
+#' 
+#' NOTE: TAC IS BSAI FOR ALL SPECIES EXCEPT THE FOLLOWING: Pollock, Greenland Turbot, Sablefish, Pacific Ocean Perch, and Other Rockfish.  
+#' This is because these are the only species for which TAC is set at the BS level, all other species are set at the BSAI level.*
+#' *Pacific Cod is the exception--it is currently set at the BS level, however this is a new change so our model at the moment does not model PCod TAC at the BS level.
+#' 
+#' Scaling it to BS is in progress. 
 #' 
 #' If you have any questions, please contact Amanda Faig (e-mail: amanda.faig@noaa.gov, call: X-4281).
 #' 
@@ -262,7 +268,9 @@ TAC_function <- function(scenario,
     } 
     
     return(output)
-    # return(ABC.DATA)
+    
+    #return(TAC)
+    #return(ABC.DATA)
     
     
     

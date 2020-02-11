@@ -1,3 +1,13 @@
+#' Title
+#'
+#' @param ABC.DATA 
+#' @param scenario 
+#' @param outputtype 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 ensemble_fun <- function(ABC.DATA,scenario,outputtype) {
     
     if (scenario == 1 | scenario == 2 | scenario == 3) {
@@ -98,28 +108,30 @@ ensemble_fun <- function(ABC.DATA,scenario,outputtype) {
     } else if (outputtype %in% c("TAC","t","T")) {  
         TAC.PRED <- (TAC.BOTHBIND + TAC.BOTHBIND + TAC.BOTHBIND.FLATSUR)/3
         
-        output <- TAC.PRED[c("TAC.BS.141",
-                             "TAC.BS.204",
-                             "TAC.BS.103",
+        output <- TAC.PRED[c("TAC.BSAI.141",
+                             "TAC.BSAI.204",
+                             "TAC.BSAI.103",
                              "TAC.BS.102",
-                             "TAC.BS.147",
-                             "TAC.BS.303",
-                             "TAC.BS.60",
-                             "TAC.BS.100",
+                             "TAC.BSAI.147",
+                             "TAC.BSAI.303",
+                             "TAC.BSAI.60",
+                             "TAC.BSAI.100",
                              "TAC.BS.310",
-                             "TAC.BS.202",
-                             "TAC.BS.106",
+                             "TAC.BSAI.202",
+                             "TAC.BSAI.106",
                              "TAC.BS.301",
                              "TAC.BS.201",
-                             "TAC.BS.104",
-                             "TAC.BS.307",
+                             "TAC.BSAI.104",
+                             "TAC.BSAI.307",
                              "TAC.BS.203",
-                             "TAC.BS.400",
-                             "TAC.BS.65",
-                             "TAC.BS.326",
-                             "TAC.BS.90",
-                             "TAC.BS.50",
-                             "TAC.BS.140")]
+                             "TAC.BSAI.400",
+                             "TAC.BSAI.65",
+                             "TAC.BSAI.326",
+                             "TAC.BSAI.90",
+                             "TAC.BSAI.50",
+                             "TAC.BSAI.140")]
+
+       
     }
     
     return (output)
