@@ -96,9 +96,8 @@ ensemble_fun <- function(ABC.DATA,scenario,outputtype) {
                                "CATCH.BS.50",
                                "CATCH.BS.140")]
     } else if (outputtype %in% c("TAC","t","T")) {  
-        TAC.PRED <- (TAC.BOTHBIND + TAC.BOTHBIND + TAC.BOTHBIND.FLATSUR)/3
-        
-        output <- TAC.PRED[c("TAC.BSAI.141",
+
+        TAC.BOTHBIND <- TAC.BOTHBIND[c("TAC.BSAI.141",
                              "TAC.BSAI.204",
                              "TAC.BSAI.103",
                              "TAC.BS.102",
@@ -121,6 +120,31 @@ ensemble_fun <- function(ABC.DATA,scenario,outputtype) {
                              "TAC.BSAI.50",
                              "TAC.BSAI.140")]
 
+        TAC.BOTHBIND.FLATSUR <- TAC.BOTHBIND.FLATSUR[c("TAC.BSAI.141",
+                                       "TAC.BSAI.204",
+                                       "TAC.BSAI.103",
+                                       "TAC.BS.102",
+                                       "TAC.BSAI.147",
+                                       "TAC.BSAI.303",
+                                       "TAC.BSAI.60",
+                                       "TAC.BSAI.100",
+                                       "TAC.BS.310",
+                                       "TAC.BSAI.202",
+                                       "TAC.BSAI.106",
+                                       "TAC.BS.301",
+                                       "TAC.BS.201",
+                                       "TAC.BSAI.104",
+                                       "TAC.BSAI.307",
+                                       "TAC.BS.203",
+                                       "TAC.BSAI.400",
+                                       "TAC.BSAI.65",
+                                       "TAC.BSAI.326",
+                                       "TAC.BSAI.90",
+                                       "TAC.BSAI.50",
+                                       "TAC.BSAI.140")]
+        
+        output <- (TAC.BOTHBIND + TAC.BOTHBIND + TAC.BOTHBIND.FLATSUR)/3
+        
        
     }
     
