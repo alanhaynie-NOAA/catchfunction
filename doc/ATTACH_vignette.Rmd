@@ -128,6 +128,7 @@ We then pass the adjusted TACs to the catch portion of the model to estimate cat
 
 ## 7. Examples
 
+### Example 1: Status Quo Catch
 If you are interested in predicting what catch would be, assuming everything about the world stays as it was in 2017 (A80 and AFA alive and well, Steller Sea Lion closure partially reopened, etc...).  You would simply use:
 
 ``` {r}
@@ -140,9 +141,9 @@ catch_function(scenario = 1,
                Yellowfin = YFS_BS_ABC)
 ```
 
-In the above example we defined the ABCs before calling catch_function simply to illustrate that the numbers chosen were not significant.  Scenario 1 is the status quo scenario.  Scenarios 2+ are defined in the help file, and correspond to alternative scenarios like the whitefish and flatfish preference scenarios described in the previous section.
+In the above example we defined the ABCs before calling catch_function simply to illustrate that the numbers chosen were not significant.  We will use these numbers for all subsequent examples for consistency.  Scenario 1 is the status quo scenario.  Scenarios 2+ are defined in the help file, and correspond to alternative scenarios like the whitefish and flatfish preference scenarios described in the previous section.
 
-
+### Example 2: Status Quo TAC
 If for your purposes you only want the predicted TAC allocation for these species, you would simply use:
 
 ``` {r}
@@ -155,6 +156,24 @@ TAC_function(scenario = 1,
 Note, `TAC_function` is based on annual allocations and thus returns BSAI TAC for all species except Alaska Pollock, Greenland turbot, Pacific oeach perch, Sablefish and Other rockfish.  This is because those are the species for which TAC is set on the BS level*.  
 
 *Pacific cod is also set on a BS level, but this is a more recent development, and so for now we still model TAC as being set on a BSAI level in Pacific cod.
+
+### Example 3: Whitefish Preference Catch (& TAC)
+
+``` {r}
+catch_function(scenario = 2, 
+               Pollock = AP_BS_ABC, 
+               Arrowtooth = ATF_BS_ABC, 
+               Yellowfin = YFS_BS_ABC)
+```
+
+As you can see above, pollock catch is now higher than it was in Example 1, and yellowfin sole catch is lower.  It may seem strange that arrowtooth flounder catch is unchanged: arrowotooth flounder catch, historically, has not responded to changes in it's own TAC.  We can see this by looking at the effect of this scenario to TAC, and comparing it to the results of example 2.
+
+``` {r}
+TAC_function(scenario = 2, 
+               Pollock = AP_BS_ABC, 
+               Arrowtooth = ATF_BS_ABC, 
+               Yellowfin = YFS_BS_ABC)
+```
 
 ## 8. Future Steps
 +  Version 2
