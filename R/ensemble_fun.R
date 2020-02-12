@@ -45,31 +45,31 @@ ensemble_fun <- function(ABC.DATA,scenario,outputtype) {
     }  else if (scenario == 2) {
         #whitefish dom
         #whitefish gets more TAC
-        TAC.BOTHBIND.FLATSUR <- predict.tac.function(predictmethod = 1, model="FLATSUR",fit=tac_BOTHBIND_loglin_flatsur,FISH.DATA)
+        TAC.BOTHBIND.FLATSUR <- predict.tac.function(predictmethod = 1, model="FLAT_WFDOM",fit=tac_BOTHBIND_loglin_flatsur,FISH.DATA)
         TAC.BOTHBIND.FLATSUR$ABCboth.UB.150 <- as.numeric(TAC.BOTHBIND.FLATSUR$ABC.BS.201 + TAC.BOTHBIND.FLATSUR$ABC.BSAI.202 >= 1.50e6*1.1)
         CATCH.BOTHBIND.FLATSUR <- predict.catch.function(model="FLATSUR",fit=catch_BOTHBIND_loglin_flatsur,TAC.BOTHBIND.FLATSUR)
         
-        TAC.BOTHBINDICATOR.FLATSUR <- predict.tac.function(predictmethod = 1, model="FLATSUR",fit=tac_BOTHBINDICATOR_loglin_flatsur,FISH.DATA)
+        TAC.BOTHBINDICATOR.FLATSUR <- predict.tac.function(predictmethod = 1, model="FLAT_WFDOM",fit=tac_BOTHBINDICATOR_loglin_flatsur,FISH.DATA)
         TAC.BOTHBINDICATOR.FLATSUR$ABCboth.UB.150 <- as.numeric(TAC.BOTHBINDICATOR.FLATSUR$ABC.BS.201 + TAC.BOTHBINDICATOR.FLATSUR$ABC.BSAI.202 >= 1.50e6*1.1)
         CATCH.BOTHBINDICATOR.FLATSUR <- predict.catch.function(model="FLATSUR",fit=catch_BOTHBINDICATOR_loglin_flatsur,TAC.BOTHBINDICATOR.FLATSUR)
         
-        TAC.BOTHBIND.NOFIRSTYEAR.SUR <- predict.tac.function(predictmethod = 1, model="SUR",fit=tac_BOTHBIND_NOFIRSTYEAR_loglin_sur,FISH.DATA)
+        TAC.BOTHBIND.NOFIRSTYEAR.SUR <- predict.tac.function(predictmethod = 1, model="SUR_WFDOM",fit=tac_BOTHBIND_NOFIRSTYEAR_loglin_sur,FISH.DATA)
         TAC.BOTHBIND.NOFIRSTYEAR.SUR$ABCboth.UB.150 <- as.numeric(TAC.BOTHBIND.NOFIRSTYEAR.SUR$ABC.BS.201 + TAC.BOTHBIND.NOFIRSTYEAR.SUR$ABC.BSAI.202 >= 1.50e6*1.1)
         CATCH.BOTHBIND.NOFIRSTYEAR.SURSUR <- predict.catch.function(model="SUR",fit=catch_BOTHBIND_NOFIRSTYEAR_loglin_sur,TAC.BOTHBIND.NOFIRSTYEAR.SUR)
         
     } else if (scenario == 3) {
         #flatfish dom
-        TAC.BOTHBIND.FLATSUR <- predict.tac.function(predictmethod = 1, model="FLATSUR",fit=tac_BOTHBIND_loglin_flatsur,FISH.DATA)
+        TAC.BOTHBIND.FLATSUR <- predict.tac.function(predictmethod = 1, model="FLAT_FFDOM",fit=tac_BOTHBIND_loglin_flatsur,FISH.DATA)
         TAC.BOTHBIND.FLATSUR$ABCboth.UB.150 <- as.numeric(TAC.BOTHBIND.FLATSUR$ABC.BS.201 + TAC.BOTHBIND.FLATSUR$ABC.BSAI.202 >= 1.50e6*0.9)
-        CATCH.BOTHBIND.FLATSUR <- predict.catch.function(model="FLATSUR",fit=catch_BOTHBIND_loglin_flatsur,TAC.BOTHBIND.FLATSUR)
+        CATCH.BOTHBIND.FLATSUR <- predict.catch.function(model="FLATSUR_FFDOM",fit=catch_BOTHBIND_loglin_flatsur,TAC.BOTHBIND.FLATSUR)
         
-        TAC.BOTHBINDICATOR.FLATSUR <- predict.tac.function(predictmethod = 1, model="FLATSUR",fit=tac_BOTHBINDICATOR_loglin_flatsur,FISH.DATA)
+        TAC.BOTHBINDICATOR.FLATSUR <- predict.tac.function(predictmethod = 1, model="FLAT_FFDOM",fit=tac_BOTHBINDICATOR_loglin_flatsur,FISH.DATA)
         TAC.BOTHBINDICATOR.FLATSUR$ABCboth.UB.150 <- as.numeric(TAC.BOTHBINDICATOR.FLATSUR$ABC.BS.201 + TAC.BOTHBINDICATOR.FLATSUR$ABC.BSAI.202 >= 1.50e6*0.9)
-        CATCH.BOTHBINDICATOR.FLATSUR <- predict.catch.function(model="FLATSUR",fit=catch_BOTHBINDICATOR_loglin_flatsur,TAC.BOTHBINDICATOR.FLATSUR)
+        CATCH.BOTHBINDICATOR.FLATSUR <- predict.catch.function(model="FLATSUR_FFDOM",fit=catch_BOTHBINDICATOR_loglin_flatsur,TAC.BOTHBINDICATOR.FLATSUR)
         
-        TAC.BOTHBIND.NOFIRSTYEAR.SUR <- predict.tac.function(predictmethod = 1, model="SUR",fit=tac_BOTHBIND_NOFIRSTYEAR_loglin_sur,FISH.DATA)
+        TAC.BOTHBIND.NOFIRSTYEAR.SUR <- predict.tac.function(predictmethod = 1, model="SUR_FFDOM",fit=tac_BOTHBIND_NOFIRSTYEAR_loglin_sur,FISH.DATA)
         TAC.BOTHBIND.NOFIRSTYEAR.SUR$ABCboth.UB.150 <- as.numeric(TAC.BOTHBIND.NOFIRSTYEAR.SUR$ABC.BS.201 + TAC.BOTHBIND.NOFIRSTYEAR.SUR$ABC.BSAI.202 >= 1.50e6*0.9)
-        CATCH.BOTHBIND.NOFIRSTYEAR.SURSUR <- predict.catch.function(model="SUR",fit=catch_BOTHBIND_NOFIRSTYEAR_loglin_sur,TAC.BOTHBIND.NOFIRSTYEAR.SUR)
+        CATCH.BOTHBIND.NOFIRSTYEAR.SURSUR <- predict.catch.function(model="SUR_FFDOM",fit=catch_BOTHBIND_NOFIRSTYEAR_loglin_sur,TAC.BOTHBIND.NOFIRSTYEAR.SUR)
     }
     
     
@@ -102,9 +102,8 @@ ensemble_fun <- function(ABC.DATA,scenario,outputtype) {
                                "CATCH.BS.50",
                                "CATCH.BS.140")]
     } else if (outputtype %in% c("TAC","t","T")) {  
-        TAC.PRED <- (TAC.BOTHBINDICATOR.FLATSUR + TAC.BOTHBIND.NOFIRSTYEAR.SUR + TAC.BOTHBIND.FLATSUR)/3
-        
-        output <- TAC.PRED[c("TAC.BSAI.141",
+
+        TAC.BOTHBINDICATOR.FLATSUR <- TAC.BOTHBINDICATOR.FLATSUR[c("TAC.BSAI.141",
                              "TAC.BSAI.204",
                              "TAC.BSAI.103",
                              "TAC.BS.102",
@@ -126,6 +125,55 @@ ensemble_fun <- function(ABC.DATA,scenario,outputtype) {
                              "TAC.BSAI.90",
                              "TAC.BSAI.50",
                              "TAC.BSAI.140")]
+        
+        TAC.BOTHBIND.NOFIRSTYEAR.SUR <- TAC.BOTHBIND.NOFIRSTYEAR.SUR[c("TAC.BSAI.141",
+                                                                   "TAC.BSAI.204",
+                                                                   "TAC.BSAI.103",
+                                                                   "TAC.BS.102",
+                                                                   "TAC.BSAI.147",
+                                                                   "TAC.BSAI.303",
+                                                                   "TAC.BSAI.60",
+                                                                   "TAC.BSAI.100",
+                                                                   "TAC.BS.310",
+                                                                   "TAC.BSAI.202",
+                                                                   "TAC.BSAI.106",
+                                                                   "TAC.BS.301",
+                                                                   "TAC.BS.201",
+                                                                   "TAC.BSAI.104",
+                                                                   "TAC.BSAI.307",
+                                                                   "TAC.BS.203",
+                                                                   "TAC.BSAI.400",
+                                                                   "TAC.BSAI.65",
+                                                                   "TAC.BSAI.326",
+                                                                   "TAC.BSAI.90",
+                                                                   "TAC.BSAI.50",
+                                                                   "TAC.BSAI.140")]
+        
+        TAC.BOTHBIND.FLATSUR <- TAC.BOTHBIND.FLATSUR[c("TAC.BSAI.141",
+                                                                   "TAC.BSAI.204",
+                                                                   "TAC.BSAI.103",
+                                                                   "TAC.BS.102",
+                                                                   "TAC.BSAI.147",
+                                                                   "TAC.BSAI.303",
+                                                                   "TAC.BSAI.60",
+                                                                   "TAC.BSAI.100",
+                                                                   "TAC.BS.310",
+                                                                   "TAC.BSAI.202",
+                                                                   "TAC.BSAI.106",
+                                                                   "TAC.BS.301",
+                                                                   "TAC.BS.201",
+                                                                   "TAC.BSAI.104",
+                                                                   "TAC.BSAI.307",
+                                                                   "TAC.BS.203",
+                                                                   "TAC.BSAI.400",
+                                                                   "TAC.BSAI.65",
+                                                                   "TAC.BSAI.326",
+                                                                   "TAC.BSAI.90",
+                                                                   "TAC.BSAI.50",
+                                                                   "TAC.BSAI.140")]
+        
+        output <- (TAC.BOTHBINDICATOR.FLATSUR + TAC.BOTHBIND.NOFIRSTYEAR.SUR + TAC.BOTHBIND.FLATSUR)/3
+        
 
        
     } else { output <- list(TAC.BOTHBINDICATOR.FLATSUR, TAC.BOTHBIND.NOFIRSTYEAR.SUR, TAC.BOTHBIND.FLATSUR)}

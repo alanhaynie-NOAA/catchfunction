@@ -27,13 +27,15 @@ If you have yet to install the R package (or if you want to upate your package, 
 ```{r, eval=F} 
 install.packages("devtools")
 library("devtools")
-install_github("amandafaig/catchfunction")
+install_github("amandafaig/catchfunction@version2")
 library("catchfunction")
 ```
 
 Otherwise, simply load the library:
 ```{r setup}
-library(catchfunction)
+library("devtools")
+install_github("amandafaig/catchfunction@version2")
+library("catchfunction")
 ```
 
 Please note that this manual is for version 2 of ATTACH.  To see the manual for version 1, the version used by Reum et al. and Holsman et al. (both forthcoming), [click here](https://github.com/amandafaig/catchfunction/blob/8e0a03f55ce1b11f73886e6fc93d8752853482c7/doc/ATTACH_vignette.pdf).
