@@ -33,8 +33,6 @@ library("catchfunction")
 
 Otherwise, simply load the library:
 ```{r setup}
-library("devtools")
-install_github("amandafaig/catchfunction@version2")
 library("catchfunction")
 ```
 
@@ -171,7 +169,15 @@ catch_function(scenario = 2,
 As you can see above, pollock catch is now higher than it was in Example 1, and yellowfin sole catch is lower.  It may seem strange that arrowtooth flounder catch is unchanged: arrowotooth flounder catch, historically, has not responded to changes in it's own TAC.  We can see this by looking at the effect of this scenario to TAC, and comparing it to the results of example 2.
 
 ``` {r}
+TAC_function(scenario = 1, 
+               Pollock = AP_BS_ABC, 
+               Arrowtooth = ATF_BS_ABC, 
+               Yellowfin = YFS_BS_ABC)
 TAC_function(scenario = 2, 
+               Pollock = AP_BS_ABC, 
+               Arrowtooth = ATF_BS_ABC, 
+               Yellowfin = YFS_BS_ABC)
+TAC_function(scenario = 3, 
                Pollock = AP_BS_ABC, 
                Arrowtooth = ATF_BS_ABC, 
                Yellowfin = YFS_BS_ABC)
