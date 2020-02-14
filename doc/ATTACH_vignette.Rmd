@@ -111,8 +111,25 @@ We decrease whitefish TAC proportionally so that the net decrease in whitefish T
 
 We then pass the adjusted TACs to the catch portion of the model to estimate catch.  Unlike in scenario 2, where we assume catch behaves as usual relative to TAC, in the flatfish preference scenario we assume the fleet is better able to catch flatfish TAC.  We make this assumption because currently most flatfish species' catches are rarely limited by TAC.  We assume catch is up to 30% higher for each flatfish species than it would normally be for any given TAC; still respecting the rule that catch for any given species cannot exceed it's respective ABC and net catch cannot exceed the ecosystem cap.
 
+### Leave one or more out of the ecosystem cap scenarios (Scenarios 5.X)
+
+Scenarios 5.1 through 5.4 are all variations of the answer to a question asked of us: what if we remove a species (or more) from the cap?
+
+The answer to that question was broken out into parts because we felt the answer depended on what assumptions we made.  
+
+In scenario 5.1 we assume the ABC still influences the TAC of other species, even if the species is not managed under the cap.  This means we assume the tons that would otherwise have been allocated to the now removed species are not reallocated to other species.  i.e. the ecosystem cap would be effectively reduced from 2 million metric tons, in order to keep the ecosystem cap constraints on other species the same as before.
+
+In scenario 5.2 we assume the cap remains 2 million metric tons, but the council only uses this extra leeway when ABCs are unusually high.  Thus we assume that other species TAC calculations are as before, despite no cap in place.  (Meaning that in most years the net TAC will be below 2 million metric tons, since the TAC calculation is based on Council decisions made with respect to the cap.)  The main distinction between 5.1 and 5.2 comes into play in situations where the sum of the predicted TACs would have surpassed 2 million metric tons.  
+
+In both we apply the code described at the end of section 2, which would adjust TACs down to comply with the ecosystem cap, but in 5.1 we include what the excluded species' TAC would have been in that calculation, whereas in 5.2 we do not.
+
+In scenario 5.3 we assume the cap remains at 2 million metric tons and the Council always uses the extra TAC created from a species leaving the cap.  If the sum of TACs is under 2 million metric tons we raise the predicted TACs until the sum is 2 million metric tons.
+
+In all of the above we assume TAC = ABC for the removed species, but catch is the same function of TAC is is in status quo.
+
 ## 7. Examples
 
+### Example 1: Status Quo Catch
 If you are interested in predicting what catch would be, assuming everything about the world stays as it was in 2017 (A80 and AFA alive and well, Steller Sea Lion closure partially reopened, etc...).  You would simply use:
 
 ``` {r}
@@ -125,9 +142,9 @@ catch_function(scenario = 1,
                Yellowfin = YFS_BS_ABC)
 ```
 
-In the above example we defined the ABCs before calling catch_function simply to illustrate that the numbers chosen were not significant.  Scenario 1 is the status quo scenario.  Scenarios 2+ are defined in the help file, and correspond to alternative scenarios like the whitefish and flatfish preference scenarios described in the previous section.
+In the above example we defined the ABCs before calling catch_function simply to illustrate that the numbers chosen were not significant.  We will use these numbers for all subsequent examples for consistency.  Scenario 1 is the status quo scenario.  Scenarios 2+ are defined in the help file, and correspond to alternative scenarios like the whitefish and flatfish preference scenarios described in the previous section.
 
-
+### Example 2: Status Quo TAC
 If for your purposes you only want the predicted TAC allocation for these species, you would simply use:
 
 ``` {r}
@@ -140,6 +157,44 @@ TAC_function(scenario = 1,
 Note, `TAC_function` is based on annual allocations and thus returns BSAI TAC for all species except Alaska Pollock, Greenland turbot, Pacific oeach perch, Sablefish and Other rockfish.  This is because those are the species for which TAC is set on the BS level*.  
 
 *Pacific cod is also set on a BS level, but this is a more recent development, and so for now we still model TAC as being set on a BSAI level in Pacific cod.
+
+### Example 3: Whitefish Preference Catch (& TAC)
+
+``` {r}
+# Status Quo catch prediction (same as example 1)
+catch_function(scenario = 1, 
+               Pollock = AP_BS_ABC, 
+               Arrowtooth = ATF_BS_ABC, 
+               Yellowfin = YFS_BS_ABC)
+
+# Whitefish preference catch prediction
+catch_function(scenario = 2, 
+               Pollock = AP_BS_ABC, 
+               Arrowtooth = ATF_BS_ABC, 
+               Yellowfin = YFS_BS_ABC)
+```
+
+As you can see above, pollock catch is now higher than it was in Example 1, and yellowfin sole catch is lower.  It may seem strange that arrowtooth flounder catch is unchanged: arrowotooth flounder catch, historically, has not responded to changes in it's own TAC.  As a result, while Arrowtooth flounder TAC is adjusted in the whitefish preference scenario as expected, catch is unchanged.
+
+``` {r}
+# Status quo TAC prediction (same as example 2)
+ TAC_function(scenario = 1, 
+               Pollock = AP_BS_ABC, 
+               Arrowtooth = ATF_BS_ABC, 
+               Yellowfin = YFS_BS_ABC)
+
+# Whitefish preference TAC prediction
+TAC_function(scenario = 2, 
+               Pollock = AP_BS_ABC, 
+               Arrowtooth = ATF_BS_ABC, 
+               Yellowfin = YFS_BS_ABC)
+```
+
+### Example 4: Series 5 scenarios
+
+ 
+
+
 
 ## 8. Future Steps
 +  Version 2
