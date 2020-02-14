@@ -53,11 +53,11 @@
 #' catch_function(3, Pollock = 2e6, Yellowfin = 2e5, PCod = 1e5)
 #' catch_function(5.1, spptomult = "Arrowtooth", multiplier = 2, 
 #'                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-#' catch_function(5.1, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(2,1), 
+#' catch_function(5.1, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(0.5,1), 
 #'                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 #' catch_function(5.2, spptomult = "Arrowtooth", multiplier = 2, 
 #'                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-#' catch_function(5.2, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(2,1), 
+#' catch_function(5.2, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(0.5,1), 
 #'                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 #' catch_function(5.3, spptomult="Arrowtooth", multiplier = 2, 
 #'                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)

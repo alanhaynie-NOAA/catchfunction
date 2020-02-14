@@ -192,6 +192,20 @@ TAC_function(scenario = 2,
 
 ### Example 4: Series 5 scenarios
 
+``` {r}
+# Status Quo catch prediction (same as example 1)
+catch_function(scenario = 1, 
+               Pollock = AP_BS_ABC, 
+               Arrowtooth = ATF_BS_ABC, 
+               Yellowfin = YFS_BS_ABC)
+
+# Remove Arrowtooth from the cap
+catch_function(5.1, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(0.5,1), 
+               Pollock = AP_BS_ABC, 
+               Arrowtooth = ATF_BS_ABC, 
+               Yellowfin = YFS_BS_ABC)
+
+```
  
 
 
