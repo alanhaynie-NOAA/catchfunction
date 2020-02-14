@@ -123,9 +123,9 @@ In scenario 5.2 we assume the cap remains 2 million metric tons, but the council
 
 In both we apply the code described at the end of section 2, which would adjust TACs down to comply with the ecosystem cap, but in 5.1 we include what the excluded species' TAC would have been in that calculation, whereas in 5.2 we do not.
 
-In scenario 5.3 we assume the cap remains at 2 million metric tons and the Council always uses the extra TAC created from a species leaving the cap.  If the sum of TACs is under 2 million metric tons we raise the predicted TACs until the sum is 2 million metric tons.
+#In scenario 5.3 we assume the cap remains at 2 million metric tons and the Council always uses the extra TAC created from a species leaving the cap.  If the sum of TACs is under 2 million metric tons we raise the predicted TACs until the sum is 2 million metric tons.
 
-In all of the above we assume TAC = ABC for the removed species, but catch is the same function of TAC is is in status quo.
+In all of the above we assume TAC = ABC for the removed species, and catch is some assumed fraction based on the multiplier provided by the user.
 
 ## 7. Examples
 
@@ -199,12 +199,25 @@ catch_function(scenario = 1,
                Arrowtooth = ATF_BS_ABC, 
                Yellowfin = YFS_BS_ABC)
 
-# Remove Arrowtooth from the cap
+# Remove Arrowtooth and Yellowfin from the cap (in that TAC can equal ABC for them)
+# assume 50% of Arrowtooth ABC/TAC is harvested, 100% of Yellowfin ABC/TAC.
+# Assume all other species as affected by the cap as before.
 catch_function(5.1, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(0.5,1), 
                Pollock = AP_BS_ABC, 
                Arrowtooth = ATF_BS_ABC, 
                Yellowfin = YFS_BS_ABC)
 
+# Remove Arrowtooth and Yellowfin from the cap; 
+# assume 50% of Arrowtooth ABC/TAC is harvested, 100% of Yellowfin ABC/TAC.
+catch_function(5.2, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(0.5,1), 
+               Pollock = AP_BS_ABC, 
+               Arrowtooth = ATF_BS_ABC, 
+               Yellowfin = YFS_BS_ABC)
+
+catch_function(5.2, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(0.5,1), 
+                Pollock = AP_BS_ABC, 
+               Arrowtooth = ATF_BS_ABC, 
+               Yellowfin = YFS_BS_ABC)
 ```
  
 

@@ -82,7 +82,7 @@ removefromcap_catch <- function(ABC.DATA,scenario,spptomult,improvedcatchscale) 
         
         # check sum < 2mmt
         check2mmt <- function(DT_orig) {
-            DT <- DT_orig %>% select(starts_with("TAC"))
+            DT <- DT_orig #%>% select(starts_with("TAC"))
             NETTAC <- rowSums(DT, na.rm = TRUE)
             if (NETTAC > 2e6) {
                 # first bring down the least valuable/zero value bycatch species
@@ -95,7 +95,7 @@ removefromcap_catch <- function(ABC.DATA,scenario,spptomult,improvedcatchscale) 
                 DT_orig$TAC.BSAI.400 <- TAC.BOTHBIND$TAC.BSAI.400 #skates
             }
             #check again
-            DT <- DT_orig %>% select(starts_with("TAC"))
+            DT <- DT_orig #%>% select(starts_with("TAC"))
             NETTAC <- rowSums(DT, na.rm = TRUE)
             if (NETTAC > 2e6) {
                 # if still over 2mmt, next bring down species for various reasons (see below)
@@ -104,7 +104,7 @@ removefromcap_catch <- function(ABC.DATA,scenario,spptomult,improvedcatchscale) 
                 DT_orig$TAC.BSAI.104 <- TAC.BOTHBIND$TAC.BSAI.104 # rock sole -- worry about market limits
             }
             #check again
-            DT <- DT_orig %>% select(starts_with("TAC"))
+            DT <- DT_orig #%>% select(starts_with("TAC"))
             NETTAC <- rowSums(DT, na.rm = TRUE)
             if (NETTAC > 2e6) {
                 # if still over 2mmt, next bring down basically everything that doesnt 
@@ -129,10 +129,12 @@ removefromcap_catch <- function(ABC.DATA,scenario,spptomult,improvedcatchscale) 
                 
             }
             #honestly at this point if we still have nettac > 2mmt something very weird is going on...
-            DT <- DT_orig %>% select(starts_with("TAC"))
+            DT <- DT_orig # %>% select(starts_with("TAC"))
             NETTAC <- rowSums(DT, na.rm = TRUE)
             if (NETTAC > 2e6) {stop('NETTAC still over 2e6 even though pollock removed.  Line 82 removefromcap_catch.R')}
         }
+        
+        
     } else {
         TAC.BOTHBIND <- predict.tac.function(predictmethod = 1, model="SUR",fit=tac_BOTHBIND_loglin_sur,FISH.DATA)
         TAC.BOTHBIND.FLATSUR <- predict.tac.function(predictmethod = 1, model="FLATSUR",fit=tac_BOTHBIND_FLATSUR_loglin_sur,FISH.DATA)
@@ -184,7 +186,7 @@ removefromcap_catch <- function(ABC.DATA,scenario,spptomult,improvedcatchscale) 
          }
          
         TAC.reallocate <- function(DT_orig,split_param) {
-            DT <- DT_orig %>% select(starts_with("TAC"))
+            DT <- DT_orig #%>% select(starts_with("TAC"))
             # If prediction exceeds cap, trim down from the LARGEST stocks
             NETTAC <- rowSums(DT, na.rm = TRUE)
             EXTRATAC <- as.numeric(NETTAC < 2e6)*(2e6 - NETTAC)

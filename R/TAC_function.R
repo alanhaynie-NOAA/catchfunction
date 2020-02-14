@@ -20,7 +20,7 @@
 #' Scenario 4: No Fishing (will return all zeros) \cr
 #' Scenario 5.1: Fiddle with a single species--calculate the rest still taking the ABC of the removed sp. in to account. \cr
 #' Scenario 5.2: Fiddle with a single species--calculate the rest assuming the ABC of the removed sp. does not influence the sp. under the cap at all. \cr
-#' Scenario 5.3: Fiddle with a single species--calculate the rest assuming the ABC of the removed sp. does not influence the sp. under the cap at all and then increase the TAC of all the remaining species until the sum of the tAC = 2mmt \cr
+# Scenario 5.3: Fiddle with a single species--calculate the rest assuming the ABC of the removed sp. does not influence the sp. under the cap at all and then increase the TAC of all the remaining species until the sum of the tAC = 2mmt \cr
 #' 
 #' @param scenario The economic scenario number. Current options: 1, 2, 3, 4, 5.1, 5.2, or 5.3
 #' @param Arrowtooth Optional.  ABC of Arrowtooth Flounder.
@@ -63,8 +63,8 @@
 #'                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 #' TAC_function(5.2, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(0.5,1), 
 #'                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-#' TAC_function(5.3, spptomult="Arrowtooth", multiplier = 2, 
-#'                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)#'                  
+# TAC_function(5.3, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(0.5,1), 
+#                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)#'                  
 
 # Above is what creates the help document.  It's easier to read by 
 # running ?TAC_function once you've loaded the package.

@@ -103,7 +103,6 @@ Scenario 3: Flatfish Political (aka TAC-setting) Preference \cr
 Scenario 4: No Fishing (will return all zeros) \cr
 Scenario 5.1: Fiddle with a single species--calculate the rest still taking the ABC of the removed sp. in to account. \cr
 Scenario 5.2: Fiddle with a single species--calculate the rest assuming the ABC of the removed sp. does not influence the sp. under the cap at all. \cr
-Scenario 5.3: Fiddle with a single species--calculate the rest assuming the ABC of the removed sp. does not influence the sp. under the cap at all and then increase the TAC of all the remaining species until the sum of the tAC = 2mmt \cr
 }
 \examples{
 TAC_function(1, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
@@ -116,6 +115,4 @@ TAC_function(5.2, spptomult = "Arrowtooth", multiplier = 2,
                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 TAC_function(5.2, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(0.5,1), 
                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-TAC_function(5.3, spptomult="Arrowtooth", multiplier = 2, 
-                 Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)#'                  
 }
