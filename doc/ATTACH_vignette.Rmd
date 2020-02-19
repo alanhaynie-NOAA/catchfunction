@@ -113,7 +113,7 @@ We then pass the adjusted TACs to the catch portion of the model to estimate cat
 
 ### Leave one or more out of the ecosystem cap scenarios (Scenarios 5.X)
 
-Scenarios 5.1 through 5.4 are all variations of the answer to a question asked of us: what if we remove a species (or more) from the cap?
+Scenarios 5.1 and 5.2 are variations of the answer to a question asked of us: what if we remove a species (or more) from the cap?
 
 The answer to that question was broken out into parts because we felt the answer depended on what assumptions we made.  
 
@@ -123,7 +123,7 @@ In scenario 5.2 we assume the cap remains 2 million metric tons, but the council
 
 In both we apply the code described at the end of section 2, which would adjust TACs down to comply with the ecosystem cap, but in 5.1 we include what the excluded species' TAC would have been in that calculation, whereas in 5.2 we do not.
 
-#In scenario 5.3 we assume the cap remains at 2 million metric tons and the Council always uses the extra TAC created from a species leaving the cap.  If the sum of TACs is under 2 million metric tons we raise the predicted TACs until the sum is 2 million metric tons.
+<!-- In scenario 5.3 we assume the cap remains at 2 million metric tons and the Council always uses the extra TAC created from a species leaving the cap.  If the sum of TACs is under 2 million metric tons we raise the predicted TACs until the sum is 2 million metric tons. -->
 
 In all of the above we assume TAC = ABC for the removed species, and catch is some assumed fraction based on the multiplier provided by the user.
 
@@ -192,6 +192,10 @@ TAC_function(scenario = 2,
 
 ### Example 4: Series 5 scenarios
 
+In the "5.x" Scenarios, we look at what would happen if a species (or more) left the ecosystem cap.  In the following examples we assume arrowtooth and yellowfin are allowed to leave the cap. 
+
+We include a multiplier which assumes we catch 50% of the arrowtooth TAC/ABC (we assume any species not managed under the ecosystem cap has TAC set at ABC, as that is what happens in most fisheries not managed with a similar sort of cap) and 100% of the Yellowfin TAC/ABC is caught.
+
 ``` {r}
 # Status Quo catch prediction (same as example 1)
 catch_function(scenario = 1, 
@@ -213,14 +217,9 @@ catch_function(5.2, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(0.5,
                Pollock = AP_BS_ABC, 
                Arrowtooth = ATF_BS_ABC, 
                Yellowfin = YFS_BS_ABC)
-
-catch_function(5.2, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(0.5,1), 
-                Pollock = AP_BS_ABC, 
-               Arrowtooth = ATF_BS_ABC, 
-               Yellowfin = YFS_BS_ABC)
 ```
  
-
+As you can see, in 5.1 Pollock's estimated catch is the same as in the status quo scenario: only when the predicted catch would have been lowered due to the 2 million ton catch does the new "room" under the ecosystem cap come into play.  In 5.2 however, Pollock's estimated catch increases as the new "room" under the ecosystem cap is always utilized.
 
 
 ## 8. Future Steps
