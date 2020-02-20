@@ -27,7 +27,7 @@ If you have yet to install the R package (or if you want to upate your package, 
 ```{r, eval=F} 
 install.packages("devtools")
 library("devtools")
-install_github("amandafaig/catchfunction@version2")
+install_github("amandafaig/catchfunction")
 library("catchfunction")
 ```
 
@@ -126,6 +126,20 @@ We decrease whitefish TAC proportionally so that the net decrease in whitefish T
 
 We then pass the adjusted TACs to the catch portion of the model to estimate catch.  Unlike in scenario 2, where we assume catch behaves as usual relative to TAC, in the flatfish preference scenario we assume the fleet is better able to catch flatfish TAC.  We make this assumption because currently most flatfish species' catches are rarely limited by TAC.  We assume catch is up to 30% higher for each flatfish species than it would normally be for any given TAC; still respecting the rule that catch for any given species cannot exceed it's respective ABC and net catch cannot exceed the ecosystem cap.
 
+### Leave one or more out of the ecosystem cap scenarios (Scenarios 5.X)
+
+Scenarios 5.1 and 5.2 are variations of the answer to a question asked of us: what if we remove a species (or more) from the cap?
+
+The answer to that question was broken out into parts because we felt the answer depended on what assumptions we made.  
+
+In scenario 5.1 we assume the ABC still influences the TAC of other species, even if the species is not managed under the cap.  This means we assume the tons that would otherwise have been allocated to the now removed species are not reallocated to other species.  i.e. the ecosystem cap would be effectively reduced from 2 million metric tons, in order to keep the ecosystem cap constraints on other species the same as before.
+
+In scenario 5.2 we assume the cap remains 2 million metric tons, but the council only uses this extra leeway when ABCs are unusually high.  Thus we assume that other species TAC calculations are as before, despite no cap in place.  (Meaning that in most years the net TAC will be below 2 million metric tons, since the TAC calculation is based on Council decisions made with respect to the cap.)  The main distinction between 5.1 and 5.2 comes into play in situations where the sum of the predicted TACs would have surpassed 2 million metric tons.  
+
+In both we apply the code described at the end of section 2, which would adjust TACs down to comply with the ecosystem cap, but in 5.1 we include what the excluded species' TAC would have been in that calculation, whereas in 5.2 we do not.
+
+In all of the above we assume TAC = ABC for the removed species, and catch is some assumed fraction based on the multiplier provided by the user.
+
 ## 7. Examples
 
 ### Example 1: Status Quo Catch
@@ -183,12 +197,47 @@ TAC_function(scenario = 3,
                Yellowfin = YFS_BS_ABC)
 ```
 
+
+### Example 4: Series 5 scenarios
+
+In the "5.x" Scenarios, we look at what would happen if a species (or more) left the ecosystem cap.  In the following examples we assume arrowtooth and yellowfin are allowed to leave the cap. 
+
+We include a multiplier which assumes we catch 50% of the arrowtooth TAC/ABC (we assume any species not managed under the ecosystem cap has TAC set at ABC, as that is what happens in most fisheries not managed with a similar sort of cap) and 100% of the Yellowfin TAC/ABC is caught.
+
+``` {r}
+# Status Quo catch prediction (same as example 1)
+catch_function(scenario = 1, 
+               Pollock = AP_BS_ABC, 
+               Arrowtooth = ATF_BS_ABC, 
+               Yellowfin = YFS_BS_ABC)
+
+# Remove Arrowtooth and Yellowfin from the cap (in that TAC can equal ABC for them)
+# assume 50% of Arrowtooth ABC/TAC is harvested, 100% of Yellowfin ABC/TAC.
+# Assume all other species as affected by the cap as before.
+catch_function(5.1, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(0.5,1), 
+               Pollock = AP_BS_ABC, 
+               Arrowtooth = ATF_BS_ABC, 
+               Yellowfin = YFS_BS_ABC)
+
+# Remove Arrowtooth and Yellowfin from the cap; 
+# assume 50% of Arrowtooth ABC/TAC is harvested, 100% of Yellowfin ABC/TAC.
+catch_function(5.2, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(0.5,1), 
+               Pollock = AP_BS_ABC, 
+               Arrowtooth = ATF_BS_ABC, 
+               Yellowfin = YFS_BS_ABC)
+```
+
+As you can see, in 5.1 Pollock's estimated catch is the same as in the status quo scenario: only when the predicted catch would have been lowered due to the 2 million ton catch does the new "room" under the ecosystem cap come into play.  In 5.2 however, Pollock's estimated catch increases as the new "room" under the ecosystem cap is always utilized.
+
+
 ## 8. Future Steps
-+  Version 2
-    + New ensemble.  We have chosen a different set of models to make the ensemble, looking specifically for variation in predictive ability across species.
-    + More data. 2018 and 2019 data is now available.
-    + Flatfish flex.  Now that 2018 and 2019 data is available, there are enough years with the flatfish flex policy (which began in 2015) that including it as a predictor variable in certain regression leads to significant coefficient estimates.
-    
 + BSAI wide estimation
     + Catch (and TAC) function(s) that take BSAI inputs and returns BSAI outputs
     
+    
+## Publications using the ATTACH (aka catchfunction) package
+
+1. Jonathan Reum, Julia Blanchard, Kirstin Holsman, Kerim Aydin, Anne Babcock Hollowed, Albert J Hermann, Wei Cheng, Amanda Faig, Alan C Haynie, and Andre Punt.  Ensemble projections of future climate change impacts on the Eastern Bering Sea food web using a multispecies size spectrum model.  Frontiers in Marine Science.  Accepted: contact jonathan.reum@noaa.gov for updates.
+
+
+2. Kirstin Holsman, Alan C Haynie, Anne Babcock Hollowed, Jonathan Reum, Kerim Aydin, Wei Cheng, Amanda Faig, Jim Ianelli, Kelly Kearney, Andre E Punt. Ecosystem-based fisheries management forestalls climate-driven collapse.  Submitted: contact kristin.holsman@noaa.gov for updates.
