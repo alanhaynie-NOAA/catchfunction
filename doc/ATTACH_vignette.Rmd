@@ -234,10 +234,16 @@ As you can see, in 5.1 Pollock's estimated catch is the same as in the status qu
 + BSAI wide estimation
     + Catch (and TAC) function(s) that take BSAI inputs and returns BSAI outputs
     
-    
+
+## Manuscript for the work that laid the foundation for the ATTACH package
+
+Alan Haynie, Amanda Faig, Kirstin Holsman, Anne Hollowed, Jonathan Reum, Steve Kasperski, and  Mary Furuness. "Predicting future management allocations and catch under the Bering Sea and Aleutian Islands Ecosystem Cap." In Prep: contact alan.haynie@noaa,gov.
+
 ## Publications using the ATTACH (aka catchfunction) package
 
-1. Jonathan Reum, Julia Blanchard, Kirstin Holsman, Kerim Aydin, Anne Babcock Hollowed, Albert J Hermann, Wei Cheng, Amanda Faig, Alan C Haynie, and Andre Punt.  Ensemble projections of future climate change impacts on the Eastern Bering Sea food web using a multispecies size spectrum model.  Frontiers in Marine Science.  Accepted: contact jonathan.reum@noaa.gov for updates.
+1. Jonathan Reum, Julia Blanchard, Kirstin Holsman, Kerim Aydin, Anne Babcock Hollowed, Albert J Hermann, Wei Cheng, Amanda Faig, Alan C Haynie, and Andre Punt.  "Ensemble projections of future climate change impacts on the Eastern Bering Sea food web using a multispecies size spectrum model.  Frontiers in Marine Science."  Accepted: contact jonathan.reum@noaa.gov.
 
 
-2. Kirstin Holsman, Alan C Haynie, Anne Babcock Hollowed, Jonathan Reum, Kerim Aydin, Wei Cheng, Amanda Faig, Jim Ianelli, Kelly Kearney, Andre E Punt. Ecosystem-based fisheries management forestalls climate-driven collapse.  Submitted: contact kristin.holsman@noaa.gov for updates.
+2. Kirstin Holsman, Alan C Haynie, Anne Babcock Hollowed, Jonathan Reum, Kerim Aydin, Wei Cheng, Amanda Faig, Jim Ianelli, Kelly Kearney, Andre E Punt. "Ecosystem-based fisheries management forestalls climate-driven collapse."  Submitted: contact kristin.holsman@noaa.gov.
+
+
