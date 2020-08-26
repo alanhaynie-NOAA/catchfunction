@@ -257,18 +257,20 @@ catch_function <- function(scenario,
       #  catch <- removefromcap_catch(ABC.DATA,5.4,spptomult,improvedcatchscale)
     #}
 
-
-# Third, pick only species that were passed in to pass back out.
-output <- catch[!missingspp]
-colnames(output) <- sppnames[!missingspp]
-output[is.na(output)] <- 0
-
-if (scenario == 5.1 | scenario == 5.2 | scenario == 5.3) {  # in scenario 5 override.
-    for (i in 1:length(spptomult)) {
-        eval(parse(text = paste("output$",spptomult[i],"<-",spptomult[i],"*",multiplier[i],sep="")))
-    }
-} 
-
+{
+# # Third, pick only species that were passed in to pass back out.
+# output <- catch[!missingspp]
+# colnames(output) <- sppnames[!missingspp]
+# output[is.na(output)] <- 0
+# 
+# if (scenario == 5.1 | scenario == 5.2 | scenario == 5.3) {  # in scenario 5 override.
+#     for (i in 1:length(spptomult)) {
+#         eval(parse(text = paste("output$",spptomult[i],"<-",spptomult[i],"*",multiplier[i],sep="")))
+#     }
+# } 
+}
+   # output <- (catch[[1]]*200/2e6 + catch[[2]]*100/2e6)/3
+   output <- (catch[[1]]*2 + catch[[2]])/3
 return(output)
 # return(ABC.DATA)
 

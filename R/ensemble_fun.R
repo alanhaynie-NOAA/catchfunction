@@ -30,6 +30,12 @@ ensemble_fun <- function(ABC.DATA,scenario,outputtype) {
     FISH.DATA$A80.ask.POP <- 1
     FISH.DATA$A82 <- 1
     
+    scenario <- 6
+    
+    TAC.BOTHBIND <- predict.tac.function(predictmethod = 1, model="SUR",fit=tac_BOTHBIND_loglin_sur,FISH.DATA)
+    TAC.BOTHBIND.FLATSUR <- predict.tac.function(predictmethod = 1, model="FLATSUR",fit=tac_BOTHBIND_FLATSUR_loglin_sur,FISH.DATA)
+    
+    output <- list(TAC.BOTHBIND,TAC.BOTHBIND.FLATSUR)
     
     if (scenario == 1) {
         TAC.BOTHBIND <- predict.tac.function(predictmethod = 1, model="SUR",fit=tac_BOTHBIND_loglin_sur,FISH.DATA)
@@ -70,83 +76,83 @@ ensemble_fun <- function(ABC.DATA,scenario,outputtype) {
     
     # create ensemble
     # 
-    if (outputtype %in% c("c","C","catch","CATCH","Catch")) {
-        CATCH.PRED <- (CATCH.BOTHBIND.SURSUR + CATCH.BOTHBIND.SUROLS + CATCH.BOTHBIND.FLATSUR.SURSUR)/3
-        
-        output <- CATCH.PRED[c("CATCH.BS.141",
-                               "CATCH.BS.204",
-                               "CATCH.BS.103",
-                               "CATCH.BS.102",
-                               "CATCH.BS.147",
-                               "CATCH.BS.303",
-                               "CATCH.BS.60",
-                               "CATCH.BS.100",
-                               "CATCH.BS.310",
-                               "CATCH.BS.202",
-                               "CATCH.BS.106",
-                               "CATCH.BS.301",
-                               "CATCH.BS.201",
-                               "CATCH.BS.104",
-                               "CATCH.BS.307",
-                               "CATCH.BS.203",
-                               "CATCH.BS.400",
-                               "CATCH.BS.65",
-                               "CATCH.BS.326",
-                               "CATCH.BS.90",
-                               "CATCH.BS.50",
-                               "CATCH.BS.140")]
-    } else if (outputtype %in% c("TAC","t","T")) {  
-
-        TAC.BOTHBIND <- TAC.BOTHBIND[c("TAC.BSAI.141",
-                             "TAC.BSAI.204",
-                             "TAC.BSAI.103",
-                             "TAC.BS.102",
-                             "TAC.BSAI.147",
-                             "TAC.BSAI.303",
-                             "TAC.BSAI.60",
-                             "TAC.BSAI.100",
-                             "TAC.BS.310",
-                             "TAC.BSAI.202",
-                             "TAC.BSAI.106",
-                             "TAC.BS.301",
-                             "TAC.BS.201",
-                             "TAC.BSAI.104",
-                             "TAC.BSAI.307",
-                             "TAC.BS.203",
-                             "TAC.BSAI.400",
-                             "TAC.BSAI.65",
-                             "TAC.BSAI.326",
-                             "TAC.BSAI.90",
-                             "TAC.BSAI.50",
-                             "TAC.BSAI.140")]
-
-        TAC.BOTHBIND.FLATSUR <- TAC.BOTHBIND.FLATSUR[c("TAC.BSAI.141",
-                                       "TAC.BSAI.204",
-                                       "TAC.BSAI.103",
-                                       "TAC.BS.102",
-                                       "TAC.BSAI.147",
-                                       "TAC.BSAI.303",
-                                       "TAC.BSAI.60",
-                                       "TAC.BSAI.100",
-                                       "TAC.BS.310",
-                                       "TAC.BSAI.202",
-                                       "TAC.BSAI.106",
-                                       "TAC.BS.301",
-                                       "TAC.BS.201",
-                                       "TAC.BSAI.104",
-                                       "TAC.BSAI.307",
-                                       "TAC.BS.203",
-                                       "TAC.BSAI.400",
-                                       "TAC.BSAI.65",
-                                       "TAC.BSAI.326",
-                                       "TAC.BSAI.90",
-                                       "TAC.BSAI.50",
-                                       "TAC.BSAI.140")]
-        
-        output <- (TAC.BOTHBIND + TAC.BOTHBIND + TAC.BOTHBIND.FLATSUR)/3
-        
-       
-    }
-    
+    # if (outputtype %in% c("c","C","catch","CATCH","Catch")) {
+    #     CATCH.PRED <- (CATCH.BOTHBIND.SURSUR + CATCH.BOTHBIND.SUROLS + CATCH.BOTHBIND.FLATSUR.SURSUR)/3
+    #     
+    #     output <- CATCH.PRED[c("CATCH.BS.141",
+    #                            "CATCH.BS.204",
+    #                            "CATCH.BS.103",
+    #                            "CATCH.BS.102",
+    #                            "CATCH.BS.147",
+    #                            "CATCH.BS.303",
+    #                            "CATCH.BS.60",
+    #                            "CATCH.BS.100",
+    #                            "CATCH.BS.310",
+    #                            "CATCH.BS.202",
+    #                            "CATCH.BS.106",
+    #                            "CATCH.BS.301",
+    #                            "CATCH.BS.201",
+    #                            "CATCH.BS.104",
+    #                            "CATCH.BS.307",
+    #                            "CATCH.BS.203",
+    #                            "CATCH.BS.400",
+    #                            "CATCH.BS.65",
+    #                            "CATCH.BS.326",
+    #                            "CATCH.BS.90",
+    #                            "CATCH.BS.50",
+    #                            "CATCH.BS.140")]
+    # } else if (outputtype %in% c("TAC","t","T")) {  
+    # 
+    #     TAC.BOTHBIND <- TAC.BOTHBIND[c("TAC.BSAI.141",
+    #                          "TAC.BSAI.204",
+    #                          "TAC.BSAI.103",
+    #                          "TAC.BS.102",
+    #                          "TAC.BSAI.147",
+    #                          "TAC.BSAI.303",
+    #                          "TAC.BSAI.60",
+    #                          "TAC.BSAI.100",
+    #                          "TAC.BS.310",
+    #                          "TAC.BSAI.202",
+    #                          "TAC.BSAI.106",
+    #                          "TAC.BS.301",
+    #                          "TAC.BS.201",
+    #                          "TAC.BSAI.104",
+    #                          "TAC.BSAI.307",
+    #                          "TAC.BS.203",
+    #                          "TAC.BSAI.400",
+    #                          "TAC.BSAI.65",
+    #                          "TAC.BSAI.326",
+    #                          "TAC.BSAI.90",
+    #                          "TAC.BSAI.50",
+    #                          "TAC.BSAI.140")]
+    # 
+    #     TAC.BOTHBIND.FLATSUR <- TAC.BOTHBIND.FLATSUR[c("TAC.BSAI.141",
+    #                                    "TAC.BSAI.204",
+    #                                    "TAC.BSAI.103",
+    #                                    "TAC.BS.102",
+    #                                    "TAC.BSAI.147",
+    #                                    "TAC.BSAI.303",
+    #                                    "TAC.BSAI.60",
+    #                                    "TAC.BSAI.100",
+    #                                    "TAC.BS.310",
+    #                                    "TAC.BSAI.202",
+    #                                    "TAC.BSAI.106",
+    #                                    "TAC.BS.301",
+    #                                    "TAC.BS.201",
+    #                                    "TAC.BSAI.104",
+    #                                    "TAC.BSAI.307",
+    #                                    "TAC.BS.203",
+    #                                    "TAC.BSAI.400",
+    #                                    "TAC.BSAI.65",
+    #                                    "TAC.BSAI.326",
+    #                                    "TAC.BSAI.90",
+    #                                    "TAC.BSAI.50",
+    #                                    "TAC.BSAI.140")]
+    #     
+    #     output <- (TAC.BOTHBIND + TAC.BOTHBIND + TAC.BOTHBIND.FLATSUR)/3
+    #     
+    #    
+    # }
+    # 
     return (output)
 }

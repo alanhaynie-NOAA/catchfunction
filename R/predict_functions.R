@@ -39,17 +39,18 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
         # If prediction exceeds cap, trim down from the LARGEST stocks
         NETTAC <- rowSums(DT, na.rm = TRUE)
         SURPLUS <- as.numeric(NETTAC > 2e6)*(NETTAC - 2e6)
-        DT <- DT[order(DT, decreasing = T)]
-        # If prediction exceeds cap, trim down pollock and yellowfin, 50/50
-        TEMP <- DT/NETTAC
-        TEMP$TAC.BS.203 <- 0
-        TEMP$TAC.AI.203 <- 0
-        TEMP$TAC.BSAI.326 <- 0
-        TEMP$TAC.BSAI.303 <- 0
-        TOTALRAT <- sum(TEMP, na.rm = TRUE)
-        TEMP <- TEMP/TOTALRAT
-        output <- DT - SURPLUS*TEMP
-        output <- log(output)         
+        # DT <- DT[order(DT, decreasing = T)]
+        # # If prediction exceeds cap, trim down pollock and yellowfin, 50/50
+        # TEMP <- DT/NETTAC
+        # TEMP$TAC.BS.203 <- 0
+        # TEMP$TAC.AI.203 <- 0
+        # TEMP$TAC.BSAI.326 <- 0
+        # TEMP$TAC.BSAI.303 <- 0
+        # TOTALRAT <- sum(TEMP, na.rm = TRUE)
+        # TEMP <- TEMP/TOTALRAT
+        # output <- DT - SURPLUS*TEMP
+        # output <- log(output)         
+        output <- SURPLUS
         return(output)
     }
     
@@ -121,9 +122,9 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
         # NaN, and going line by line to implement TAC = 0 if ABC = 0 is quite messy
         # 
         PREDICTIONS <- TAC.CAPFUNCTION(PREDICTIONS)
-        if (predictmethod  == 1) {
-            PREDICTIONS <- exp(PREDICTIONS)
-        } 
+      #  if (predictmethod  == 1) {
+      #      PREDICTIONS <- exp(PREDICTIONS)
+      #  } 
     }
     
     if (FLATSUR | FLAT_FFDOM | FLAT_WFDOM) {
@@ -195,7 +196,7 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
         # 
         # Apply 2MT cap explicitly
         PREDICTIONS <- TAC.CAPFUNCTION(PREDICTIONS)
-        PREDICTIONS <- exp(PREDICTIONS)
+       # PREDICTIONS <- exp(PREDICTIONS)
         
         
     }
@@ -322,10 +323,10 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
     }
     
     ## Return predictions ####
-    PREDICTIONS$YEAR <- 1
-    FISH.DATA$YEAR <- 1
-    output <- merge(PREDICTIONS,FISH.DATA, by = "YEAR")
-    
+  #  PREDICTIONS$YEAR <- 1
+  #  FISH.DATA$YEAR <- 1
+  #  output <- merge(PREDICTIONS,FISH.DATA, by = "YEAR")
+   output <- PREDICTIONS 
     return(output)
     
 }
