@@ -1,11 +1,11 @@
 ensemble_fun <- function(ABC.DATA,scenario,outputtype) {
     
-    if (scenario == 1 | scenario == 2 | scenario == 3) {
+   # if (scenario == 1 | scenario == 2 | scenario == 3) {
         FISH.DATA <- ABC.DATA
         FISH.DATA$ABCboth <- FISH.DATA$ABC.BSAI.202 + FISH.DATA$ABC.BS.201
         FISH.DATA$ABCboth.UB.150 <- as.numeric(FISH.DATA$ABC.BS.201 + FISH.DATA$ABC.BSAI.202 >= 1.5e6)
         FISH.DATA$pollock.bs.UB <-  as.numeric(FISH.DATA$ABC.BS.201 > 1.2e6)
-    }   
+   # }   
     
     # These are all the indicators required in the regressions (I honestly think some of them are no longer needed, so this could probably
     # do to be cleaned up a bit, but its not hurting anyone.)
@@ -64,10 +64,44 @@ ensemble_fun <- function(ABC.DATA,scenario,outputtype) {
         CATCH.BOTHBIND.SURSUR <- predict.catch.function(model="SUR_FFDOM",fit=catch_BOTHBIND_loglin_sur,TAC.BOTHBIND )
         CATCH.BOTHBIND.SUROLS <- predict.catch.function(model="NOSUR_FFDOM",fit = catch_BOTHBIND_loglin_nosur,TAC.BOTHBIND )
         CATCH.BOTHBIND.FLATSUR.SURSUR <- predict.catch.function(model="FLATSUR_FFDOM",fit=catch_BOTHBIND_FLATSUR_loglin_sur,TAC.BOTHBIND.FLATSUR )
-    }
+    } else if (scenario == 6) {
+        CATCH.PRED$CATCH.BS.141 <- ABC.DATA$ABC.BS.141
+        CATCH.PRED$CATCH.BS.204 <- ABC.DATA$ABC.BS.204
+        CATCH.PRED$CATCH.BS.103 <- ABC.DATA$ABC.BS.103
+        CATCH.PRED$CATCH.BS.102 <- ABC.DATA$ABC.BS.102
+        CATCH.PRED$CATCH.BS.147 <- ABC.DATA$ABC.BS.147
+        CATCH.PRED$CATCH.BS.303 <- ABC.DATA$ABC.BS.303
+        CATCH.PRED$CATCH.BS.60 <- ABC.DATA$ABC.BS.60
+        CATCH.PRED$CATCH.BS.100 <- ABC.DATA$ABC.BS.100
+        CATCH.PRED$CATCH.BS.310 <- ABC.DATA$ABC.BS.310
+        CATCH.PRED$CATCH.BS.202 <- ABC.DATA$ABC.BS.202
+        CATCH.PRED$CATCH.BS.106 <- ABC.DATA$ABC.BS.106
+        CATCH.PRED$CATCH.BS.301 <- ABC.DATA$ABC.BS.301
+        CATCH.PRED$CATCH.BS.201 <- ABC.DATA$ABC.BS.201
+        CATCH.PRED$CATCH.BS.104 <- ABC.DATA$ABC.BS.104
+        CATCH.PRED$CATCH.BS.307 <- ABC.DATA$ABC.BS.307
+        CATCH.PRED$CATCH.BS.203 <- ABC.DATA$ABC.BS.203
+        CATCH.PRED$CATCH.BS.400 <- ABC.DATA$ABC.BS.400
+        CATCH.PRED$CATCH.BS.65 <- ABC.DATA$ABC.BS.65
+        CATCH.PRED$CATCH.BS.326 <- ABC.DATA$ABC.BS.326
+        CATCH.PRED$CATCH.BS.90 <- ABC.DATA$ABC.BS.90
+        CATCH.PRED$CATCH.BS.50 <- ABC.DATA$ABC.BS.50
+        CATCH.PRED$CATCH.BS.140 <- ABC.DATA$ABC.BS.140
+        
+        output <- CATCH.PRED
+    } else if (scenario == 8) { 
+        TAC.BOTHBIND <- predict.tac.function(predictmethod = 1, model="SUR",fit=tac_BOTHBIND_loglin_sur,FISH.DATA)
+        
+        CATCH.BOTHBIND.SURSUR <- predict.catch.function(model="SUR",fit=catch_BOTHBIND_loglin_sur,TAC.BOTHBIND )
+        CATCH.BOTHBIND.SUROLS <- predict.catch.function(model="NOSUR",fit = catch_BOTHBIND_loglin_nosur,TAC.BOTHBIND )
+        
+        TAC.BOTHBIND.FLATSUR <- predict.tac.function(predictmethod = 1, model="FLATSUR",fit=tac_BOTHBIND_FLATSUR_loglin_sur,FISH.DATA)
+        
+        CATCH.BOTHBIND.FLATSUR.SURSUR <- predict.catch.function(model="FLATSUR",fit=catch_BOTHBIND_FLATSUR_loglin_sur,TAC.BOTHBIND.FLATSUR )
+        }
+
     
-    
-    
+    if (scenario != 6) {
     # create ensemble
     # 
     if (outputtype %in% c("c","C","catch","CATCH","Catch")) {
@@ -146,6 +180,7 @@ ensemble_fun <- function(ABC.DATA,scenario,outputtype) {
         output <- (TAC.BOTHBIND + TAC.BOTHBIND + TAC.BOTHBIND.FLATSUR)/3
         
        
+    }
     }
     
     return (output)

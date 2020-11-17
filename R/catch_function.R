@@ -16,6 +16,13 @@
 #' Scenario 5.2: Fiddle with a single species--calculate the rest assuming the ABC of the removed sp. does not influence the sp. under the cap at all. \cr
 # Scenario 5.3: Fiddle with a single species--calculate the rest assuming the ABC of the removed sp. does not influence the sp. under the cap at all and then increase the TAC of all the remaining species until the sum of the tAC = 2mmt \cr
 # Scenario 5.4: Scenario 5.3, but in this case let catch range from the old predicted catch to TAC.  The amount which catch improves from old predicted catch to TAC can be dialed 0 to 1 using "improvscatchscale". \cr
+#' Scenario 6: Catch = ABC
+#' Scenario 7: Catch = TAC (harvest technology improves)
+#' Scenario 8.1: Cap goes up to 2.4 MMT; harvest technology stays as is **May be scrapped
+#' Scenario 8.2: Cap goes up to 2.4 MMT; harvest technology improves
+#' Scenario 9.1: Cap decreases to 1.6 MMT; harvest technology stays as is **May be scrapped
+#' Scenario 9.2: Cap decreases to 1.6 MMT; harvest technology improves
+#' 
 #' 
 #' @param scenario The economic scenario number. Current options: 1, 2, 3, 4, 5.1, 5.2, or 5.3
 #' @param Arrowtooth Optional.  ABC of Arrowtooth Flounder.
@@ -55,10 +62,10 @@
 #'                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 #' catch_function(5.1, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(0.5,1), 
 #'                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-#' catch_function(5.2, spptomult = "Arrowtooth", multiplier = 2, 
-#'                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-#' catch_function(5.2, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(0.5,1), 
-#'                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
+# catch_function(5.2, spptomult = "Arrowtooth", multiplier = 2, 
+#                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
+# catch_function(5.2, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(0.5,1), 
+#                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 # catch_function(5.3, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(0.5,1), 
 #                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 # catch_function(5.4, spptomult="Arrowtooth", multiplier = 2, improvedcatchscale=0.5, 
@@ -191,7 +198,13 @@ catch_function <- function(scenario,
     }
     
     
-    ## Create BSAI where necessary
+    ## Create BS TAC where necessary, from BSAI TAC
+    
+    BSfun <- function(DT, code) {
+        # Otherwise, assume BSAI ABC is the sum of BS and AI.  
+        eval(parse(text= paste("output <- DT$TAC.BSAI.",code,"*mean.BS.AI.ABCs$ABC.BS.",code,"/(mean.BS.AI.ABCs$ABC.BS.",code,"+ mean.BS.AI.ABCs$ABC.AI.",code,")",sep="")))
+        return(output)
+    }
     
     BSAIfun <- function(DT, code) {
         if (eval(parse(text= paste("DT$ABC.BS.",code,"[1] == 0",sep="")))) {
@@ -253,9 +266,161 @@ catch_function <- function(scenario,
         catch <- ensemble_fun(ABC.DATA,1,"catch")
     } else if (scenario == 5.3) {
         catch <- removefromcap_catch(ABC.DATA,5.3,spptomult,0)
-    }# else if (scenario == 5.4) {
+    } else if (scenario == 6) {
+        catch <- ensemble_fun(ABC.DATA,6,"catch")
+    } else if (scenario == 7) {
+        TAC_BSAI <- ensemble_fun(ABC.DATA,1,"TAC")
+         DT <- data.frame(2)
+         # note TAC here comes out as BSAI TAC for most species, except Pollock (201), POP (301), Sablefish (203), Greenland Turbot (102), and X (310)
+        DT$CATCH.BS.141 <- BSfun(TAC_BSAI,"141")
+        DT$CATCH.BS.204 <- BSfun(TAC_BSAI,"204")
+        DT$CATCH.BS.103 <- BSfun(TAC_BSAI,"103")
+        DT$CATCH.BS.102 <- TAC_BSAI$TAC.BS.102
+        DT$CATCH.BS.147 <- BSfun(TAC_BSAI,"147")
+        DT$CATCH.BS.303 <- BSfun(TAC_BSAI,"303")
+        DT$CATCH.BS.60 <- BSfun(TAC_BSAI,"60")
+        DT$CATCH.BS.100 <- BSfun(TAC_BSAI,"100")
+        DT$CATCH.BS.310 <- TAC_BSAI$TAC.BS.310
+        DT$CATCH.BS.202 <- BSfun(TAC_BSAI,"202")
+        DT$CATCH.BS.106 <- BSfun(TAC_BSAI,"106")
+        DT$CATCH.BS.301 <- TAC_BSAI$TAC.BS.301
+        DT$CATCH.BS.201 <- TAC_BSAI$TAC.BS.201
+        DT$CATCH.BS.104 <- BSfun(TAC_BSAI,"104")
+        DT$CATCH.BS.307 <- BSfun(TAC_BSAI,"307")
+        DT$CATCH.BS.203 <- TAC_BSAI$TAC.BS.203
+        DT$CATCH.BS.400 <- BSfun(TAC_BSAI,"400")
+        DT$CATCH.BS.65 <- BSfun(TAC_BSAI,"65")
+        DT$CATCH.BS.326 <- BSfun(TAC_BSAI,"326")
+        DT$CATCH.BS.90 <- BSfun(TAC_BSAI,"90")
+        DT$CATCH.BS.50 <- BSfun(TAC_BSAI,"50")
+        DT$CATCH.BS.140 <- BSfun(TAC_BSAI,"140")
+        catch <- DT[c("CATCH.BS.141",
+                                        "CATCH.BS.204",
+                                        "CATCH.BS.103",
+                                        "CATCH.BS.102",
+                                        "CATCH.BS.147",
+                                        "CATCH.BS.303",
+                                        "CATCH.BS.60",
+                                        "CATCH.BS.100",
+                                        "CATCH.BS.310",
+                                        "CATCH.BS.202",
+                                        "CATCH.BS.106",
+                                        "CATCH.BS.301",
+                                        "CATCH.BS.201",
+                                        "CATCH.BS.104",
+                                        "CATCH.BS.307",
+                                        "CATCH.BS.203",
+                                        "CATCH.BS.400",
+                                        "CATCH.BS.65",
+                                        "CATCH.BS.326",
+                                        "CATCH.BS.90",
+                                        "CATCH.BS.50",
+                                        "CATCH.BS.140")]
+    } else if (scenario == 8.1) {
+        catch <- ensemble_fun(ABC.DATA,8,"catch")
+    } else if (scenario == 8.2) {
+        catch <- ensemble_fun(ABC.DATA,8,,"TAC")
+        DT <- data.frame(2)
+        # note TAC here comes out as BSAI TAC for most species, except Pollock (201), POP (301), Sablefish (203), Greenland Turbot (102), and X (310)
+        DT$CATCH.BS.141 <- BSfun(TAC_BSAI,"141")
+        DT$CATCH.BS.204 <- BSfun(TAC_BSAI,"204")
+        DT$CATCH.BS.103 <- BSfun(TAC_BSAI,"103")
+        DT$CATCH.BS.102 <- TAC_BSAI$TAC.BS.102
+        DT$CATCH.BS.147 <- BSfun(TAC_BSAI,"147")
+        DT$CATCH.BS.303 <- BSfun(TAC_BSAI,"303")
+        DT$CATCH.BS.60 <- BSfun(TAC_BSAI,"60")
+        DT$CATCH.BS.100 <- BSfun(TAC_BSAI,"100")
+        DT$CATCH.BS.310 <- TAC_BSAI$TAC.BS.310
+        DT$CATCH.BS.202 <- BSfun(TAC_BSAI,"202")
+        DT$CATCH.BS.106 <- BSfun(TAC_BSAI,"106")
+        DT$CATCH.BS.301 <- TAC_BSAI$TAC.BS.301
+        DT$CATCH.BS.201 <- TAC_BSAI$TAC.BS.201
+        DT$CATCH.BS.104 <- BSfun(TAC_BSAI,"104")
+        DT$CATCH.BS.307 <- BSfun(TAC_BSAI,"307")
+        DT$CATCH.BS.203 <- TAC_BSAI$TAC.BS.203
+        DT$CATCH.BS.400 <- BSfun(TAC_BSAI,"400")
+        DT$CATCH.BS.65 <- BSfun(TAC_BSAI,"65")
+        DT$CATCH.BS.326 <- BSfun(TAC_BSAI,"326")
+        DT$CATCH.BS.90 <- BSfun(TAC_BSAI,"90")
+        DT$CATCH.BS.50 <- BSfun(TAC_BSAI,"50")
+        DT$CATCH.BS.140 <- BSfun(TAC_BSAI,"140")
+        catch <- DT[c("CATCH.BS.141",
+                      "CATCH.BS.204",
+                      "CATCH.BS.103",
+                      "CATCH.BS.102",
+                      "CATCH.BS.147",
+                      "CATCH.BS.303",
+                      "CATCH.BS.60",
+                      "CATCH.BS.100",
+                      "CATCH.BS.310",
+                      "CATCH.BS.202",
+                      "CATCH.BS.106",
+                      "CATCH.BS.301",
+                      "CATCH.BS.201",
+                      "CATCH.BS.104",
+                      "CATCH.BS.307",
+                      "CATCH.BS.203",
+                      "CATCH.BS.400",
+                      "CATCH.BS.65",
+                      "CATCH.BS.326",
+                      "CATCH.BS.90",
+                      "CATCH.BS.50",
+                      "CATCH.BS.140")]
+    } else if (scenario == 9.1) {
+        catch <- ensemble_fun(ABC.DATA,9,"catch")
+    } else if (scenario == 9.2) {
+        catch <- ensemble_fun(ABC.DATA,9,,"TAC")
+        DT <- data.frame(2)
+        # note TAC here comes out as BSAI TAC for most species, except Pollock (201), POP (301), Sablefish (203), Greenland Turbot (102), and X (310)
+        DT$CATCH.BS.141 <- BSfun(TAC_BSAI,"141")
+        DT$CATCH.BS.204 <- BSfun(TAC_BSAI,"204")
+        DT$CATCH.BS.103 <- BSfun(TAC_BSAI,"103")
+        DT$CATCH.BS.102 <- TAC_BSAI$TAC.BS.102
+        DT$CATCH.BS.147 <- BSfun(TAC_BSAI,"147")
+        DT$CATCH.BS.303 <- BSfun(TAC_BSAI,"303")
+        DT$CATCH.BS.60 <- BSfun(TAC_BSAI,"60")
+        DT$CATCH.BS.100 <- BSfun(TAC_BSAI,"100")
+        DT$CATCH.BS.310 <- TAC_BSAI$TAC.BS.310
+        DT$CATCH.BS.202 <- BSfun(TAC_BSAI,"202")
+        DT$CATCH.BS.106 <- BSfun(TAC_BSAI,"106")
+        DT$CATCH.BS.301 <- TAC_BSAI$TAC.BS.301
+        DT$CATCH.BS.201 <- TAC_BSAI$TAC.BS.201
+        DT$CATCH.BS.104 <- BSfun(TAC_BSAI,"104")
+        DT$CATCH.BS.307 <- BSfun(TAC_BSAI,"307")
+        DT$CATCH.BS.203 <- TAC_BSAI$TAC.BS.203
+        DT$CATCH.BS.400 <- BSfun(TAC_BSAI,"400")
+        DT$CATCH.BS.65 <- BSfun(TAC_BSAI,"65")
+        DT$CATCH.BS.326 <- BSfun(TAC_BSAI,"326")
+        DT$CATCH.BS.90 <- BSfun(TAC_BSAI,"90")
+        DT$CATCH.BS.50 <- BSfun(TAC_BSAI,"50")
+        DT$CATCH.BS.140 <- BSfun(TAC_BSAI,"140")
+        catch <- DT[c("CATCH.BS.141",
+                      "CATCH.BS.204",
+                      "CATCH.BS.103",
+                      "CATCH.BS.102",
+                      "CATCH.BS.147",
+                      "CATCH.BS.303",
+                      "CATCH.BS.60",
+                      "CATCH.BS.100",
+                      "CATCH.BS.310",
+                      "CATCH.BS.202",
+                      "CATCH.BS.106",
+                      "CATCH.BS.301",
+                      "CATCH.BS.201",
+                      "CATCH.BS.104",
+                      "CATCH.BS.307",
+                      "CATCH.BS.203",
+                      "CATCH.BS.400",
+                      "CATCH.BS.65",
+                      "CATCH.BS.326",
+                      "CATCH.BS.90",
+                      "CATCH.BS.50",
+                      "CATCH.BS.140")]
+    } 
+   
+    # else if (scenario == 5.4) {
       #  catch <- removefromcap_catch(ABC.DATA,5.4,spptomult,improvedcatchscale)
-    #}
+    #} 
 
 
 # Third, pick only species that were passed in to pass back out.
@@ -269,6 +434,7 @@ if (scenario == 5.1 | scenario == 5.2 | scenario == 5.3) {  # in scenario 5 over
     }
 } 
 
+ #   output <- TAC_BSAI
 return(output)
 # return(ABC.DATA)
 
