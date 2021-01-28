@@ -319,7 +319,7 @@ catch_function <- function(scenario,
     } else if (scenario == 8.1) {
         catch <- ensemble_fun(ABC.DATA,8,"catch")
     } else if (scenario == 8.2) {
-        catch <- ensemble_fun(ABC.DATA,8,,"TAC")
+        TAC_BSAI <- ensemble_fun(ABC.DATA,8,"TAC")
         DT <- data.frame(2)
         # note TAC here comes out as BSAI TAC for most species, except Pollock (201), POP (301), Sablefish (203), Greenland Turbot (102), and X (310)
         DT$CATCH.BS.141 <- BSfun(TAC_BSAI,"141")
@@ -369,7 +369,7 @@ catch_function <- function(scenario,
     } else if (scenario == 9.1) {
         catch <- ensemble_fun(ABC.DATA,9,"catch")
     } else if (scenario == 9.2) {
-        catch <- ensemble_fun(ABC.DATA,9,,"TAC")
+        catch <- ensemble_fun(ABC.DATA,9,"TAC")
         DT <- data.frame(2)
         # note TAC here comes out as BSAI TAC for most species, except Pollock (201), POP (301), Sablefish (203), Greenland Turbot (102), and X (310)
         DT$CATCH.BS.141 <- BSfun(TAC_BSAI,"141")

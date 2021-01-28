@@ -90,12 +90,12 @@ ensemble_fun <- function(ABC.DATA,scenario,outputtype) {
         
         output <- CATCH.PRED
     } else if (scenario == 8) { 
-        TAC.BOTHBIND <- predict.tac.function(predictmethod = 1, model="SUR",fit=tac_BOTHBIND_loglin_sur,FISH.DATA)
+        TAC.BOTHBIND <- predict.tac.function(predictmethod = 2, model="SUR",fit=tac_BOTHBIND_loglin_sur,FISH.DATA)
         
         CATCH.BOTHBIND.SURSUR <- predict.catch.function(model="SUR",fit=catch_BOTHBIND_loglin_sur,TAC.BOTHBIND )
         CATCH.BOTHBIND.SUROLS <- predict.catch.function(model="NOSUR",fit = catch_BOTHBIND_loglin_nosur,TAC.BOTHBIND )
         
-        TAC.BOTHBIND.FLATSUR <- predict.tac.function(predictmethod = 1, model="FLATSUR",fit=tac_BOTHBIND_FLATSUR_loglin_sur,FISH.DATA)
+        TAC.BOTHBIND.FLATSUR <- predict.tac.function(predictmethod = 2, model="FLATSUR",fit=tac_BOTHBIND_FLATSUR_loglin_sur,FISH.DATA)
         
         CATCH.BOTHBIND.FLATSUR.SURSUR <- predict.catch.function(model="FLATSUR",fit=catch_BOTHBIND_FLATSUR_loglin_sur,TAC.BOTHBIND.FLATSUR )
         }
@@ -176,12 +176,12 @@ ensemble_fun <- function(ABC.DATA,scenario,outputtype) {
                                        "TAC.BSAI.90",
                                        "TAC.BSAI.50",
                                        "TAC.BSAI.140")]
+    
         
         output <- (TAC.BOTHBIND + TAC.BOTHBIND + TAC.BOTHBIND.FLATSUR)/3
-        
-       
+   
     }
     }
-    
+
     return (output)
 }

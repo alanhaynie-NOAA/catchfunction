@@ -1,4 +1,4 @@
-predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
+predict.tac.function <- function(predictmethod,model,fit,FISH.DATA){
     # Preamble ####  
     # 
     SUR<- F
@@ -34,13 +34,13 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
     
     # Define CAP function ####
     
-    TAC.CAPFUNCTION <- function(DT) {
+    TAC.CAPFUNCTION <- function(DT,CAP) {
         DT <- exp(DT)
-        # If prediction exceeds cap, trim down from the LARGEST stocks
+        # If prediction exceeds cap, trim down proportionally
         NETTAC <- rowSums(DT, na.rm = TRUE)
-        SURPLUS <- as.numeric(NETTAC > 2e6)*(NETTAC - 2e6)
+        SURPLUS <- as.numeric(NETTAC > CAP*1e6)*(NETTAC - CAP*1e6)
         DT <- DT[order(DT, decreasing = T)]
-        # If prediction exceeds cap, trim down pollock and yellowfin, 50/50
+        # If prediction exceeds cap, trim down all species but those specified below at 0
         TEMP <- DT/NETTAC
         TEMP$TAC.BS.203 <- 0
         TEMP$TAC.AI.203 <- 0
@@ -53,13 +53,96 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
         return(output)
     }
     
+    TAC.CAPNOLOWER <- function(DTSQ, DTALT, CAP) {
+        # DTSQ is the status quo TACs (DT stands for data table)
+        # DTALT is the new scenario TACs (ALT stands for alternative)
+        # CAP is the new scenario CAP
+        DTALT <- exp(DTALT) # go from log form to real numbers
+        DTSQ <- exp(DTSQ) # go from log form to real numbers
+        DTSQ <- DTSQ[ ,colnames(DTALT)] # make sure the columns are in the same order!
+        
+        # goal: to decrease net TAC down to CAP, but no lower than status quo TAC.
+        
+        NETTAC <- rowSums(DTALT, na.rm = TRUE) # Calculate Net TAC
+    
+        # Begin a loop to lower species 
+        while (NETTAC > CAP*1e6) {  # Loop stops when NETTAC is leq CAP
+            # calculate the distance (from TAC to SQ TAC) to TAC ratio for each species.
+            
+            disttoabc <- DTALT - DTSQ  #how much higher the new prediction is over the status quo
+            disttoabc_to_tac_ratio <- disttoabc/DTALT # ratio of that distance to prediction (and 
+            # thus how much the prediction can be lowered)
+          
+            disttoabc_to_tac_ratio[disttoabc_to_tac_ratio < 1e-9] <- 0 # if the distance is this 
+            # small, lets say it's close enough to zero and stop lowering. (This precaution is 
+            # necessary due to rounding error when saving these values.)
+           
+            # the following are exempt from being lowered:
+            disttoabc_to_tac_ratio$TAC.BS.203 <- 0 # BS sablefish
+            disttoabc_to_tac_ratio$TAC.AI.203 <- 0 # AI sablefish
+            disttoabc_to_tac_ratio$TAC.BSAI.326 <- 0 # BSAI shortraker
+            disttoabc_to_tac_ratio$TAC.BSAI.303 <- 0 # BSAI northern rockfish
+            
+            # the minimum, nonzero, ratio is the one that will determine how 
+            # much the predicted TACs will lower by, this round:
+            x <- min(disttoabc_to_tac_ratio[disttoabc_to_tac_ratio > 0], na.rm = T)
+            xvec <- disttoabc_to_tac_ratio # xvec is a duplicate of disttoabc_to_tac_ratio. 
+            # This could be cleaned up later if you wish, but I appreciate that it lets me
+            # alter xvec without altering disttoabc_to_tac_ratio when troubleshooting.
+            xvec[xvec > 0] <- x # all species that will be lowered will be lowered by x
+            
+            # These two checks could, and perhaps should, be if/stop conditions as they 
+            # should never happen.
+            xvec[is.na(xvec)] <- 0 # if a value is NA then it doesn't get lowered
+            xvec[xvec < 0] <- 0 # if a value is negative (i.e. already below status quo) 
+            # then it doesn't get lowered...  
+            
+            if (sum(xvec*DTALT)==0 & NETTAC > CAP*1e6) stop('infinite loop') 
+            # if this happens it means there all species are at status quo levels, 
+            # and yet the net tac is still over the cap.  That'd mean there's an 
+            # error somewhere since by defin sq must be lower than the 2mmt cap.  
+            # Code will stop for debugging.
+            
+            
+            if (sum(xvec*DTALT) < (NETTAC - CAP*1e6)) { #if lowering everything by x won't get us down to CAP
+                # decrease everything by x
+                DTALT <- DTALT - xvec*DTALT
+                
+                NETTAC <- rowSums(DTALT, na.rm = TRUE) # Calculate Net TAC
+                
+                if ((NETTAC - CAP*1e6) < -1e-6) {
+                    stop('NETTAC is lower than CAP.  something went wrong.')
+                } else if ((NETTAC - CAP*1e6) < 1e-9){
+                    # if the difference between NETTAC and CAP is between 0 and -1e-9 then 
+                    #just set it to 0; it's close enough.
+                    NETTAC <- CAP
+                }  
+                # now go back to the beginning and do it again until NETTAC = CAP
+            } else { # if lowering everything by x would be too much
+                # then instead, we lower proportionally until we get to CAP
+                dtvec <- DTALT # a copy so I can alter DTALT values without alterting DTALT
+                dtvec[xvec == 0] <- 0 # don't lower the species where xvec = 0
+                # decrease all TAC proportionally, till we get to NETTAC = CAP
+                DTALT <- DTALT - (dtvec/sum(dtvec))*(NETTAC-CAP*1e6)
+                
+                NETTAC <- rowSums(DTALT, na.rm = TRUE) # Calculate Net TAC
+                
+                if ((NETTAC - CAP*1e6)> 1e-9) {
+                    stop('goalamt should be 0, but its not.  something went wrong') 
+                } 
+            }
+        }
+        DTALT <- log(DTALT)
+        return(DTALT)
+    }
     # make predictions  ####
     if (SUR | SUR_FFDOM | SUR_WFDOM) {
         PREDICTIONS <- data.frame(TAC.BSAI.60=0)
         
-        Pred.SUR <-  predict(fit[[16]], FISH.DATA)
         
-        if (predictmethod  == 1 ) {
+        if (predictmethod  %in%  c(1,2) ) {
+            Pred.SUR <-  predict(fit[[16]], FISH.DATA)
+            
             # Octopus
             PREDICTIONS$TAC.BSAI.60 <- pmin(predict(fit[[1]], FISH.DATA), log(FISH.DATA$ABC.BSAI.60))
             # Sharks
@@ -113,17 +196,86 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
             PREDICTIONS$TAC.BSAI.104 <- pmin(predict(fit[[19]], FISH.DATA) , log(FISH.DATA$ABC.BSAI.104))
             # Plaice
             PREDICTIONS$TAC.BSAI.106 <- pmin(predict(fit[[11]], FISH.DATA), log(FISH.DATA$ABC.BSAI.106))
+            
+            
         } 
+        
+        if (predictmethod  == 2 ) {
+            # FISH.DATA$ABCboth <- 0
+            #FISH.DATA$ABCboth.UB.150 <- 0
+            #FISH.DATA$pollock.bs.UB <- 0
+            PREDICTIONS.B <- data.frame(TAC.BSAI.60=0)
+            
+            Pred.SUR.B <-  predict(fit[[16]], FISH.DATA)
+            
+            # Octopus
+            PREDICTIONS.B$TAC.BSAI.60 <- pmin(predict(fit[[1]], FISH.DATA), log(FISH.DATA$ABC.BSAI.60))
+            # Sharks
+            PREDICTIONS.B$TAC.BSAI.65 <- pmin(predict(fit[[2]], FISH.DATA),log(FISH.DATA$ABC.BSAI.65))
+            # Skates
+            PREDICTIONS.B$TAC.BSAI.90 <- pmin(predict(fit[[3]], FISH.DATA),log(FISH.DATA$ABC.BSAI.90))
+            # Sculpin
+            PREDICTIONS.B$TAC.BSAI.400 <- pmin(predict(fit[[4]], FISH.DATA),log(FISH.DATA$ABC.BSAI.400))
+            # Squid
+            PREDICTIONS.B$TAC.BSAI.50 <- pmin(Pred.SUR.B$squid.pred,log(FISH.DATA$ABC.BSAI.50))
+            
+            # Shortraker
+            PREDICTIONS.B$TAC.BSAI.326 <-log(FISH.DATA$ABC.BSAI.326)
+            # Rougheye
+            PREDICTIONS.B$TAC.BSAI.307 <- pmin(predict(fit[[15]],FISH.DATA),log(FISH.DATA$ABC.BSAI.307))
+            # Other Rockfish
+            PREDICTIONS.B$TAC.BS.310 <- pmin(predict(fit[[8]], FISH.DATA),log(FISH.DATA$ABC.BS.310))
+            PREDICTIONS.B$TAC.AI.310 <-log(FISH.DATA$ABC.AI.310)
+            # Northern 
+            PREDICTIONS.B$TAC.BSAI.303 <- pmin(predict(fit[[7]], FISH.DATA), log(FISH.DATA$ABC.BSAI.303))
+            # POP
+            PREDICTIONS.B$TAC.BS.301 <- pmin(predict(fit[[6]], FISH.DATA) + log(1.2),log(FISH.DATA$ABC.BS.301))
+            PREDICTIONS.B$TAC.AI.301 <-log(FISH.DATA$ABC.AI.301)
+            
+            # Pollock
+            PREDICTIONS.B$TAC.BS.201 <- pmin(Pred.SUR.B$pollock.pred + log(1.4), log(FISH.DATA$ABC.BS.201))
+            PREDICTIONS.B$TAC.AI.201 <- pmin(predict(fit[[18]], FISH.DATA),log(FISH.DATA$ABC.AI.201))
+            # PCod
+            PREDICTIONS.B$TAC.BSAI.202 <- pmin(Pred.SUR.B$Pcod.pred + log(1.4),log(FISH.DATA$ABC.BSAI.202))
+            # Sablefish
+            PREDICTIONS.B$TAC.BS.203 <- pmin(Pred.SUR.B$sablefish.pred ,log(FISH.DATA$ABC.BS.203))
+            PREDICTIONS.B$TAC.AI.203 <- pmin(predict(fit[[17]], FISH.DATA),log(FISH.DATA$ABC.AI.203))
+            # Atka
+            PREDICTIONS.B$TAC.BSAI.204 <- pmin(Pred.SUR.B$atka.pred ,log(FISH.DATA$ABC.BSAI.204))
+            
+            # Yellowfin
+            PREDICTIONS.B$TAC.BSAI.140 <- pmin(Pred.SUR.B$yellowfin.pred + log(1.2),log(FISH.DATA$ABC.BSAI.140))
+            # Arrowtooth
+            PREDICTIONS.B$TAC.BSAI.141 <- pmin(predict(fit[[14]], FISH.DATA), log(FISH.DATA$ABC.BSAI.141))
+            # Kamchatka
+            PREDICTIONS.B$TAC.BSAI.147 <- pmin(predict(fit[[5]], FISH.DATA),log(FISH.DATA$ABC.BSAI.147))
+            
+            # Other FLatfish
+            PREDICTIONS.B$TAC.BSAI.100 <- pmin(predict(fit[[12]], FISH.DATA), log(FISH.DATA$ABC.BSAI.100))
+            # Greenland turbot
+            PREDICTIONS.B$TAC.BS.102 <-  pmin(predict(fit[[9]], FISH.DATA), log(FISH.DATA$ABC.BS.102))
+            PREDICTIONS.B$TAC.AI.102 <-  pmin(predict(fit[[10]], FISH.DATA), log(FISH.DATA$ABC.AI.102))
+            # Flathead sole
+            PREDICTIONS.B$TAC.BSAI.103 <- pmin(predict(fit[[13]], FISH.DATA) + log(1.2), log(FISH.DATA$ABC.BSAI.103))
+            # Rock Sole
+            PREDICTIONS.B$TAC.BSAI.104 <- pmin(predict(fit[[19]], FISH.DATA), log(FISH.DATA$ABC.BSAI.104))
+            # Plaice
+            PREDICTIONS.B$TAC.BSAI.106 <- pmin(predict(fit[[11]], FISH.DATA), log(FISH.DATA$ABC.BSAI.106))
+        }
         
         
         PREDICTIONS[is.na(PREDICTIONS)] <- -Inf  # assume that any NaN comes from -Inf*0
         # This is crude, admittedly.. But this was the only time I was getting 
         # NaN, and going line by line to implement TAC = 0 if ABC = 0 is quite messy
         # 
-        PREDICTIONS <- TAC.CAPFUNCTION(PREDICTIONS)
-        if (predictmethod  == 1) {
-            PREDICTIONS <- exp(PREDICTIONS)
-        } 
+        PREDICTIONS <- TAC.CAPFUNCTION(PREDICTIONS, 2)
+        if (predictmethod == 2) {
+            PREDICTIONS.B[is.na(PREDICTIONS.B)] <- -Inf
+            PREDICTIONS <- TAC.CAPNOLOWER(DTALT = PREDICTIONS.B, DTSQ = PREDICTIONS, 2.4)}
+        
+        
+        PREDICTIONS <- exp(PREDICTIONS)
+        
     }
     
     if (FLATSUR | FLAT_FFDOM | FLAT_WFDOM) {
@@ -132,7 +284,7 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
         Pred.SUR <-  predict(fit[[12]], FISH.DATA)
         Pred.SUR.flat <- predict(fit[[13]], FISH.DATA)
         
-        if (predictmethod  == 1 ) { 
+        if (predictmethod  %in%  c(1,2) ) { 
             # Octopus
             PREDICTIONS$TAC.BSAI.60 <- pmin(predict(fit[[1]], FISH.DATA),log(FISH.DATA$ABC.BSAI.60))
             # Sharks
@@ -188,13 +340,78 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
             # Plaice
             PREDICTIONS$TAC.BSAI.106 <- pmin(predict(fit[[6]], FISH.DATA),log(FISH.DATA$ABC.BSAI.106))
         } 
-        
+        if (predictmethod  == 2 ) { 
+            PREDICTIONS.B <- data.frame(TAC.BSAI.60=0)
+            
+            # FISH.DATA$ABCboth <- 0
+            # FISH.DATA$ABCboth.UB.150 <- 0
+            # FISH.DATA$pollock.bs.UB <- 0
+            # Octopus
+            PREDICTIONS.B$TAC.BSAI.60 <- pmin(predict(fit[[1]], FISH.DATA),log(FISH.DATA$ABC.BSAI.60))
+            # Sharks
+            PREDICTIONS.B$TAC.BSAI.65 <- pmin(predict(fit[[2]], FISH.DATA),log(FISH.DATA$ABC.BSAI.65))
+            # Skates
+            PREDICTIONS.B$TAC.BSAI.90 <- pmin(predict(fit[[3]], FISH.DATA),log(FISH.DATA$ABC.BSAI.90))
+            # Sculpin
+            PREDICTIONS.B$TAC.BSAI.400 <- pmin(predict(fit[[4]], FISH.DATA),log(FISH.DATA$ABC.BSAI.400))
+            # Squid
+            PREDICTIONS.B$TAC.BSAI.50 <- pmin(Pred.SUR.flat$squid.pred ,log(FISH.DATA$ABC.BSAI.50))
+            
+            # Shortraker
+            PREDICTIONS.B$TAC.BSAI.326 <- log(FISH.DATA$ABC.BSAI.326)
+            # Rougheye
+            PREDICTIONS.B$TAC.BSAI.307 <- pmin(predict(fit[[8]],FISH.DATA),log(FISH.DATA$ABC.BSAI.307))
+            # Other Rockfish
+            PREDICTIONS.B$TAC.BS.310 <- pmin(predict(fit[[9]],FISH.DATA),log(FISH.DATA$ABC.BS.310))
+            PREDICTIONS.B$TAC.AI.310 <-log(FISH.DATA$ABC.AI.310)
+            # Northern 
+            PREDICTIONS.B$TAC.BSAI.303 <- pmin(predict(fit[[10]], FISH.DATA),log(FISH.DATA$ABC.BSAI.303))
+            # POP
+            PREDICTIONS.B$TAC.BS.301 <- pmin(predict(fit[[11]],FISH.DATA)+ log(1.2),log(FISH.DATA$ABC.BS.301))
+            PREDICTIONS.B$TAC.AI.301 <- log(FISH.DATA$ABC.AI.301)
+            
+            # Pollock
+            PREDICTIONS.B$TAC.BS.201 <- pmin(Pred.SUR.flat$pollock.pred + log(1.4),log(FISH.DATA$ABC.BS.201))
+            PREDICTIONS.B$TAC.AI.201 <- pmin(predict(fit[[16]],FISH.DATA),log(FISH.DATA$ABC.AI.201))
+            # PCod
+            PREDICTIONS.B$TAC.BSAI.202 <- pmin(Pred.SUR.flat$Pcod.pred + log(1.4) ,log(FISH.DATA$ABC.BSAI.202))
+            # Sablefish
+            PREDICTIONS.B$TAC.BS.203 <- pmin(Pred.SUR.flat$sablefish.pred ,log(FISH.DATA$ABC.BS.203))
+            PREDICTIONS.B$TAC.AI.203 <- pmin(predict(fit[[15]],FISH.DATA),log(FISH.DATA$ABC.AI.203))
+            # Atka
+            PREDICTIONS.B$TAC.BSAI.204 <- pmin(Pred.SUR.flat$atka.pred ,log(FISH.DATA$ABC.BSAI.204))
+            
+            
+            # Yellowfin
+            PREDICTIONS.B$TAC.BSAI.140 <- pmin(Pred.SUR.flat$yellowfin.pred + log(1.2),log(FISH.DATA$ABC.BSAI.140))
+            # Arrowtooth
+            PREDICTIONS.B$TAC.BSAI.141 <- pmin(Pred.SUR.flat$arrowtooth.pred,log(FISH.DATA$ABC.BSAI.141))
+            # Kamchatka
+            PREDICTIONS.B$TAC.BSAI.147 <- pmin(predict(fit[[5]], FISH.DATA),log(FISH.DATA$ABC.BSAI.147))
+            
+            # Other FLatfish
+            PREDICTIONS.B$TAC.BSAI.100 <- pmin(Pred.SUR.flat$Oflat.pred,log(FISH.DATA$ABC.BSAI.100))
+            # Greenland turbot
+            PREDICTIONS.B$TAC.BS.102 <- pmin(predict(fit[[17]],FISH.DATA),log(FISH.DATA$ABC.BS.102))
+            PREDICTIONS.B$TAC.AI.102 <- pmin(predict(fit[[14]],FISH.DATA),log(FISH.DATA$ABC.AI.102))
+            # Flathead sole
+            PREDICTIONS.B$TAC.BSAI.103 <- pmin(predict(fit[[7]],FISH.DATA)+ log(1.2),log(FISH.DATA$ABC.BSAI.103))
+            # Rock Sole
+            PREDICTIONS.B$TAC.BSAI.104 <- pmin(predict(fit[[18]], FISH.DATA),log(FISH.DATA$ABC.BSAI.104))
+            # Plaice
+            PREDICTIONS.B$TAC.BSAI.106 <- pmin(predict(fit[[6]], FISH.DATA),log(FISH.DATA$ABC.BSAI.106))
+        } 
         PREDICTIONS[is.na(PREDICTIONS)] <- -Inf  # assume that any NaN comes from -Inf*0
         # This is crude, admittedly.. But this was the only time I was getting 
         # NaN, and going line by line to implement TAC = 0 if ABC = 0 is quite messy
         # 
         # Apply 2MT cap explicitly
-        PREDICTIONS <- TAC.CAPFUNCTION(PREDICTIONS)
+        PREDICTIONS <- TAC.CAPFUNCTION(PREDICTIONS, 2)
+        if (predictmethod == 2) {
+            PREDICTIONS.B[is.na(PREDICTIONS.B)] <- -Inf
+            PREDICTIONS <- TAC.CAPNOLOWER(DTSQ = PREDICTIONS, DTALT = PREDICTIONS.B, 2.4) }
+        
+        
         PREDICTIONS <- exp(PREDICTIONS)
         
         
@@ -363,7 +580,7 @@ predict.catch.function <- function(model,fit,FISH.DATA) {
         NOSUR_FFDOM <- T
     }
     
-
+    
     
     # Define CAP function ####
     
@@ -385,7 +602,7 @@ predict.catch.function <- function(model,fit,FISH.DATA) {
         return(DT)
     }
     
-        bsaicatchnogreaterthan <- function(bsvec,aivec,maxbsvec,maxaivec,maxbsaivec){
+    bsaicatchnogreaterthan <- function(bsvec,aivec,maxbsvec,maxaivec,maxbsaivec){
         for (i in 1:length(bsvec)) {
             bs <- exp(bsvec[i])
             ai <- exp(aivec[i])
@@ -500,7 +717,7 @@ predict.catch.function <- function(model,fit,FISH.DATA) {
     if (NOSUR | NOSUR_FFDOM) {
         PREDICTIONS <- data.frame(CATCH.BS.60=0)   #PTAC stands for predicted TAC
         
-           # Octopus
+        # Octopus
         PREDICTIONS$CATCH.BS.60 <- predict(fit[[1]], FISH.DATA)
         PREDICTIONS$CATCH.AI.60 <- predict(fit[[2]], FISH.DATA)
         # Sharks
@@ -573,7 +790,7 @@ predict.catch.function <- function(model,fit,FISH.DATA) {
     if (SUR | SUR_FFDOM) {
         PREDICTIONS <- data.frame(CATCH.BS.60=0)  #PTAC stands for predicted TAC
         
-          
+        
         Pred.SUR.A80 <- predict(fit[[32]], FISH.DATA)
         Pred.SUR.AFA <- predict(fit[[33]], FISH.DATA)
         
@@ -751,7 +968,7 @@ predict.catch.function <- function(model,fit,FISH.DATA) {
         PREDICTIONS$CATCH.AI.104 <- log(1.3) + PREDICTIONS$CATCH.AI.104
         # Plaice
         PREDICTIONS$CATCH.BS.106 <- pmin(log(1.3) + PREDICTIONS$CATCH.BS.106,pmin(pmax(log(FISH.DATA$TAC.BSAI.106), 13.3e3), log(FISH.DATA$ABC.BSAI.106))) # No AI
-
+        
     }
     
     
