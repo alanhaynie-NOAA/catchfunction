@@ -98,7 +98,16 @@ ensemble_fun <- function(ABC.DATA,scenario,outputtype) {
         TAC.BOTHBIND.FLATSUR <- predict.tac.function(predictmethod = 2, model="FLATSUR",fit=tac_BOTHBIND_FLATSUR_loglin_sur,FISH.DATA)
         
         CATCH.BOTHBIND.FLATSUR.SURSUR <- predict.catch.function(model="FLATSUR",fit=catch_BOTHBIND_FLATSUR_loglin_sur,TAC.BOTHBIND.FLATSUR )
-        }
+    } else if (scenario == 9) { 
+        TAC.BOTHBIND <- predict.tac.function(predictmethod = 3, model="SUR",fit=tac_BOTHBIND_loglin_sur,FISH.DATA)
+        
+        CATCH.BOTHBIND.SURSUR <- predict.catch.function(model="SUR",fit=catch_BOTHBIND_loglin_sur,TAC.BOTHBIND )
+        CATCH.BOTHBIND.SUROLS <- predict.catch.function(model="NOSUR",fit = catch_BOTHBIND_loglin_nosur,TAC.BOTHBIND )
+        
+        TAC.BOTHBIND.FLATSUR <- predict.tac.function(predictmethod = 3, model="FLATSUR",fit=tac_BOTHBIND_FLATSUR_loglin_sur,FISH.DATA)
+        
+        CATCH.BOTHBIND.FLATSUR.SURSUR <- predict.catch.function(model="FLATSUR",fit=catch_BOTHBIND_FLATSUR_loglin_sur,TAC.BOTHBIND.FLATSUR )
+    }
 
     
     if (scenario != 6) {
