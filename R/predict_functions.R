@@ -381,7 +381,6 @@ predict.tac.function <- function(predictmethod,model,fit,FISH.DATA){
         
         PREDICTIONS <- exp(PREDICTIONS)
         NETTAC <- rowSums(PREDICTIONS, na.rm = TRUE)
-        print(NETTAC)
         
     }
     
