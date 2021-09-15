@@ -783,6 +783,11 @@ predict.catch.function <- function(model,fit,FISH.DATA) {
         return(DT)
     }
     
+   # this code (bsaicatchnogreaterthan) makes sure that even if in the ai or bs we go over ABC 
+   # (which historially does happen) we don't in the bsai, except where permitted (because again, 
+   # historically it does happen in some species).  Note: I dont believe we've ever gone over the
+   # OFL, as Alaska is *very* careful not to overfish.
+    
     bsaicatchnogreaterthan <- function(bsvec,aivec,maxbsvec,maxaivec,maxbsaivec){
         for (i in 1:length(bsvec)) {
             bs <- exp(bsvec[i])
