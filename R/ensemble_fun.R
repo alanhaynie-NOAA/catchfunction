@@ -65,7 +65,8 @@ ensemble_fun <- function(ABC.DATA,scenario,outputtype) {
         CATCH.BOTHBIND.SUROLS <- predict.catch.function(model="NOSUR_FFDOM",fit = catch_BOTHBIND_loglin_nosur,TAC.BOTHBIND )
         CATCH.BOTHBIND.FLATSUR.SURSUR <- predict.catch.function(model="FLATSUR_FFDOM",fit=catch_BOTHBIND_FLATSUR_loglin_sur,TAC.BOTHBIND.FLATSUR )
     } else if (scenario == 6) {
-        CATCH.PRED$CATCH.BS.141 <- ABC.DATA$ABC.BS.141
+        CATCH.PRED <- as.data.frame(ABC.DATA$ABC.BS.141)
+        colnames(CATCH.PRED) <- c("CATCH.BS.141")
         CATCH.PRED$CATCH.BS.204 <- ABC.DATA$ABC.BS.204
         CATCH.PRED$CATCH.BS.103 <- ABC.DATA$ABC.BS.103
         CATCH.PRED$CATCH.BS.102 <- ABC.DATA$ABC.BS.102

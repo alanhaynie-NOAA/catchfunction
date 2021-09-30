@@ -14,7 +14,7 @@
 #' Scenario 4: No Fishing (will return all zeros) \cr
 #' Scenario 5.1: Fiddle with a single species--calculate the rest still taking the ABC of the removed sp. in to account. \cr
 #' Scenario 5.2: Fiddle with a single species--calculate the rest assuming the ABC of the removed sp. does not influence the sp. under the cap at all. \cr
-# Scenario 5.3: Fiddle with a single species--calculate the rest assuming the ABC of the removed sp. does not influence the sp. under the cap at all and then increase the TAC of all the remaining species until the sum of the tAC = 2mmt \cr
+#' Scenario 5.3: Fiddle with a single species--calculate the rest assuming the ABC of the removed sp. does not influence the sp. under the cap at all and then increase the TAC of all the remaining species until the sum of the tAC = 2mmt \cr
 # Scenario 5.4: Scenario 5.3, but in this case let catch range from the old predicted catch to TAC.  The amount which catch improves from old predicted catch to TAC can be dialed 0 to 1 using "improvscatchscale". \cr
 #' Scenario 6: Catch = ABC
 #' Scenario 7: Catch = TAC (harvest technology improves)
@@ -24,7 +24,7 @@
 #' Scenario 9.2: Cap decreases to 1.6 MMT; harvest technology improves
 #' 
 #' 
-#' @param scenario The economic scenario number. Current options: 1, 2, 3, 4, 5.1, 5.2, or 5.3
+#' @param scenario The economic scenario number.
 #' @param Arrowtooth Optional.  ABC of Arrowtooth Flounder.
 #' @param Atka Optional.  ABC of Atka Mackerel.
 #' @param Flathead Optional.  ABC of Flathead Sole.
@@ -68,9 +68,12 @@
 #                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 # catch_function(5.3, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(0.5,1), 
 #                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-# catch_function(5.4, spptomult="Arrowtooth", multiplier = 2, improvedcatchscale=0.5, 
-#                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-#                   i dont think this is coded up yet???  
+# catch_function(6, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
+# catch_function(7, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
+# catch_function(8.1, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
+# catch_function(8.2, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
+# catch_function(9.1, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
+# catch_function(9.2, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 
 # Above is what creates the help document.  It's easier to read by 
 # running ?catch_function once you've loaded the package.
@@ -416,11 +419,8 @@ catch_function <- function(scenario,
                       "CATCH.BS.90",
                       "CATCH.BS.50",
                       "CATCH.BS.140")]
-    } 
+    } else {warning("no such scenario has been coded")}
    
-    # else if (scenario == 5.4) {
-      #  catch <- removefromcap_catch(ABC.DATA,5.4,spptomult,improvedcatchscale)
-    #} 
 
 
 # Third, pick only species that were passed in to pass back out.

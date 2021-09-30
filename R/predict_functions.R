@@ -33,6 +33,12 @@ predict.tac.function <- function(predictmethod,model,fit,FISH.DATA){
     }
     
     # For 1.6 MMT (predictmethod 3)
+    # These 'multipliers' (actually added since its in log space) reflect how much we 
+    # believe the species TAC will change if the cap goes down to 1.6MMT.  The average
+    # should be about 0.8 (since 1.6MMT is 80% of 2MMT) but we don't believe all species
+    # would feel the hit the same way.  This is meant to account for this belief.
+    # This is my "expert opinion" and was not vetted by anyone else: you will want to do that 
+    # and/or adjust the values
     alpha <- log(0.85)
     beta <- log(0.9)
     gamma <- 0
