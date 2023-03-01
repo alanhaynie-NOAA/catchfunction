@@ -578,7 +578,7 @@ predict.catch.function <- function(model,fit,FISH.DATA) {
 
 
         Pred.SUR.A80 <- predict(fit[[32]], FISH.DATA)
-        Pred.SUR.AFA <- predict(fit[[33]], FISH.DATA)
+        # Pred.SUR.AFA <- predict(fit[[33]], FISH.DATA)
 
         # Octopus
         PREDICTIONS$CATCH.BS.60 <- predict(fit[[1]], FISH.DATA)
@@ -593,7 +593,7 @@ predict.catch.function <- function(model,fit,FISH.DATA) {
         PREDICTIONS$CATCH.BS.400 <- predict(fit[[7]], FISH.DATA)
         PREDICTIONS$CATCH.AI.400 <- predict(fit[[8]], FISH.DATA)
         # Squid
-        PREDICTIONS$CATCH.BS.50 <- Pred.SUR.AFA$squid.pred
+        PREDICTIONS$CATCH.BS.50 <- predict(fit[[41]], FISH.DATA)
         PREDICTIONS$CATCH.AI.50 <- predict(fit[[38]], FISH.DATA)
 
 
@@ -614,7 +614,7 @@ predict.catch.function <- function(model,fit,FISH.DATA) {
         PREDICTIONS$CATCH.AI.301 <- pmin(predict(fit[[12]], FISH.DATA),log(FISH.DATA$ABC.AI.301))
 
         # Pollock
-        PREDICTIONS$CATCH.BS.201 <- pmin(Pred.SUR.AFA$pollock.pred,pmin(log(FISH.DATA$ABC.BS.201),log(FISH.DATA$TAC.BS.201) + log(FISH.DATA$TAC.BS.201)))
+        PREDICTIONS$CATCH.BS.201 <- pmin(predict(fit[[40]], FISH.DATA),pmin(log(FISH.DATA$ABC.BS.201),log(FISH.DATA$TAC.BS.201) + log(FISH.DATA$TAC.BS.201)))
         PREDICTIONS$CATCH.AI.201 <- pmin(predict(fit[[37]], FISH.DATA),log(FISH.DATA$TAC.AI.201))
         # PCod
         PREDICTIONS$CATCH.BS.202 <- Pred.SUR.A80$PCod.pred
@@ -656,7 +656,7 @@ predict.catch.function <- function(model,fit,FISH.DATA) {
         PREDICTIONS <- data.frame(CATCH.BS.60=0)  #PTAC stands for predicted TAC
 
         Pred.SUR.A80 <- predict(fit[[30]], FISH.DATA)
-        Pred.SUR.AFA <- predict(fit[[31]], FISH.DATA)
+        # Pred.SUR.AFA <- predict(fit[[31]], FISH.DATA)
         Pred.SUR.flat <- predict(fit[[32]],FISH.DATA)
 
         # Octopus
@@ -672,7 +672,7 @@ predict.catch.function <- function(model,fit,FISH.DATA) {
         PREDICTIONS$CATCH.BS.400 <- predict(fit[[7]], FISH.DATA)
         PREDICTIONS$CATCH.AI.400 <- predict(fit[[8]], FISH.DATA)
         # Squid
-        PREDICTIONS$CATCH.BS.50 <- Pred.SUR.AFA$squid.pred
+        PREDICTIONS$CATCH.BS.50 <- predict(fit[[40]], FISH.DATA)
         PREDICTIONS$CATCH.AI.50 <- predict(fit[[37]], FISH.DATA)
 
 
@@ -693,7 +693,7 @@ predict.catch.function <- function(model,fit,FISH.DATA) {
         PREDICTIONS$CATCH.AI.301 <- pmin(predict(fit[[12]], FISH.DATA),log(FISH.DATA$ABC.AI.301))
 
         # Pollock
-        PREDICTIONS$CATCH.BS.201 <- pmin(Pred.SUR.AFA$pollock.pred,pmin(log(FISH.DATA$ABC.BS.201),log(FISH.DATA$TAC.BS.201) + log(FISH.DATA$TAC.BS.201)))
+        PREDICTIONS$CATCH.BS.201 <- pmin(predict(fit[[39]], FISH.DATA),pmin(log(FISH.DATA$ABC.BS.201),log(FISH.DATA$TAC.BS.201) + log(FISH.DATA$TAC.BS.201)))
         PREDICTIONS$CATCH.AI.201 <- pmin(predict(fit[[36]], FISH.DATA),log(FISH.DATA$ABC.AI.201))
         # PCod
         PREDICTIONS$CATCH.BS.202 <- Pred.SUR.flat$PCod.pred
