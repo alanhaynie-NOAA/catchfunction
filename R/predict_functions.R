@@ -72,7 +72,7 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
             # Sculpin
             PREDICTIONS$TAC.BSAI.400 <- pmin(predict(fit[[4]], FISH.DATA),log(FISH.DATA$ABC.BSAI.400))
             # Squid
-            PREDICTIONS$TAC.BSAI.50 <- pmin(Pred.SUR$squid.pred,log(FISH.DATA$ABC.BSAI.50))
+            PREDICTIONS$TAC.BSAI.50 <- pmin(predict(fit[[20]], FISH.DATA),log(FISH.DATA$ABC.BSAI.50))
 
             # Shortraker
             PREDICTIONS$TAC.BSAI.326 <-log(FISH.DATA$ABC.BSAI.326)
@@ -145,7 +145,8 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
             # Sculpin
             PREDICTIONS$TAC.BSAI.400 <- pmin(predict(fit[[4]], FISH.DATA),log(FISH.DATA$ABC.BSAI.400))
             # Squid
-            PREDICTIONS$TAC.BSAI.50 <- pmin(Pred.SUR.flat$squid.pred ,log(FISH.DATA$ABC.BSAI.50))
+            # PREDICTIONS$TAC.BSAI.50 <- pmin(Pred.SUR.flat$squid.pred ,log(FISH.DATA$ABC.BSAI.50))
+            PREDICTIONS$TAC.BSAI.50 <- pmin(predict(fit[[19]], FISH.DATA),log(FISH.DATA$ABC.BSAI.50))
 
             # Shortraker
             PREDICTIONS$TAC.BSAI.326 <- log(FISH.DATA$ABC.BSAI.326)
