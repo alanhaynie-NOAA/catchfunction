@@ -1,12 +1,12 @@
 #' Catch Function
 #'
-#' @description 
+#' @description
 #' This function predicts the BS catch for each species whose ABC is given.  It is meant to work with the ACLIM bio models.
-#' 
+#'
 #' If you have any questions, please contact Amanda Faig (e-mail: amanda.faig@noaa.gov, call: X-4281).
-#' 
+#'
 #' This version last updated June 2018
-#' 
+#'
 #' Currently programmed scenarios: \cr
 #' Scenario 1: Status Quo (Log-Linear) \cr
 #' Scenario 2: Whitefish (Pollock and Cod) Political (aka TAC-setting) Preference \cr
@@ -16,7 +16,7 @@
 #' Scenario 5.2: Fiddle with a single species--calculate the rest assuming the ABC of the removed sp. does not influence the sp. under the cap at all. \cr
 # Scenario 5.3: Fiddle with a single species--calculate the rest assuming the ABC of the removed sp. does not influence the sp. under the cap at all and then increase the TAC of all the remaining species until the sum of the tAC = 2mmt \cr
 # Scenario 5.4: Scenario 5.3, but in this case let catch range from the old predicted catch to TAC.  The amount which catch improves from old predicted catch to TAC can be dialed 0 to 1 using "improvscatchscale". \cr
-#' 
+#'
 #' @param scenario The economic scenario number. Current options: 1, 2, 3, 4, 5.1, 5.2, or 5.3
 #' @param Arrowtooth Optional.  ABC of Arrowtooth Flounder.
 #' @param Atka Optional.  ABC of Atka Mackerel.
@@ -43,54 +43,54 @@
 #' @param spptomult Required if running any of the 5-series scenarios.  Will be discarded otherwise.  Choose a species catch to override with N*ABC.  Must be spelt exactly as one of the species parameters, case sensitive.  Must be in quotation marks.  If you want to replace more than one species, create a vector of strings (e.g. c("Arrowtooth","Atka"))
 #' @param multiplier Required if running scenario 5-series scenarios.  Will be discarded otherwise.  The N which will be multiplied with ABC to override the species designated by spptomult. If you are replacing more than one species, the order of the numbers corresponds to the order of the names in the spptomult string. (e.g. c(1,5) would imply the first species listed in spptomult has its catch replaced with 1*ABC_spp1 and the second is replaced with 5*ABC_spp2)
 #' @param improvedcatchscale Required if running scenario 5.4.  Will be discarded otherwise.  Choose the level to which catch has improved from status quo.  If 0, 5.4 collapses to 5.3.  If 1, Catch = TAC.
-#' 
+#'
 #' @import systemfit
 #'
 #' @export
-#' 
-#' @examples 
+#'
+#' @examples
 #' catch_function(1, Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
 #' catch_function(3, Pollock = 2e6, Yellowfin = 2e5, PCod = 1e5)
-#' catch_function(5.1, spptomult = "Arrowtooth", multiplier = 2, 
+#' catch_function(5.1, spptomult = "Arrowtooth", multiplier = 2,
 #'                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-#' catch_function(5.1, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(0.5,1), 
+#' catch_function(5.1, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(0.5,1),
 #'                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-#' catch_function(5.2, spptomult = "Arrowtooth", multiplier = 2, 
+#' catch_function(5.2, spptomult = "Arrowtooth", multiplier = 2,
 #'                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-#' catch_function(5.2, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(0.5,1), 
+#' catch_function(5.2, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(0.5,1),
 #'                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-# catch_function(5.3, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(0.5,1), 
+# catch_function(5.3, spptomult = c("Arrowtooth","Yellowfin"), multiplier = c(0.5,1),
 #                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-# catch_function(5.4, spptomult="Arrowtooth", multiplier = 2, improvedcatchscale=0.5, 
+# catch_function(5.4, spptomult="Arrowtooth", multiplier = 2, improvedcatchscale=0.5,
 #                  Pollock = 2e6, Arrowtooth = 2e5, Yellowfin = 2e5)
-#                   i dont think this is coded up yet???  
+#                   i dont think this is coded up yet???
 
-# Above is what creates the help document.  It's easier to read by 
+# Above is what creates the help document.  It's easier to read by
 # running ?catch_function once you've loaded the package.
-# 
+#
 # Below is the function users call.
-catch_function <- function(scenario, 
-                           Arrowtooth, 
-                           Atka, 
-                           Flathead, 
-                           Greenland, 
-                           Kamchatka, 
-                           Northern, 
-                           Octopus, 
-                           OtherFlat, 
-                           OtherRock, 
-                           PCod, 
-                           Plaice, 
-                           POP, 
-                           Pollock, 
-                           Rock, 
-                           Rougheye, 
-                           Sablefish, 
-                           Sculpin, 
+catch_function <- function(scenario,
+                           Arrowtooth,
+                           Atka,
+                           Flathead,
+                           Greenland,
+                           Kamchatka,
+                           Northern,
+                           Octopus,
+                           OtherFlat,
+                           OtherRock,
+                           PCod,
+                           Plaice,
+                           POP,
+                           Pollock,
+                           Rock,
+                           Rougheye,
+                           Sablefish,
+                           Sculpin,
                            Shark,
-                           Shortraker, 
-                           Skate, 
-                           Squid, 
+                           Shortraker,
+                           Skate,
+                           Squid,
                            Yellowfin,
                            spptomult,
                            multiplier,
@@ -118,67 +118,67 @@ catch_function <- function(scenario,
                 "90",
                 "50",
                 "140")
-    # And their corresponding names, alphabetically.  
-    # Honestly this could be saved in sysdata and loaded but it's not bad to have 
+    # And their corresponding names, alphabetically.
+    # Honestly this could be saved in sysdata and loaded but it's not bad to have
     # handy in case if you forget what number = what species
-    sppnames <- c("Arrowtooth", 
-                  "Atka", 
-                  "Flathead", 
-                  "Greenland", 
-                  "Kamchatka", 
-                  "Northern", 
-                  "Octopus", 
-                  "OtherFlat", 
-                  "OtherRock", 
-                  "PCod", 
-                  "Plaice", 
-                  "POP", 
-                  "Pollock", 
-                  "Rock", 
-                  "Rougheye", 
-                  "Sablefish", 
-                  "Sculpin", 
+    sppnames <- c("Arrowtooth",
+                  "Atka",
+                  "Flathead",
+                  "Greenland",
+                  "Kamchatka",
+                  "Northern",
+                  "Octopus",
+                  "OtherFlat",
+                  "OtherRock",
+                  "PCod",
+                  "Plaice",
+                  "POP",
+                  "Pollock",
+                  "Rock",
+                  "Rougheye",
+                  "Sablefish",
+                  "Sculpin",
                   "Shark",
-                  "Shortraker", 
-                  "Skate", 
-                  "Squid", 
+                  "Shortraker",
+                  "Skate",
+                  "Squid",
                   "Yellowfin")
     # Figure out which species' ABCs WERE NOT passed through by the user.
-    missingspp <- c(missing(Arrowtooth), 
-                    missing(Atka), 
-                    missing(Flathead), 
-                    missing(Greenland), 
-                    missing(Kamchatka), 
-                    missing(Northern), 
-                    missing(Octopus), 
-                    missing(OtherFlat), 
-                    missing(OtherRock), 
-                    missing(PCod), 
-                    missing(Plaice), 
-                    missing(POP), 
-                    missing(Pollock), 
-                    missing(Rock), 
-                    missing(Rougheye), 
-                    missing(Sablefish), 
-                    missing(Sculpin), 
+    missingspp <- c(missing(Arrowtooth),
+                    missing(Atka),
+                    missing(Flathead),
+                    missing(Greenland),
+                    missing(Kamchatka),
+                    missing(Northern),
+                    missing(Octopus),
+                    missing(OtherFlat),
+                    missing(OtherRock),
+                    missing(PCod),
+                    missing(Plaice),
+                    missing(POP),
+                    missing(Pollock),
+                    missing(Rock),
+                    missing(Rougheye),
+                    missing(Sablefish),
+                    missing(Sculpin),
                     missing(Shark),
-                    missing(Shortraker), 
-                    missing(Skate), 
-                    missing(Squid), 
+                    missing(Shortraker),
+                    missing(Skate),
+                    missing(Squid),
                     missing(Yellowfin))
-    
+
     if (scenario %in% c(5.1,5.2,5.3,5.4)) { # if we're running scenario 5 we need some checks to make sure the inputs work well.
         if (sum(spptomult %in% sppnames) < length(spptomult)) {stop("spptomult needs to be match one of the species inputs exactly.  Check spelling and capitalization compared to help file.")}
         if (missing(spptomult) | missing(multiplier)) {stop("Scenario 5 requires that a species to override catch with N*ABC be designated, and also that the multiplier (N) is desginated.  Check that you have both.")}
-        
+
     }
-    
-    
-    # Load the mean ABCs from system data.  This was calculated by just finding a 
+
+
+    # Load the mean ABCs from system data.  This was calculated by just finding a
     # simple mean using all the available data.
     ABC.DATA <- mean.BS.AI.ABCs
-    
-    
+
+
     # For any species given (not missing) replace the ABC.DATA$ABC.BS mean with the given.
     # Also, replace ABC.DATA$ABC.AI mean with the relative increase/decrease in the BS.
     # (i.e. assume AI ABC rises and falls with BS.)
@@ -189,30 +189,30 @@ catch_function <- function(scenario,
             eval(parse(text = paste("ABC.DATA$ABC.AI.",allspp[i],"<-",changeinABC,"*mean.BS.AI.ABCs$ABC.AI.",allspp[i],sep="")))
         }
     }
-    
-    
+
+
     ## Create BSAI where necessary
-    
+
     BSAIfun <- function(DT, code) {
         if (eval(parse(text= paste("DT$ABC.BS.",code,"[1] == 0",sep="")))) {
             # If the ABC passed through was 0, assume entire BSAI ABC is wiped out (0)
             eval(parse(text= paste("DT$ABC.BSAI.",code," <- DT$ABC.BS.",code,sep="")))
         } else {
-            # Otherwise, assume BSAI ABC is the sum of BS and AI.  
+            # Otherwise, assume BSAI ABC is the sum of BS and AI.
             eval(parse(text= paste("DT$ABC.BSAI.",code,"<- DT$ABC.BS.",code,"+ DT$ABC.AI.",code,sep="")))
         }
         return(DT)
     }
-    
-    # Honestly the first else in the above loop should be redundant, since we already 
+
+    # Honestly the first else in the above loop should be redundant, since we already
     # assume AI rises and falls with BS.  At some point I probably should remove this redundancy.
-    
+
     ABC.DATA <- BSAIfun(ABC.DATA,"100")
     ABC.DATA <- BSAIfun(ABC.DATA,"103")
     ABC.DATA <- BSAIfun(ABC.DATA,"104")
     ABC.DATA <- BSAIfun(ABC.DATA,"106")
     #ABC.DATA <- BSAIfun(ABC.DATA,"140")
-    ABC.DATA$ABC.BSAI.140 <- ABC.DATA$ABC.BS.140  
+    ABC.DATA$ABC.BSAI.140 <- ABC.DATA$ABC.BS.140
     # For yellowfin (140), assume BS ABC makes up entire BSAI. In practice it appears the AI ABC is ignored when decision making/harvesting.
     ABC.DATA <- BSAIfun(ABC.DATA,"141")
     ABC.DATA <- BSAIfun(ABC.DATA,"147")
@@ -226,10 +226,10 @@ catch_function <- function(scenario,
     ABC.DATA <- BSAIfun(ABC.DATA,"65")
     ABC.DATA <- BSAIfun(ABC.DATA,"90")
     ABC.DATA <- BSAIfun(ABC.DATA,"202")
-    
-    
+    ABC.DATA <- BSAIfun(ABC.DATA,"201")
+
     ## Second, pass ABCs to status quo function to get catch
-    
+
     if (scenario == 1) {
         catch <- ensemble_fun(ABC.DATA,1,"catch")
         # log linear
@@ -249,7 +249,7 @@ catch_function <- function(scenario,
             eval(parse(text = paste("ABC.DATA$ABC.BSAI.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
             eval(parse(text = paste("ABC.DATA$ABC.BS.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
             eval(parse(text = paste("ABC.DATA$ABC.AI.",allspp[match(spptomult[i],sppnames)],"<- 0",sep="")))
-        } 
+        }
         catch <- ensemble_fun(ABC.DATA,1,"catch")
     } else if (scenario == 5.3) {
         catch <- removefromcap_catch(ABC.DATA,5.3,spptomult,0)
@@ -267,7 +267,7 @@ if (scenario == 5.1 | scenario == 5.2 | scenario == 5.3) {  # in scenario 5 over
     for (i in 1:length(spptomult)) {
         eval(parse(text = paste("output$",spptomult[i],"<-",spptomult[i],"*",multiplier[i],sep="")))
     }
-} 
+}
 
 return(output)
 # return(ABC.DATA)
