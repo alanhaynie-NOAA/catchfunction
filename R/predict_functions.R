@@ -40,7 +40,7 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
         NETTAC <- rowSums(DT, na.rm = TRUE)
         NETTAC <- rowSums(DT, na.rm = TRUE) - DT$TAC.BSAI.50 - DT$TAC.BSAI.400 # ignore squid and sculpin when setting cap
         SURPLUS <- as.numeric(NETTAC > 2e6)*(NETTAC - 2e6)
-        DT <- DT[order(DT, decreasing = T)]
+        DT <- DT[order(as.matrix(DT), decreasing = T)]
         # If prediction exceeds cap, trim down pollock and yellowfin, 50/50
         TEMP <- DT/NETTAC
         TEMP$TAC.BS.203 <- 0
