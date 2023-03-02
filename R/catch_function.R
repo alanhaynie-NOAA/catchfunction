@@ -5,7 +5,7 @@
 #'
 #' If you have any questions, please contact Amanda Faig (e-mail: amanda.faig@noaa.gov, call: X-4281).
 #'
-#' This version last updated June 2018
+#' This version last updated March 2023
 #'
 #' Currently programmed scenarios: \cr
 #' Scenario 1: Status Quo (Log-Linear) \cr
