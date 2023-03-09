@@ -52,11 +52,8 @@ predict.tac.function <- function(predictmethod ,model,fit,FISH.DATA){
         TOTALRAT <- sum(TEMP, na.rm = TRUE)
         TEMP <- TEMP/TOTALRAT
         output <- DT - SURPLUS*TEMP
-        if(any(output<0)) return(paste("Error: negative TAC. Check for excessive Sablefish, Shortraker, or Northern RS ABC."))
-        if(all(output>0)){
-          output <- log(output)
-          return(output)
-        }
+        output <- log(output)
+        return(output)
     }
 
     # make predictions  ####
